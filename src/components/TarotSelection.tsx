@@ -1,0 +1,262 @@
+import React, { useState, useEffect } from 'react';
+import styled from '@emotion/styled';
+import { TarotCard } from '../types';
+import { getRandomTarotCards } from '../services/api';
+
+interface TarotSelectionProps {
+  onCardSelect: (card: TarotCard) => void;
+}
+
+const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
+  const [cards, setCards] = useState<TarotCard[]>([]);
+  const [selectedCardIdx, setSelectedCardIdx] = useState<number | null>(null);
+  const [flippedCards, setFlippedCards] = useState<boolean[]>([false, false, false]);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
+    // 랜덤 타로 카드 3장 가져오기
+    setCards(getRandomTarotCards());
+  }, []);
+
+  const handleCardClick = (index: number) => {
+    // 아직 뒤집히지 않은 카드만 선택 가능
+    if (!flippedCards[index]) {
+      const newFlippedCards = [...flippedCards];
+      newFlippedCards[index] = true;
+      setFlippedCards(newFlippedCards);
+      setSelectedCardIdx(index);
+      setShowConfirm(true);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (selectedCardIdx !== null) {
+      onCardSelect(cards[selectedCardIdx]);
+    }
+  };
+
+  const handleReset = () => {
+    setFlippedCards([false, false, false]);
+    setSelectedCardIdx(null);
+    setShowConfirm(false);
+    setCards(getRandomTarotCards());
+  };
+
+  if (cards.length === 0) {
+    return <LoadingContainer>카드를 준비 중입니다...</LoadingContainer>;
+  }
+
+  return (
+    <Container>
+      <Title>타로 카드를 한 장 선택하세요</Title>
+      <Description>
+        직관에 따라 끌리는 카드를 골라보세요. 타로 카드는 당신의 운세와 결합하여
+        더 깊은 통찰력을 제공합니다.
+      </Description>
+      
+      <CardsContainer>
+        {cards.map((card, index) => (
+          <Card 
+            key={index} 
+            isFlipped={flippedCards[index]} 
+            isSelected={selectedCardIdx === index}
+            onClick={() => handleCardClick(index)}
+          >
+            <CardInner isFlipped={flippedCards[index]}>
+              <CardFront>
+                <img 
+                  src="/tarot/back.jpg" 
+                  alt="Tarot Card Back" 
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '8px',
+                    objectFit: 'cover'
+                  }}
+                />
+              </CardFront>
+              <CardBack>
+                <img 
+                  src={card.image} 
+                  alt={card.name} 
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: '8px',
+                    objectFit: 'cover'
+                  }}
+                />
+                <CardTitle>{card.name}</CardTitle>
+                <CardDescription>{card.description}</CardDescription>
+              </CardBack>
+            </CardInner>
+          </Card>
+        ))}
+      </CardsContainer>
+      
+      <ButtonContainer>
+        <Button onClick={handleReset}>카드 재설정</Button>
+        <ConfirmButton onClick={handleConfirm} disabled={selectedCardIdx === null}>
+          선택 확인
+        </ConfirmButton>
+      </ButtonContainer>
+    </Container>
+  );
+};
+
+const Container = styled.div`
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  font-size: 1.2rem;
+  color: #666;
+`;
+
+const Title = styled.h2`
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+`;
+
+const Description = styled.p`
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  line-height: 1.6;
+`;
+
+const CardsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+`;
+
+const Card = styled.div<{ isFlipped: boolean; isSelected: boolean }>`
+  width: 240px;
+  height: 400px;
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s;
+  transform: ${props => props.isSelected ? 'translateY(-20px)' : 'none'};
+  
+  &:hover {
+    transform: ${props => props.isFlipped ? 'none' : 'translateY(-10px)'};
+  }
+  
+  @media (max-width: 768px) {
+    width: 180px;
+    height: 300px;
+  }
+`;
+
+const CardInner = styled.div<{ isFlipped: boolean }>`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+  transform: ${props => props.isFlipped ? 'rotateY(180deg)' : 'rotateY(0)'};
+`;
+
+const CardFront = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background-color: #2c1b5a;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CardBack = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: rotateY(180deg);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+`;
+
+const CardTitle = styled.h3`
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+`;
+
+const CardDescription = styled.p`
+  margin: 0;
+  color: #666;
+  font-size: 0.8rem;
+  line-height: 1.4;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+`;
+
+const Button = styled.button`
+  padding: 0.8rem 1.5rem;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #cbd5e0;
+  }
+`;
+
+const ConfirmButton = styled.button`
+  padding: 0.8rem 1.5rem;
+  background-color: #6b46c1;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #553c9a;
+  }
+`;
+
+export default TarotSelection; 
