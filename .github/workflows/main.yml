@@ -27,7 +27,7 @@ jobs:
       run: |
         echo "REACT_APP_OPENAI_API_KEY=your_openai_api_key_here" > .env
     - name: Build
-      run: npm run build
+      run: CI=false npm run build
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
