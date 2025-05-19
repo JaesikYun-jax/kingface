@@ -4,11 +4,31 @@ import { tarotCards } from '../assets/tarotData';
 
 // OpenAI API 키 가져오기
 const getApiKey = (): string => {
-  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+  // 다양한 소스에서 API 키 검색
+  let apiKey = process.env.REACT_APP_OPENAI_API_KEY || 
+               // @ts-ignore - Cloudflare Pages 런타임 환경 변수
+               window.ENV?.REACT_APP_OPENAI_API_KEY || 
+               // 일부 배포 환경에서는 OPENAI_API_KEY로만 설정될 수 있음
+               process.env.OPENAI_API_KEY;
+  
+  console.log('환경 변수 검색 중...');
+  
   if (!apiKey) {
-    console.error('API 키가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
+    console.error('❌ API 키가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
+    alert('OpenAI API 키가 설정되지 않았습니다. Cloudflare Pages 대시보드에서 환경 변수를 설정하고 재배포해주세요.');
     return '';
   }
+  
+  // 예시 API 키 감지
+  if (apiKey.includes('your_openai_api_key_here') || apiKey.includes('sk-abcdefg')) {
+    console.error('❌ 유효한 API 키가 아닙니다. 예시 대신 실제 API 키를 사용해주세요.');
+    alert('유효한 OpenAI API 키가 아닙니다. Cloudflare Pages 대시보드에서 유효한 API 키를 설정하고 재배포해주세요.');
+    return '';
+  }
+  
+  // API 키 로그 숨김 (보안)
+  console.log('✅ API 키가 로드되었습니다:', apiKey.substring(0, 5) + '...');
+  
   // API 키에서 불필요한 공백이나 특수문자 제거
   return apiKey.trim();
 };
