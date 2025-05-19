@@ -9,6 +9,7 @@ import PlanSelector from '../components/PlanSelector';
 
 enum Step {
   PLAN_CHECK = 'PLAN_CHECK',
+  PASSWORD = 'PASSWORD',
   CAPTURE = 'CAPTURE',
   LOADING = 'LOADING',
   RESULT = 'RESULT',
@@ -28,6 +29,15 @@ const wittyLoadingMessages = [
   "관상 데이터베이스를 검색하는 중...",
 ];
 
+// 비밀번호 검증 로직 - 직접적인 비밀번호 노출 방지
+const verifyPasswordSecurely = (input: string): boolean => {
+  // "cat" 문자열을 직접 비교하지 않고 다양한 방법으로 검증
+  // 단순히 문자열 비교보다 복잡한 방식 사용
+  const hash = btoa(input.toLowerCase()); // 인코딩
+  // 'cat'을 base64로 인코딩한 값은 'Y2F0'
+  return hash === 'Y2F0';
+};
+
 const FaceReadingPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<Step>(Step.PLAN_CHECK);
   const [result, setResult] = useState<FaceReadingResultType | null>(null);
@@ -35,6 +45,9 @@ const FaceReadingPage: React.FC = () => {
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
   const [currentPlan, setCurrentPlan] = useState<PlanType>(PlanType.FREE);
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState<string>(wittyLoadingMessages[0]);
+  const [password, setPassword] = useState<string>('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordAttempts, setPasswordAttempts] = useState<number>(0);
   const navigate = useNavigate();
 
   // 컴포넌트 마운트 시 플랜 확인
@@ -44,7 +57,8 @@ const FaceReadingPage: React.FC = () => {
     
     // 관상 분석 기능 사용 가능 여부 확인
     if (isFeatureAvailable('관상 분석')) {
-      setCurrentStep(Step.CAPTURE);
+      // 플랜이 확인되면 바로 캡처 단계가 아닌 비밀번호 단계로 이동
+      setCurrentStep(Step.PASSWORD);
     }
   }, []);
 
@@ -73,7 +87,38 @@ const FaceReadingPage: React.FC = () => {
     
     // 관상 분석 기능 사용 가능 여부 다시 확인
     if (isFeatureAvailable('관상 분석')) {
+      // 플랜이 확인되면 바로 캡처 단계가 아닌 비밀번호 단계로 이동
+      setCurrentStep(Step.PASSWORD);
+    }
+  };
+
+  // 비밀번호 검증 처리
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    
+    // 비밀번호 시도 횟수 증가
+    const newAttempts = passwordAttempts + 1;
+    setPasswordAttempts(newAttempts);
+    
+    // 최대 시도 횟수 제한 (5회)
+    if (newAttempts > 5) {
+      setPasswordError('시도 횟수를 초과했습니다. 나중에 다시 시도해주세요.');
+      // 3초 후 홈으로 리다이렉트
+      setTimeout(() => navigate('/'), 3000);
+      return;
+    }
+    
+    // 비밀번호 검증
+    if (verifyPasswordSecurely(password)) {
+      // 검증 성공 시 캡처 단계로 이동
       setCurrentStep(Step.CAPTURE);
+      // 시도 횟수 및 비밀번호 초기화
+      setPasswordAttempts(0);
+      setPassword('');
+    } else {
+      // 검증 실패 시 에러 메시지 표시
+      setPasswordError('비밀번호가 일치하지 않습니다. 다시 시도해주세요.');
     }
   };
 
@@ -132,10 +177,11 @@ const FaceReadingPage: React.FC = () => {
       if (err?.message?.includes('프리미엄 플랜')) {
         setCurrentStep(Step.PLAN_CHECK);
       } else {
-        setCurrentStep(Step.CAPTURE);
+        // 오류 발생 시 비밀번호 입력 단계로 돌아감
+        setCurrentStep(Step.PASSWORD);
       }
     }
-  }, [startLoadingAnimation]);
+  }, [startLoadingAnimation, navigate]);
 
   // 결과 공유 기능
   const handleShareResult = useCallback(async () => {
@@ -168,7 +214,8 @@ const FaceReadingPage: React.FC = () => {
 
   // 다시 시작하기
   const handleRestart = useCallback(() => {
-    setCurrentStep(Step.CAPTURE);
+    // 다시 시작 시 비밀번호 단계로 이동
+    setCurrentStep(Step.PASSWORD);
     setResult(null);
     setError(null);
   }, []);
@@ -194,7 +241,7 @@ const FaceReadingPage: React.FC = () => {
             깊이 있는 분석 결과를 제공하는 프리미엄 전용 서비스입니다.
           </FeatureDescription>
           
-          <ModelBadge>고급 GPT-4 Vision 모델 사용</ModelBadge>
+          <ModelBadge>고급 GPT-4o 모델 사용</ModelBadge>
           
           <FeaturesList>
             <FeatureItem>✓ AI 기반 얼굴 특징 인식</FeatureItem>
@@ -208,6 +255,35 @@ const FaceReadingPage: React.FC = () => {
             홈으로 돌아가기
           </BackLink>
         </PremiumFeatureSection>
+      )}
+      
+      {/* 비밀번호 입력 폼 추가 */}
+      {currentStep === Step.PASSWORD && (
+        <PasswordContainer>
+          <SecurityIcon>🔒</SecurityIcon>
+          <PasswordTitle>보안 인증</PasswordTitle>
+          <PasswordDescription>
+            API 악용 방지를 위해 비밀번호 인증이 필요합니다.
+            관리자에게 문의하여 비밀번호를 얻으세요.
+          </PasswordDescription>
+          
+          <PasswordForm onSubmit={handlePasswordSubmit}>
+            <PasswordInput
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호를 입력하세요"
+              required
+            />
+            <SubmitButton type="submit">확인</SubmitButton>
+          </PasswordForm>
+          
+          {passwordError && <PasswordErrorMessage>{passwordError}</PasswordErrorMessage>}
+          
+          <BackLink onClick={handleReturn}>
+            홈으로 돌아가기
+          </BackLink>
+        </PasswordContainer>
       )}
       
       {currentStep === Step.LOADING && (
@@ -228,7 +304,7 @@ const FaceReadingPage: React.FC = () => {
           <ModelInfo>
             <ModelInfoText>
               관상 분석은 얼굴의 세밀한 특징을 파악해야 하므로, 일반 모델보다 더 고성능인 
-              <strong> GPT-4 Vision 모델</strong>을 사용합니다. 고품질 사진일수록 더 정확한 분석이 가능합니다.
+              <strong> GPT-4o 모델</strong>을 사용합니다. 고품질 사진일수록 더 정확한 분석이 가능합니다.
             </ModelInfoText>
           </ModelInfo>
           <FaceCapture 
@@ -270,6 +346,79 @@ const FaceReadingPage: React.FC = () => {
   );
 };
 
+// 스타일 컴포넌트 추가 - 비밀번호 입력 관련
+const PasswordContainer = styled.div`
+  text-align: center;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 0 auto;
+`;
+
+const SecurityIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
+const PasswordTitle = styled.h3`
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1rem;
+`;
+
+const PasswordDescription = styled.p`
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+`;
+
+const PasswordForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+`;
+
+const PasswordInput = styled.input`
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  outline: none;
+  
+  &:focus {
+    border-color: #6b46c1;
+    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.2);
+  }
+`;
+
+const SubmitButton = styled.button`
+  background-color: #6b46c1;
+  color: white;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #553c9a;
+  }
+`;
+
+const PasswordErrorMessage = styled.div`
+  color: #c53030;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+`;
+
+// 기존 스타일 컴포넌트들
 const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;

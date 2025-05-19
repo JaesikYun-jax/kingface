@@ -376,7 +376,7 @@ const extractPersonalityTraits = (content: string): string[] => {
   const personalitySection = extractSection(content, '성격 특성', '전반적인 운세').toLowerCase();
   
   // 정규식을 사용하여 키워드를 찾음 (볼드, 숫자+점, 따옴표 등으로 표시된 부분)
-  const keywordMatches = personalitySection.match(/['"]([^'"]+)['"]|\*\*([^\*]+)\*\*|^\d+\.\s*([^\n:]+):|•\s*([^\n:]+):|◦\s*([^\n:]+):|[\-\*]\s*([^\n:]+):/gm);
+  const keywordMatches = personalitySection.match(/['"]([^'"]+)['"]|\*([^*]+)\*|^\d+\.\s*([^\n:]+):|•\s*([^\n:]+):|◦\s*([^\n:]+):|[-*]\s*([^\n:]+):/gm);
   
   let traits: string[] = [];
   
@@ -406,7 +406,7 @@ export const getRandomTarotCards = (): TarotCard[] => {
   return shuffled.slice(0, 3);
 };
 
-export default {
+const apiExports = {
   generateFortune,
   analyzeFaceReading,
   getRandomTarotCards,
@@ -414,4 +414,6 @@ export default {
   setCurrentPlanType,
   getServicePlanConfig,
   isFeatureAvailable
-}; 
+};
+
+export default apiExports; 
