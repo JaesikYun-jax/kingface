@@ -180,10 +180,7 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
 const extractFacialFeatureAnalysis = (content: string): Array<{icon: string, title: string, content: string}> => {
   // 콘솔에 원본 내용을 출력하여 디버깅 지원
   console.log("Raw content for parsing:", content);
-  
-  // 다양한 헤더 패턴 인식을 위한 정규식
-  const headerPattern = /(?:^|\n)(?:#{1,3}\s*|\*\*\s*)(이마|눈|코|입|귀|입과 턱|눈과 눈썹|종합)(?:\s*\([^)]*\))?(?:\s*:|\*\*|\s*#{1,3}|\n)/i;
-  
+
   // 기본 구조 정의
   const features = [
     { 
@@ -218,46 +215,110 @@ const extractFacialFeatureAnalysis = (content: string): Array<{icon: string, tit
     }
   ];
   
-  // 각 특징에 대해 내용 찾기
-  features.forEach((feature, index) => {
-    // 특징 키워드 중 하나라도 매칭되면 내용 추출
-    for (const keyword of feature.keywords) {
-      // 다양한 패턴으로 검색 시도
-      let extracted = extractSectionByPattern(content, keyword);
+  try {
+    // 새로운 접근법: 표준화된 마크다운 헤더를 기반으로 섹션 추출
+    
+    // 마크다운에서 '## 얼굴 부위별 분석' 섹션 찾기
+    const analysisHeaderRegex = /## 얼굴 부위별 분석/i;
+    const analysisMatch = content.match(analysisHeaderRegex);
+    
+    if (analysisMatch && analysisMatch.index !== undefined) {
+      const sectionStart = analysisMatch.index + analysisMatch[0].length;
       
-      if (extracted) {
-        feature.content = extracted;
-        break;
-      }
+      // 다음 '##' 헤더까지 또는 내용 끝까지
+      const nextHeaderMatch = content.substring(sectionStart).match(/\n## /);
+      const sectionEnd = nextHeaderMatch && nextHeaderMatch.index !== undefined
+        ? sectionStart + nextHeaderMatch.index
+        : content.length;
+      
+      // 얼굴 부위별 분석 섹션만 추출
+      const facialFeaturesSection = content.substring(sectionStart, sectionEnd).trim();
+      
+      // 각 얼굴 부위 섹션 추출 (### 헤더로 구분)
+      features.forEach((feature) => {
+        for (const keyword of feature.keywords) {
+          const headerRegex = new RegExp(`### ${keyword}[^#]*(?=###|$)`, 'i');
+          const match = facialFeaturesSection.match(headerRegex);
+          
+          if (match && match[0]) {
+            // 헤더 라인 제거
+            let extracted = match[0].replace(/^### .+\n/, '').trim();
+            
+            if (extracted) {
+              feature.content = extracted;
+              break;
+            }
+          }
+        }
+      });
+      
+      // 더 일반적인 접근 방식으로 재시도 (### 이마, ### 눈 등)
+      features.forEach((feature, index) => {
+        if (feature.content === '분석 정보가 없습니다.') {
+          const headerText = feature.title.split(' ')[0]; // "이마", "눈" 등만 사용
+          const headerRegex = new RegExp(`### ${headerText}[^#]*(?=###|$)`, 'i');
+          const match = facialFeaturesSection.match(headerRegex);
+          
+          if (match && match[0]) {
+            // 헤더 라인 제거
+            let extracted = match[0].replace(/^### .+\n/, '').trim();
+            
+            if (extracted) {
+              feature.content = extracted;
+            }
+          }
+        }
+      });
     }
     
-    // 내용이 없으면 두 번째 시도: 마크다운 헤더 패턴으로 검색
-    if (feature.content === '분석 정보가 없습니다.') {
-      // 마크다운 헤더 패턴으로 시도
-      for (const keyword of feature.keywords) {
-        const headerRegex = new RegExp(`#+\\s*${keyword}[\\s\\S]*?(?=#+\\s|$)`, 'i');
-        const match = content.match(headerRegex);
-        if (match) {
-          feature.content = match[0].trim();
-          break;
+    // 새 방식으로 추출 실패 시 기존 방식으로 대체
+    features.forEach((feature, index) => {
+      if (feature.content === '분석 정보가 없습니다.') {
+        // 특징 키워드 중 하나라도 매칭되면 내용 추출
+        for (const keyword of feature.keywords) {
+          // 다양한 패턴으로 검색 시도
+          let extracted = extractSectionByPattern(content, keyword);
+          
+          if (extracted) {
+            feature.content = extracted;
+            break;
+          }
+        }
+        
+        // 내용이 없으면 두 번째 시도: 마크다운 헤더 패턴으로 검색
+        if (feature.content === '분석 정보가 없습니다.') {
+          // 마크다운 헤더 패턴으로 시도
+          for (const keyword of feature.keywords) {
+            const headerRegex = new RegExp(`#+\\s*${keyword}[\\s\\S]*?(?=#+\\s|$)`, 'i');
+            const match = content.match(headerRegex);
+            if (match) {
+              feature.content = match[0].trim();
+              break;
+            }
+          }
+        }
+        
+        // 여전히 내용이 없으면 단순 키워드 포함 여부 확인
+        if (feature.content === '분석 정보가 없습니다.') {
+          for (const keyword of feature.keywords) {
+            if (content.includes(keyword)) {
+              // 키워드 주변 문맥 추출 (50자 전후)
+              const keywordIndex = content.indexOf(keyword);
+              const start = Math.max(0, keywordIndex - 50);
+              const end = Math.min(content.length, keywordIndex + 100);
+              feature.content = content.substring(start, end).trim();
+              break;
+            }
+          }
         }
       }
-    }
-    
-    // 여전히 내용이 없으면 단순 키워드 포함 여부 확인
-    if (feature.content === '분석 정보가 없습니다.') {
-      for (const keyword of feature.keywords) {
-        if (content.includes(keyword)) {
-          // 키워드 주변 문맥 추출 (50자 전후)
-          const keywordIndex = content.indexOf(keyword);
-          const start = Math.max(0, keywordIndex - 50);
-          const end = Math.min(content.length, keywordIndex + 100);
-          feature.content = content.substring(start, end).trim();
-          break;
-        }
-      }
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Error extracting facial features:', error);
+  }
+  
+  // 디버그 로깅
+  console.log('Extracted facial features:', features.map(f => ({ title: f.title, content: f.content.substring(0, 30) + '...' })));
   
   return features;
 };

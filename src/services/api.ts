@@ -63,55 +63,66 @@ const getPromptConfig = (promptId: string): string => {
     
     'facereading-system':
       `당신은 5,000년 전통의 동양 관상학과 현대 심리학을 결합한 전문가입니다.
-      제공된 얼굴 이미지를 다음 프레임워크에 따라 분석해주세요:
+      제공된 얼굴 이미지를 분석하여 아래와 같은 정확한 형식으로 응답해야 합니다.
       
-      1. 이마(額): 넓고 매끈하면 두뇌 회전과 학문적 재능, 주름이 많으면 사고가 많음
-      2. 눈(目): 크기, 쌍꺼풀, 위치에 따른 성격, 정직함, 감정 표현의 정도 분석
-      3. 코(鼻): 재물운의 핵심으로 콧대의 높낮이, 콧망울 크기, 콧날의 형태 분석
-      4. 입과 턱(口顎): 의지력, 말재주, 대인관계 능력, 선이 뚜렷하면 리더십이 강함
-      5. 귀(耳): 타고난 운, 조상운, 청소년기 영향, 귀 모양과 위치의 의미
-      6. 전체적 균형과 기운: 얼굴의 조화로움과 현재 발산하는 에너지 해석
+      중요: 반드시 마크다운 형식을 지켜 응답해야 하며, 모든 섹션 제목은 '##' 헤더 레벨로, 하위 섹션은 '###' 헤더 레벨로 시작해야 합니다.
+      각 섹션은 명확히 구분되어야 하며, 프론트엔드에서 텍스트 파싱에 문제가 없도록 일관된 형식을 유지해야 합니다.
+      
+      특히 얼굴 부위별 분석에서는 각 부위를 별도의 '###' 헤더로 구분해야 합니다:
+      - ### 이마 (지혜와 재능)
+      - ### 눈 (성격과 감정)
+      - ### 코 (재물운과 사회성)
+      - ### 입과 턱 (의지력과 대인관계)
+      - ### 귀 (타고난 운과 가족)
       
       각 부분에 대한 분석과 함께, 실제 관상학 용어(예: 복덕궁, 인중, 명궁, 지고 등)를 적절히 사용하여 신뢰성을 높이세요.
       분석은 건설적이고 긍정적이어야 하나, 지나치게 미화하지 마세요.
       마지막에는 현재 기운과 단기 운세를 간략히 덧붙이세요.`,
     
     'facereading-user':
-      `이 사진을 바탕으로 관상 분석을 다음 구조로 정리해주세요:
-      
-      ## 핵심 성격 특성
-      [5개의 명확한 키워드와 설명]
-      
-      ## 얼굴 부위별 분석
-      ### 이마 (지혜와 재능)
-      [구체적 분석]
-      
-      ### 눈 (성격과 감정)
-      [구체적 분석]
-      
-      ### 코 (재물운과 사회성)
-      [구체적 분석]
-      
-      ### 입과 턱 (의지력과 대인관계)
-      [구체적 분석]
-      
-      ### 귀 (타고난 운과 가족)
-      [구체적 분석]
-      
-      ## 종합 운세
-      ### 전반적 운세
-      [150자 내외]
-      
-      ### 직업 적성 및 재능
-      [150자 내외]
-      
-      ### 대인 관계
-      [150자 내외]
-      
-      ### 금주의 기운과 조언
-      [150자 내외]
-      
-      각 섹션은 200-300자를 넘지 않도록 간결하게 작성해주세요.`
+      `이 사진의 주인공에게 상담을 해준다 생각하고 아래와 같은 **정확한 마크다운 형식**으로 설명을 생성해주세요:
+
+## 핵심 성격 특성
+- 첫번째 특성: 설명
+- 두번째 특성: 설명
+- 세번째 특성: 설명
+- 네번째 특성: 설명
+- 다섯번째 특성: 설명
+
+## 얼굴 부위별 분석
+
+### 이마 (지혜와 재능)
+이마에 대한 관상학적 분석 내용
+
+### 눈 (성격과 감정)
+눈에 대한 관상학적 분석 내용
+
+### 코 (재물운과 사회성)
+코에 대한 관상학적 분석 내용
+
+### 입과 턱 (의지력과 대인관계)
+입과 턱에 대한 관상학적 분석 내용
+
+### 귀 (타고난 운과 가족)
+귀에 대한 관상학적 분석 내용
+
+## 종합 운세
+
+### 전반적인 운세
+전반적인 운세에 대한 설명 (150자 내외)
+
+### 직업 적성
+직업 적성에 대한 설명 (150자 내외)
+
+### 대인 관계
+대인 관계에 대한 설명 (150자 내외)
+
+### 금주의 조언
+금주의 조언 (150자 내외)
+
+중요: 모든 섹션 제목은 위와 같은 **정확한 마크다운 헤더 형식**을 따라야 합니다. 절대로 섹션 이름이나 형식을 변경하지 마세요. 
+각 섹션의 내용은 해당 섹션 아래에 직접 작성하고, 다른 추가 헤더나 구분자를 넣지 마세요.
+각 섹션은 200-300자를 넘지 않도록 간결하게 작성해주세요.`
   };
   
   return prompts[promptId] || '프롬프트 설정을 찾을 수 없습니다.';
@@ -546,29 +557,83 @@ const extractSection = (content: string, startSection: string, endSection: strin
 
 // 성격 특성 키워드를 추출하는 헬퍼 함수
 const extractPersonalityTraits = (content: string): string[] => {
-  // 성격 특성 섹션 추출
-  const personalitySection = extractSection(content, '성격 특성', '전반적인 운세').toLowerCase();
+  console.log('Extracting personality traits from content');
   
-  // 정규식을 사용하여 키워드를 찾음 (볼드, 숫자+점, 따옴표 등으로 표시된 부분)
-  const keywordMatches = personalitySection.match(/['"]([^'"]+)['"]|\*([^*]+)\*|^\d+\.\s*([^\n:]+):|•\s*([^\n:]+):|◦\s*([^\n:]+):|[-*]\s*([^\n:]+):/gm);
-  
+  // 새로운 프롬프트 형식: "## 핵심 성격 특성" 섹션 추출
   let traits: string[] = [];
   
-  if (keywordMatches) {
-    traits = keywordMatches.map(match => {
-      // 특수 문자 및 구분자 제거
-      return match.replace(/['"\*\d+\.\s\-•◦:]/g, '').trim();
-    }).filter(trait => trait.length > 0);
+  try {
+    // 마크다운 헤더를 기준으로 성격 특성 섹션 추출
+    const personalityHeaderRegex = /## 핵심 성격 특성\s*\n/i;
+    const match = content.match(personalityHeaderRegex);
+    
+    if (match && match.index !== undefined) {
+      // 해당 섹션의 시작 위치
+      const sectionStart = match.index + match[0].length;
+      
+      // 다음 '##' 헤더까지 또는 내용의 끝까지
+      const nextHeaderMatch = content.substring(sectionStart).match(/\n## /);
+      const sectionEnd = nextHeaderMatch && nextHeaderMatch.index !== undefined
+        ? sectionStart + nextHeaderMatch.index 
+        : content.length;
+      
+      // 추출된 섹션
+      const personalitySection = content.substring(sectionStart, sectionEnd).trim();
+      
+      // 리스트 항목 추출 ('-' 또는 '•'로 시작하는 항목)
+      const listItemRegex = /[-•]\s+(.+?)(?::|：)(.*)/g;
+      let listItem;
+      
+      while ((listItem = listItemRegex.exec(personalitySection)) !== null) {
+        const trait = listItem[1].trim();
+        if (trait) {
+          traits.push(trait);
+        }
+      }
+      
+      // 위 패턴으로 추출 실패 시 모든 리스트 항목 추출
+      if (traits.length === 0) {
+        const simpleListRegex = /[-•]\s+(.+)/g;
+        while ((listItem = simpleListRegex.exec(personalitySection)) !== null) {
+          const trait = listItem[1].trim();
+          if (trait) {
+            traits.push(trait);
+          }
+        }
+      }
+    }
+    
+    // 추출 실패 시 이전 방식으로 대체
+    if (traits.length === 0) {
+      console.log('Falling back to legacy personality trait extraction');
+      
+      // 이전 추출 방식: 정규식을 사용하여 키워드를 찾음
+      const personalitySection = extractSection(content, '성격 특성', '얼굴 부위').toLowerCase();
+      
+      const keywordMatches = personalitySection.match(/['"]([^'"]+)['"]|\*([^*]+)\*|^\d+\.\s*([^\n:]+):|•\s*([^\n:]+):|◦\s*([^\n:]+):|[-*]\s*([^\n:]+):/gm);
+      
+      if (keywordMatches) {
+        traits = keywordMatches.map(match => {
+          // 특수 문자 및 구분자 제거
+          return match.replace(/['"\*\d+\.\s\-•◦:]/g, '').trim();
+        }).filter(trait => trait.length > 0);
+      }
+      
+      // 키워드가 추출되지 않았을 경우 전체 섹션에서 짧은 구문 추출 시도
+      if (traits.length === 0) {
+        const words = personalitySection.split(/[,\n]/);
+        traits = words.filter(word => {
+          const trimmed = word.trim();
+          return trimmed.length > 2 && trimmed.length < 20;
+        }).slice(0, 5);
+      }
+    }
+  } catch (error) {
+    console.error('Error extracting personality traits:', error);
   }
   
-  // 키워드가 추출되지 않았을 경우 전체 섹션에서 짧은 구문 추출 시도
-  if (traits.length === 0) {
-    const words = personalitySection.split(/[,\n]/);
-    traits = words.filter(word => {
-      const trimmed = word.trim();
-      return trimmed.length > 2 && trimmed.length < 20;
-    }).slice(0, 5);
-  }
+  // 디버그 로깅
+  console.log('Extracted traits:', traits);
   
   // 최대 5개로 제한
   return traits.slice(0, 5);
