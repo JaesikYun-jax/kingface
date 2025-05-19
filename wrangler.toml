@@ -1,5 +1,4 @@
 name = "kingface"
 compatibility_date = "2025-05-19"
 
-[site]
-bucket = "./build" 
+# [site] 섹션 제거 
