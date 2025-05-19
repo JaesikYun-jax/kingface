@@ -69,10 +69,32 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     }
   }, [webcamRef]);
   
-  // 사진 다시 찍기
-  const handleRetake = useCallback(() => {
+  // 사진 다시 찍기 (이제 resetImage로 리네이밍)
+  const resetImage = useCallback(() => {
     setCapturedImage(null);
-  }, []);
+    
+    // Webcam 컴포넌트 참조 초기화
+    if (webcamRef.current) {
+      // 카메라 스트림 재설정을 위한 지연 추가
+      setTimeout(() => {
+        if (webcamRef.current) {
+          try {
+            // 카메라 스트림 강제 재설정
+            const video = webcamRef.current.video;
+            if (video && video.srcObject) {
+              const tracks = (video.srcObject as MediaStream).getTracks();
+              tracks.forEach(track => track.stop());
+            }
+            // 웹캠 컴포넌트 내부 상태 재설정
+            webcamRef.current.stream = null;
+            webcamRef.current.video = null;
+          } catch (err) {
+            console.error("카메라 초기화 오류:", err);
+          }
+        }
+      }, 100);
+    }
+  }, [webcamRef]);
   
   // 카메라 전환 (전면/후면)
   const toggleCamera = useCallback(() => {
@@ -146,6 +168,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
             {capturedImage ? (
               <SmallImageContainer>
                 <CapturedImage src={capturedImage} alt="업로드된 이미지" />
+                <CloseButton onClick={resetImage}>✕</CloseButton>
               </SmallImageContainer>
             ) : (
               <UploadArea onClick={handleUploadClick}>
@@ -160,6 +183,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
             {capturedImage ? (
               <SmallImageContainer>
                 <CapturedImage src={capturedImage} alt="촬영된 얼굴" />
+                <CloseButton onClick={resetImage}>✕</CloseButton>
               </SmallImageContainer>
             ) : (
               <SmallWebcamContainer>
@@ -238,14 +262,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
             )}
           </>
         ) : (
-          <ButtonGroup>
-            <RetakeButton onClick={handleRetake} disabled={isLoading}>
-              🔄 다시 {uploadMode ? '선택' : '찍기'}
-            </RetakeButton>
-            <ConfirmButton onClick={handleConfirm} disabled={isLoading}>
-              {isLoading ? '분석 중...' : '확인'}
-            </ConfirmButton>
-          </ButtonGroup>
+          <ConfirmButton onClick={handleConfirm} disabled={isLoading} fullWidth>
+            {isLoading ? '분석 중...' : '확인'}
+          </ConfirmButton>
         )}
       </ButtonContainer>
       
@@ -461,7 +480,7 @@ const RetakeButton = styled.button`
   }
 `;
 
-const ConfirmButton = styled.button`
+const ConfirmButton = styled.button<{ fullWidth?: boolean }>`
   flex: 1;
   padding: 0.8rem;
   background-color: #38a169;
@@ -472,6 +491,7 @@ const ConfirmButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
+  width: ${props => props.fullWidth ? '100%' : 'auto'};
   
   &:hover:not(:disabled) {
     background-color: #2f855a;
@@ -555,6 +575,30 @@ const UploadSubText = styled.p`
   font-size: 0.85rem;
   color: #718096;
   margin-top: 0.5rem;
+`;
+
+// 이미지 취소 버튼
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
 `;
 
 export default FaceCapture; 

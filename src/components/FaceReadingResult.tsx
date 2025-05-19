@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
+import ReactMarkdown from 'react-markdown';
 import { FaceReadingResult as FaceReadingResultType } from '../types';
 
 interface FaceReadingResultProps {
@@ -21,6 +22,9 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
     month: 'long',
     day: 'numeric'
   });
+
+  // 얼굴 부위별 분석 데이터 추출
+  const facialFeatureAnalysis = extractFacialFeatureAnalysis(result.content || '');
 
   return (
     <Container>
@@ -47,6 +51,21 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
           </PersonalityTraitsCard>
         </ImageSection>
         
+        {/* 얼굴 부위별 분석 섹션 추가 */}
+        <FacialFeaturesSection>
+          <FeaturesHeader>얼굴 부위별 분석</FeaturesHeader>
+          
+          {facialFeatureAnalysis.map((feature, index) => (
+            <FeatureCard key={index}>
+              <FeatureIcon>{feature.icon}</FeatureIcon>
+              <FeatureTitle>{feature.title}</FeatureTitle>
+              <FeatureContent>
+                <ReactMarkdown>{feature.content}</ReactMarkdown>
+              </FeatureContent>
+            </FeatureCard>
+          ))}
+        </FacialFeaturesSection>
+        
         <AnalysisSection>
           <AnalysisCard>
             <SectionIcon>🔮</SectionIcon>
@@ -68,7 +87,7 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
           
           <AdviceCard>
             <AdviceIcon>💡</AdviceIcon>
-            <AdviceTitle>AI의 조언</AdviceTitle>
+            <AdviceTitle>금주의 기운과 조언</AdviceTitle>
             <AdviceContent>{result.advice}</AdviceContent>
           </AdviceCard>
         </AnalysisSection>
@@ -105,6 +124,50 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
       </ButtonContainer>
     </Container>
   );
+};
+
+// 얼굴 부위별 분석 데이터 추출 함수
+const extractFacialFeatureAnalysis = (content: string): Array<{icon: string, title: string, content: string}> => {
+  const features = [
+    { 
+      icon: '🧠', 
+      title: '이마 (지혜와 재능)', 
+      content: extractSection(content, '이마', '눈') || '분석 정보가 없습니다.' 
+    },
+    { 
+      icon: '👁️', 
+      title: '눈 (성격과 감정)', 
+      content: extractSection(content, '눈', '코') || '분석 정보가 없습니다.' 
+    },
+    { 
+      icon: '👃', 
+      title: '코 (재물운과 사회성)', 
+      content: extractSection(content, '코', '입') || '분석 정보가 없습니다.' 
+    },
+    { 
+      icon: '👄', 
+      title: '입과 턱 (의지력과 대인관계)', 
+      content: extractSection(content, '입', '귀') || '분석 정보가 없습니다.' 
+    },
+    { 
+      icon: '👂', 
+      title: '귀 (타고난 운과 가족)', 
+      content: extractSection(content, '귀', '종합') || '분석 정보가 없습니다.' 
+    }
+  ];
+  
+  return features;
+};
+
+// 콘텐츠에서 특정 섹션 추출
+const extractSection = (content: string, startSection: string, endSection: string): string => {
+  const startIndex = content.indexOf(startSection);
+  if (startIndex === -1) return '';
+  
+  const endIndex = content.indexOf(endSection, startIndex);
+  if (endIndex === -1) return content.substring(startIndex);
+  
+  return content.substring(startIndex, endIndex).trim();
 };
 
 const Container = styled.div`
@@ -339,6 +402,71 @@ const ActionButton = styled.button<{ color: string }>`
   
   @media (max-width: 640px) {
     width: 100%;
+  }
+`;
+
+// 얼굴 부위별 분석 섹션 스타일
+const FacialFeaturesSection = styled.div`
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: 1rem;
+  
+  @media (min-width: 768px) {
+    margin-top: 0;
+  }
+`;
+
+const FeaturesHeader = styled.h2`
+  color: #4a5568;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+`;
+
+const FeatureCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+`;
+
+const FeatureIcon = styled.div`
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+`;
+
+const FeatureTitle = styled.h3`
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+`;
+
+const FeatureContent = styled.div`
+  font-size: 0.95rem;
+  color: #4a5568;
+  line-height: 1.6;
+  
+  p {
+    margin: 0.5rem 0;
+  }
+  
+  strong {
+    color: #2d3748;
+    font-weight: 600;
   }
 `;
 

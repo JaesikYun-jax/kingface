@@ -36,6 +36,7 @@ export interface FaceReadingResult {
   relationships: string;      // 대인 관계
   advice: string;            // 조언
   imageUrl: string;          // 분석된 이미지 URL
+  content?: string;          // 원본 분석 내용 (마크다운 형식)
 }
 
 // 서비스 플랜 타입
