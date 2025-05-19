@@ -1,4 +1,7 @@
 name = "kingface"
 compatibility_date = "2025-05-19"
 
+# Pages 설정 추가
+pages_build_output_dir = "build"
+
 # [site] 섹션 제거 
