@@ -33,6 +33,7 @@
     "start": "BROWSER=chrome react-scripts start",
     "dev": "BROWSER=chrome react-scripts start",
     "build": "CI=false react-scripts build",
+    "deploy": "npx wrangler pages deploy build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
