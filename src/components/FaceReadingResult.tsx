@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import ReactMarkdown from 'react-markdown';
 import { FaceReadingResult as FaceReadingResultType } from '../types';
@@ -16,6 +16,9 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
   onShare,
   onReturn
 }) => {
+  // 디버그 모달 상태 관리
+  const [showDebugModal, setShowDebugModal] = useState<boolean>(false);
+
   // 현재 날짜 포맷팅
   const currentDate = new Date().toLocaleDateString('ko-KR', {
     year: 'numeric',
@@ -28,6 +31,53 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
 
   return (
     <Container>
+      {/* 디버그 버튼 추가 */}
+      <DebugButton onClick={() => setShowDebugModal(true)}>
+        🐛
+      </DebugButton>
+
+      {/* 디버그 모달 */}
+      {showDebugModal && (
+        <DebugModal>
+          <DebugModalContent>
+            <DebugModalHeader>
+              <h2>API 응답 디버그</h2>
+              <CloseButton onClick={() => setShowDebugModal(false)}>✕</CloseButton>
+            </DebugModalHeader>
+            <DebugModalBody>
+              <h3>원본 응답 내용:</h3>
+              <pre>{result.content || '응답 데이터가 없습니다.'}</pre>
+              
+              <h3>파싱된 데이터:</h3>
+              <DebugTable>
+                <tbody>
+                  <tr>
+                    <td>성격 특성:</td>
+                    <td>{result.personalityTraits.join(', ') || '데이터 없음'}</td>
+                  </tr>
+                  <tr>
+                    <td>전반적 운세:</td>
+                    <td>{result.overallFortune || '데이터 없음'}</td>
+                  </tr>
+                  <tr>
+                    <td>직업 적성:</td>
+                    <td>{result.careerSuitability || '데이터 없음'}</td>
+                  </tr>
+                  <tr>
+                    <td>대인 관계:</td>
+                    <td>{result.relationships || '데이터 없음'}</td>
+                  </tr>
+                  <tr>
+                    <td>조언:</td>
+                    <td>{result.advice || '데이터 없음'}</td>
+                  </tr>
+                </tbody>
+              </DebugTable>
+            </DebugModalBody>
+          </DebugModalContent>
+        </DebugModal>
+      )}
+
       <ResultHeader>
         <Title>당신의 관상 분석 결과</Title>
         <SubTitle>{currentDate} 기준</SubTitle>
@@ -128,46 +178,147 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
 
 // 얼굴 부위별 분석 데이터 추출 함수
 const extractFacialFeatureAnalysis = (content: string): Array<{icon: string, title: string, content: string}> => {
+  // 콘솔에 원본 내용을 출력하여 디버깅 지원
+  console.log("Raw content for parsing:", content);
+  
+  // 다양한 헤더 패턴 인식을 위한 정규식
+  const headerPattern = /(?:^|\n)(?:#{1,3}\s*|\*\*\s*)(이마|눈|코|입|귀|입과 턱|눈과 눈썹|종합)(?:\s*\([^)]*\))?(?:\s*:|\*\*|\s*#{1,3}|\n)/i;
+  
+  // 기본 구조 정의
   const features = [
     { 
       icon: '🧠', 
       title: '이마 (지혜와 재능)', 
-      content: extractSection(content, '이마', '눈') || '분석 정보가 없습니다.' 
+      keywords: ['이마', '앞이마', '이마(額)', '額'], 
+      content: '분석 정보가 없습니다.' 
     },
     { 
       icon: '👁️', 
       title: '눈 (성격과 감정)', 
-      content: extractSection(content, '눈', '코') || '분석 정보가 없습니다.' 
+      keywords: ['눈', '눈동자', '눈썹', '눈과 눈썹', '눈(目)', '目'], 
+      content: '분석 정보가 없습니다.' 
     },
     { 
       icon: '👃', 
       title: '코 (재물운과 사회성)', 
-      content: extractSection(content, '코', '입') || '분석 정보가 없습니다.' 
+      keywords: ['코', '코(鼻)', '鼻'], 
+      content: '분석 정보가 없습니다.' 
     },
     { 
       icon: '👄', 
       title: '입과 턱 (의지력과 대인관계)', 
-      content: extractSection(content, '입', '귀') || '분석 정보가 없습니다.' 
+      keywords: ['입', '턱', '입술', '입과 턱', '입턱', '입(口)', '口顎'], 
+      content: '분석 정보가 없습니다.' 
     },
     { 
       icon: '👂', 
       title: '귀 (타고난 운과 가족)', 
-      content: extractSection(content, '귀', '종합') || '분석 정보가 없습니다.' 
+      keywords: ['귀', '귀(耳)', '耳'], 
+      content: '분석 정보가 없습니다.' 
     }
   ];
+  
+  // 각 특징에 대해 내용 찾기
+  features.forEach((feature, index) => {
+    // 특징 키워드 중 하나라도 매칭되면 내용 추출
+    for (const keyword of feature.keywords) {
+      // 다양한 패턴으로 검색 시도
+      let extracted = extractSectionByPattern(content, keyword);
+      
+      if (extracted) {
+        feature.content = extracted;
+        break;
+      }
+    }
+    
+    // 내용이 없으면 두 번째 시도: 마크다운 헤더 패턴으로 검색
+    if (feature.content === '분석 정보가 없습니다.') {
+      // 마크다운 헤더 패턴으로 시도
+      for (const keyword of feature.keywords) {
+        const headerRegex = new RegExp(`#+\\s*${keyword}[\\s\\S]*?(?=#+\\s|$)`, 'i');
+        const match = content.match(headerRegex);
+        if (match) {
+          feature.content = match[0].trim();
+          break;
+        }
+      }
+    }
+    
+    // 여전히 내용이 없으면 단순 키워드 포함 여부 확인
+    if (feature.content === '분석 정보가 없습니다.') {
+      for (const keyword of feature.keywords) {
+        if (content.includes(keyword)) {
+          // 키워드 주변 문맥 추출 (50자 전후)
+          const keywordIndex = content.indexOf(keyword);
+          const start = Math.max(0, keywordIndex - 50);
+          const end = Math.min(content.length, keywordIndex + 100);
+          feature.content = content.substring(start, end).trim();
+          break;
+        }
+      }
+    }
+  });
   
   return features;
 };
 
-// 콘텐츠에서 특정 섹션 추출
+// 다양한 패턴으로 섹션 추출 시도
+const extractSectionByPattern = (content: string, sectionName: string): string | null => {
+  // 콘텐츠가 없으면 null 반환
+  if (!content) return null;
+  
+  // 일반적인 마크다운 헤더 패턴
+  const patterns = [
+    // ### 섹션명 패턴
+    new RegExp(`###\\s*${sectionName}[^#]*(?=###|$)`, 'i'),
+    // ## 섹션명 패턴
+    new RegExp(`##\\s*${sectionName}[^#]*(?=##|$)`, 'i'),
+    // # 섹션명 패턴
+    new RegExp(`#\\s*${sectionName}[^#]*(?=\\s*#|$)`, 'i'),
+    // 섹션명: 패턴
+    new RegExp(`\\b${sectionName}\\s*:[^\\n]*(?:\\n(?!\\b\\w+\\s*:)[^\\n]*)*`, 'i'),
+    // **섹션명** 패턴
+    new RegExp(`\\*\\*\\s*${sectionName}\\s*\\*\\*[^*]*(?=\\*\\*|$)`, 'i'),
+    // 섹션명 단락 패턴 (단락 단위로 추출)
+    new RegExp(`(?:^|\\n)${sectionName}[^\\n]*(?:\\n(?!\\b\\w+:)[^\\n]*)*`, 'i')
+  ];
+  
+  // 각 패턴으로 시도
+  for (const pattern of patterns) {
+    const match = content.match(pattern);
+    if (match && match[0]) {
+      let result = match[0].trim();
+      
+      // 헤더 제거 (예: ### 이마 -> 이마)
+      result = result.replace(/^#{1,3}\s*/, '');
+      
+      // 볼드 마크다운 제거 (예: **이마** -> 이마)
+      result = result.replace(/^\*\*|\*\*$/g, '');
+      
+      // 섹션명 자체 제거 (결과에서 섹션명+콜론 제거)
+      result = result.replace(new RegExp(`^${sectionName}\\s*:?\\s*`, 'i'), '');
+      
+      return result.trim();
+    }
+  }
+  
+  return null;
+};
+
+// 특정 섹션 추출 함수 (기존)
 const extractSection = (content: string, startSection: string, endSection: string): string => {
+  // 원본 로직 유지
   const startIndex = content.indexOf(startSection);
   if (startIndex === -1) return '';
   
   const endIndex = content.indexOf(endSection, startIndex);
   if (endIndex === -1) return content.substring(startIndex);
   
-  return content.substring(startIndex, endIndex).trim();
+  // 추가 로직: 마크다운 헤더 패턴 인식
+  const sectionText = content.substring(startIndex, endIndex).trim();
+  
+  // ### 같은 마크다운 헤더 제거
+  return sectionText.replace(/^#{1,3}\s*/, '');
 };
 
 const Container = styled.div`
@@ -467,6 +618,125 @@ const FeatureContent = styled.div`
   strong {
     color: #2d3748;
     font-weight: 600;
+  }
+`;
+
+// 디버그 버튼 스타일
+const DebugButton = styled.button`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+// 디버그 모달 스타일
+const DebugModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
+
+const DebugModalContent = styled.div`
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  background-color: white;
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+`;
+
+const DebugModalHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #4a5568;
+  color: white;
+  padding: 1rem;
+  
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+const DebugModalBody = styled.div`
+  padding: 1rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 60px);
+  
+  h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: #4a5568;
+  }
+  
+  pre {
+    background-color: #f1f5f9;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    white-space: pre-wrap;
+    color: #334155;
+  }
+`;
+
+const DebugTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  
+  td {
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+  }
+  
+  td:first-of-type {
+    width: 120px;
+    font-weight: bold;
+    background-color: #f1f5f9;
   }
 `;
 

@@ -343,6 +343,12 @@ export const analyzeFaceReading = async (imageBase64: string): Promise<FaceReadi
         'Authorization': `Bearer ${apiKey}`
       };
       
+      // 디버그 모드 - 프롬프트 로깅
+      console.log('사용중인 프롬프트:', {
+        system: systemPrompt.substring(0, 100) + '...',
+        user: userPrompt.substring(0, 100) + '...'
+      });
+      
       // 실제 환경에서는 서버를 통해 API 키를 노출하지 않도록 백엔드 API를 사용해야 합니다
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
@@ -352,27 +358,104 @@ export const analyzeFaceReading = async (imageBase64: string): Promise<FaceReadi
   
       const content = response.data.choices[0].message.content;
       
+      // 응답 디버그 로깅
+      console.log('API 응답 수신:', content.substring(0, 100) + '...');
+      
+      // 응답이 너무 짧으면 에러로 처리
+      if (!content || content.length < 20) {
+        console.error('API 응답이 너무 짧거나 없습니다:', content);
+        throw new Error('AI가 충분한 분석 내용을 생성하지 못했습니다. 다시 시도해 주세요.');
+      }
+      
       // 응답을 파싱하여 FaceReadingResult 형태로 반환
       // 성격 특성은 본문에서 키워드 추출
       const personalityTraits = extractPersonalityTraits(content);
       
-      return {
-        personalityTraits,
-        overallFortune: content.includes('전반적인 운세') ? 
-          extractSection(content, '전반적인 운세', '직업 적성') : 
-          extractSection(content, '운세', '직업'),
-        careerSuitability: content.includes('직업 적성') ? 
-          extractSection(content, '직업 적성', '대인 관계') : 
-          extractSection(content, '직업', '대인 관계'),
-        relationships: content.includes('대인 관계') ? 
-          extractSection(content, '대인 관계', '조언') : 
-          extractSection(content, '연애', '조언'),
-        advice: content.includes('조언') ? 
-          content.substring(content.indexOf('조언')) : 
-          '조언을 찾을 수 없습니다.',
+      // 기본 결과 구조 생성
+      const result: FaceReadingResult = {
+        personalityTraits: personalityTraits.length > 0 ? personalityTraits : ['분석 불가'],
+        overallFortune: '분석 정보를 찾을 수 없습니다.',
+        careerSuitability: '분석 정보를 찾을 수 없습니다.',
+        relationships: '분석 정보를 찾을 수 없습니다.',
+        advice: '분석 정보를 찾을 수 없습니다.',
         imageUrl: imageBase64,
         content: content // 원본 분석 내용 저장
       };
+      
+      // 여러 가능한 섹션 이름에 대해 추출 시도
+      const overallSections = ['전반적인 운세', '운세', '종합', '종합 운세'];
+      const careerSections = ['직업 적성', '직업', '커리어', '경력'];
+      const relationshipSections = ['대인 관계', '연애', '대인관계', '인간관계'];
+      const adviceSections = ['조언', '어드바이스', '금주의 조언'];
+      
+      // 각 섹션에 대해 추출 시도
+      for (const section of overallSections) {
+        if (content.includes(section)) {
+          // 첫번째 매칭되는 다음 섹션 이름 찾기
+          const nextSectionIndex = findNextSectionIndex(content, section, [...careerSections, ...relationshipSections, ...adviceSections]);
+          if (nextSectionIndex !== -1) {
+            result.overallFortune = content.substring(content.indexOf(section), nextSectionIndex).trim();
+          } else {
+            // 다음 섹션이 없으면 끝까지 추출
+            result.overallFortune = content.substring(content.indexOf(section)).trim();
+          }
+          break;
+        }
+      }
+      
+      // 직업 적성 추출
+      for (const section of careerSections) {
+        if (content.includes(section)) {
+          // 첫번째 매칭되는 다음 섹션 이름 찾기
+          const nextSectionIndex = findNextSectionIndex(content, section, [...relationshipSections, ...adviceSections]);
+          if (nextSectionIndex !== -1) {
+            result.careerSuitability = content.substring(content.indexOf(section), nextSectionIndex).trim();
+          } else {
+            // 다음 섹션이 없으면 끝까지 추출
+            result.careerSuitability = content.substring(content.indexOf(section)).trim();
+          }
+          break;
+        }
+      }
+      
+      // 대인 관계 추출
+      for (const section of relationshipSections) {
+        if (content.includes(section)) {
+          // 첫번째 매칭되는 다음 섹션 이름 찾기
+          const nextSectionIndex = findNextSectionIndex(content, section, [...adviceSections]);
+          if (nextSectionIndex !== -1) {
+            result.relationships = content.substring(content.indexOf(section), nextSectionIndex).trim();
+          } else {
+            // 다음 섹션이 없으면 끝까지 추출
+            result.relationships = content.substring(content.indexOf(section)).trim();
+          }
+          break;
+        }
+      }
+      
+      // 조언 추출
+      for (const section of adviceSections) {
+        if (content.includes(section)) {
+          result.advice = content.substring(content.indexOf(section)).trim();
+          break;
+        }
+      }
+      
+      // 섹션 제목 정리 - 섹션 이름 자체 제거
+      result.overallFortune = cleanSectionTitle(result.overallFortune, overallSections);
+      result.careerSuitability = cleanSectionTitle(result.careerSuitability, careerSections);
+      result.relationships = cleanSectionTitle(result.relationships, relationshipSections);
+      result.advice = cleanSectionTitle(result.advice, adviceSections);
+      
+      console.log('파싱된 결과:', {
+        personalityTraits: result.personalityTraits,
+        overallFortune: result.overallFortune.substring(0, 30) + '...',
+        careerSuitability: result.careerSuitability.substring(0, 30) + '...',
+        relationships: result.relationships.substring(0, 30) + '...',
+        advice: result.advice.substring(0, 30) + '...'
+      });
+      
+      return result;
     } catch (error: any) {
       console.error('API 호출 오류:', error);
       
@@ -415,6 +498,39 @@ export const analyzeFaceReading = async (imageBase64: string): Promise<FaceReadi
     console.error('관상 분석 오류:', error);
     throw error;
   }
+};
+
+// 다음 섹션의 인덱스 찾기
+const findNextSectionIndex = (content: string, currentSection: string, nextSections: string[]): number => {
+  const currentSectionIndex = content.indexOf(currentSection);
+  if (currentSectionIndex === -1) return -1;
+  
+  // 각 다음 섹션에 대해 인덱스 찾기
+  let minNextIndex = content.length;
+  for (const nextSection of nextSections) {
+    const nextIndex = content.indexOf(nextSection, currentSectionIndex + currentSection.length);
+    if (nextIndex !== -1 && nextIndex < minNextIndex) {
+      minNextIndex = nextIndex;
+    }
+  }
+  
+  return minNextIndex === content.length ? -1 : minNextIndex;
+};
+
+// 섹션 제목 정리
+const cleanSectionTitle = (sectionContent: string, sectionNames: string[]): string => {
+  let cleaned = sectionContent;
+  
+  // 마크다운 헤더 제거
+  cleaned = cleaned.replace(/^#{1,3}\s*/m, '');
+  
+  // 섹션 이름과 콜론 제거
+  for (const name of sectionNames) {
+    const regex = new RegExp(`^${name}\\s*:?\\s*`, 'i');
+    cleaned = cleaned.replace(regex, '');
+  }
+  
+  return cleaned.trim();
 };
 
 // 응답에서 섹션을 추출하는 헬퍼 함수
