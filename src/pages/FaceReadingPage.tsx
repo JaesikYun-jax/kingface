@@ -17,16 +17,21 @@ enum Step {
 
 // 로딩 중 보여줄 위트있는 메시지 배열
 const wittyLoadingMessages = [
-  "얼굴 특징 스캔 중...",
-  "성격 분석 알고리즘 적용 중...",
-  "얼굴 비율 계산 중...",
-  "표정과 특징 패턴 분석 중...",
-  "심리 프로필 생성 중...",
-  "시각적 특성 매핑 중...",
-  "인공지능 분석 진행 중...",
-  "얼굴 특징 데이터베이스 참고 중...",
-  "당신만의 특별한 프로필 만드는 중...",
-  "결과 최적화 중..."
+  "영혼의 기억을 검색 중...",
+  "전생의 데이터베이스 탐색 중...",
+  "운명의 실타래 풀어내는 중...",
+  "과거와 현재 연결 중...",
+  "신비한 이야기 짜맞추는 중...",
+  "영적 영감 수집 중...",
+  "창작의 에너지 충전 중...",
+  "우주에서 메시지 수신 중...",
+  "별자리의 지혜 참고 중...",
+  "영적 가이드와 교신 중...",
+  "이야기의 조각 모으는 중...",
+  "상상력 주문 발동 중...",
+  "신비한 차원 접속 중...",
+  "운명의 책 펼치는 중...",
+  "시간의 문 여는 중..."
 ];
 
 // 비밀번호 검증 로직 - 직접적인 비밀번호 노출 방지
@@ -223,11 +228,11 @@ const FaceReadingPage: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title>AI 관상 분석</Title>
+        <Title>AI 운명 이야기</Title>
         <Subtitle>
           {currentStep === Step.PLAN_CHECK 
-            ? '프리미엄 서비스로 당신의 얼굴에 담긴 운명을 분석해 드립니다' 
-            : '당신의 얼굴에 담긴 운명을 AI가 분석해 드립니다'}
+            ? '프리미엄 서비스로 당신만의 독특한 운명 이야기를 들려드립니다' 
+            : '아이(AI)보살이 들려주는 신비로운 당신의 이야기'}
         </Subtitle>
       </Header>
       
@@ -235,20 +240,20 @@ const FaceReadingPage: React.FC = () => {
 
       {currentStep === Step.PLAN_CHECK && (
         <PremiumFeatureSection>
-          <FeatureTitle>AI 관상 분석 서비스</FeatureTitle>
+          <FeatureTitle>AI 운명 이야기 서비스</FeatureTitle>
           <FeatureDescription>
-            얼굴 사진을 분석하여 성격 특성, 운세, 직업 적성, 대인 관계에 대한 
-            깊이 있는 분석 결과를 제공하는 프리미엄 전용 서비스입니다.
+            당신의 이미지에서 영감을 받아 과거 전생과 미래의 가능성을 창의적으로 연결한
+            신비로운 이야기를 들려드리는 프리미엄 전용 서비스입니다.
           </FeatureDescription>
           
           <ModelBadge>고급 GPT-4o 모델 사용</ModelBadge>
           
           <FeaturesList>
-            <FeatureItem>✓ AI 기반 얼굴 특징 인식</FeatureItem>
-            <FeatureItem>✓ 성격 특성 키워드 분석</FeatureItem>
-            <FeatureItem>✓ 직업 적성 및 재능 분석</FeatureItem>
-            <FeatureItem>✓ 대인 관계 및 연애 성향 파악</FeatureItem>
-            <FeatureItem>✓ 운세 및 미래 전망 제시</FeatureItem>
+            <FeatureItem>✓ 전생 스토리 창작</FeatureItem>
+            <FeatureItem>✓ 신비로운 운명선 해석</FeatureItem>
+            <FeatureItem>✓ 숨겨진 재능 발견</FeatureItem>
+            <FeatureItem>✓ 인연과 관계의 비밀</FeatureItem>
+            <FeatureItem>✓ 영적 조언과 메시지</FeatureItem>
           </FeaturesList>
           <PlanSelector onSelect={handlePlanSelect} />
           <BackLink onClick={handleReturn}>
@@ -288,12 +293,12 @@ const FaceReadingPage: React.FC = () => {
       
       {currentStep === Step.LOADING && (
         <LoadingContainer>
-          <LoadingText>얼굴 분석 중...</LoadingText>
+          <LoadingText>신비한 이야기 창작 중...</LoadingText>
           <LoadingBarContainer>
             <LoadingBar width={loadingProgress} />
           </LoadingBarContainer>
           <LoadingDescription>
-            AI가 당신의 얼굴 특징을 분석하여 성격 프로필을 만들고 있습니다.
+            아이(AI)보살이 당신만을 위한 재미있는 이야기를 만들고 있습니다.
           </LoadingDescription>
           <LoadingMessage>{currentLoadingMessage}</LoadingMessage>
         </LoadingContainer>
@@ -303,8 +308,8 @@ const FaceReadingPage: React.FC = () => {
         <>
           <ModelInfo>
             <ModelInfoText>
-              관상 분석은 얼굴의 세밀한 특징을 파악해야 하므로, 일반 모델보다 더 고성능인 
-              <strong> GPT-4o 모델</strong>을 사용합니다. 고품질 사진일수록 더 정확한 분석이 가능합니다.
+              신비로운 운명 이야기는 AI의 창작력을 극대화하기 위해 일반 모델보다 더 고성능인 
+              <strong> GPT-4o 모델</strong>을 사용합니다. 이미지는 단지 영감을 주는 소재로만 활용됩니다.
             </ModelInfoText>
           </ModelInfo>
           <FaceCapture 
@@ -334,12 +339,12 @@ const FaceReadingPage: React.FC = () => {
       
       <DisclaimerSection>
         <Disclaimer>
-          * 이 서비스는 오락 목적으로 제공되며, 분석 결과는 참고용입니다.
-          AI 기술을 활용하여 재미있고 개인화된 분석을 제공하지만,
-          실제 미래나 운명을 예측하지는 않습니다.
+          * 이 서비스는 순수한 엔터테인먼트 목적으로 제공되는 창작 게임입니다.
+          모든 이야기와 해석은 AI의 창의적 상상력으로 만들어진 것이며,
+          실제 분석이나 예측을 의미하지 않습니다.
         </Disclaimer>
         <Disclaimer>
-          * 촬영 또는 업로드한 이미지는 분석 목적으로만 사용되며, 서버에 영구 저장되지 않습니다.
+          * 이미지는 오직 창작 영감을 위한 소재로만 사용되며, 서버에 영구 저장되지 않습니다.
         </Disclaimer>
       </DisclaimerSection>
     </Container>

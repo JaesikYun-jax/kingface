@@ -176,11 +176,11 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   
   return (
     <Container>
-      <Title>AI 관상 분석</Title>
+      <Title>AI 운명 이야기</Title>
       <SubTitle>
         {uploadMode 
-          ? '얼굴 사진을 업로드하여 AI 관상 분석을 받아보세요' 
-          : '얼굴 사진을 찍어 AI 관상 분석을 받아보세요'}
+          ? '사진을 업로드하고 당신만의 신비로운 이야기를 들어보세요' 
+          : '사진을 찍고 당신만의 신비로운 이야기를 들어보세요'}
       </SubTitle>
       
       {error && <ErrorMessage>{error}</ErrorMessage>}
