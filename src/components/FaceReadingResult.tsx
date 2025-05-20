@@ -18,6 +18,8 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
 }) => {
   // 디버그 모달 상태 관리
   const [showDebugModal, setShowDebugModal] = useState<boolean>(false);
+  // 원본 분석 결과 표시 여부
+  const [showOriginalContent, setShowOriginalContent] = useState<boolean>(false);
 
   // 현재 날짜 포맷팅
   const currentDate = new Date().toLocaleDateString('ko-KR', {
@@ -120,28 +122,55 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
           <AnalysisCard>
             <SectionIcon>🔮</SectionIcon>
             <SectionTitle>종합 운세</SectionTitle>
-            <SectionContent>{result.overallFortune}</SectionContent>
+            <SectionContent>
+              <ReactMarkdown>{result.overallFortune}</ReactMarkdown>
+            </SectionContent>
           </AnalysisCard>
           
           <AnalysisCard>
             <SectionIcon>💼</SectionIcon>
             <SectionTitle>직업 적성</SectionTitle>
-            <SectionContent>{result.careerSuitability}</SectionContent>
+            <SectionContent>
+              <ReactMarkdown>{result.careerSuitability}</ReactMarkdown>
+            </SectionContent>
           </AnalysisCard>
           
           <AnalysisCard>
             <SectionIcon>👥</SectionIcon>
             <SectionTitle>대인 관계</SectionTitle>
-            <SectionContent>{result.relationships}</SectionContent>
+            <SectionContent>
+              <ReactMarkdown>{result.relationships}</ReactMarkdown>
+            </SectionContent>
           </AnalysisCard>
           
           <AdviceCard>
             <AdviceIcon>💡</AdviceIcon>
             <AdviceTitle>금주의 기운과 조언</AdviceTitle>
-            <AdviceContent>{result.advice}</AdviceContent>
+            <AdviceContent>
+              <ReactMarkdown>{result.advice}</ReactMarkdown>
+            </AdviceContent>
           </AdviceCard>
         </AnalysisSection>
       </ResultSection>
+      
+      {/* 원본 콘텐츠 토글 버튼 */}
+      <ButtonContainer style={{ padding: '0 2rem 1rem', borderTop: 'none' }}>
+        <ActionButton 
+          onClick={() => setShowOriginalContent(!showOriginalContent)} 
+          color="#4a5568"
+          style={{ width: 'auto', margin: '0 auto' }}
+        >
+          <ButtonIcon>{showOriginalContent ? '📁' : '📂'}</ButtonIcon>
+          {showOriginalContent ? '원본 분석 결과 숨기기' : '원본 분석 결과 보기'}
+        </ActionButton>
+      </ButtonContainer>
+      
+      {/* 원본 관상 분석 콘텐츠 */}
+      {showOriginalContent && (
+        <OriginalContent>
+          <ReactMarkdown>{result.content || '분석 결과가 없습니다.'}</ReactMarkdown>
+        </OriginalContent>
+      )}
       
       <Disclaimer>
         * 이 관상 분석은 AI를 활용한 참고용 결과로, 실제 특성이나 운세와 다를 수 있습니다.
@@ -531,11 +560,28 @@ const SectionTitle = styled.h3`
   vertical-align: middle;
 `;
 
-const SectionContent = styled.p`
+const SectionContent = styled.div`
   color: #2d3748;
   font-size: 1rem;
   line-height: 1.8;
-  white-space: pre-line;
+  
+  p {
+    margin: 0.5rem 0;
+  }
+  
+  strong, em {
+    color: #2d3748;
+    font-weight: 600;
+  }
+  
+  ul, ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+  
+  li {
+    margin-bottom: 0.25rem;
+  }
 `;
 
 const AdviceCard = styled(AnalysisCard)`
@@ -558,11 +604,28 @@ const AdviceTitle = styled.h3`
   vertical-align: middle;
 `;
 
-const AdviceContent = styled.p`
+const AdviceContent = styled.div`
   color: #2d3748;
   font-size: 1rem;
   line-height: 1.8;
-  white-space: pre-line;
+  
+  p {
+    margin: 0.5rem 0;
+  }
+  
+  strong, em {
+    color: #2d3748;
+    font-weight: 600;
+  }
+  
+  ul, ol {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+  
+  li {
+    margin-bottom: 0.25rem;
+  }
 `;
 
 const Disclaimer = styled.p`
@@ -798,6 +861,47 @@ const DebugTable = styled.table`
     width: 120px;
     font-weight: bold;
     background-color: #f1f5f9;
+  }
+`;
+
+// 원본 관상 분석 콘텐츠 렌더링을 위한 컴포넌트 추가
+const OriginalContent = styled.div`
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  h2 {
+    font-size: 1.4rem;
+    color: #4a5568;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    color: #4a5568;
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  p {
+    margin: 0.75rem 0;
+    line-height: 1.8;
+  }
+
+  ul, ol {
+    margin: 0.75rem 0;
+    padding-left: 1.5rem;
+  }
+
+  li {
+    margin: 0.5rem 0;
+  }
+
+  em, strong {
+    color: #4a5568;
   }
 `;
 
