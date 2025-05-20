@@ -27,16 +27,24 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
   }
 
   // 결과 이미지 크기 설정 (정사각형)
-  canvas.width = containerSize;
-  canvas.height = containerSize;
+  const outputSize = containerSize;
+  canvas.width = outputSize;
+  canvas.height = outputSize;
 
-  // 크롭할 영역 계산
+  // 크롭할 영역 계산 - 중심 기준 좌표 계산
   const sourceX = (containerSize / 2 - translateX) / scale;
   const sourceY = (containerSize / 2 - translateY) / scale;
-  const sourceWidth = containerSize / scale;
-  const sourceHeight = containerSize / scale;
+  const sourceSize = containerSize / scale;
 
-  // 이미지를 캔버스 전체 영역에 그리기
+  // 이미지 영역 계산
+  const sourceWidth = sourceSize;
+  const sourceHeight = sourceSize;
+
+  // 캔버스 배경을 검정색으로 설정 (투명 배경을 방지)
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, outputSize, outputSize);
+
+  // 이미지를 캔버스에 그리기
   ctx.drawImage(
     image,
     sourceX, 
@@ -45,10 +53,11 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
     sourceHeight,
     0, 
     0, 
-    containerSize, 
-    containerSize
+    outputSize, 
+    outputSize
   );
 
+  // 고품질 이미지로 반환
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
       if (!blob) {
@@ -116,8 +125,8 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
         newScale = containerSize / img.naturalHeight;
       }
       
-      // 약간 축소해서 시작 (전체 이미지가 보이도록)
-      newScale = Math.min(newScale * 0.8, 1);
+      // 이미지가 프레임을 더 많이 채우도록 확대
+      newScale = Math.min(newScale * 1.5, 3); // 1.5배 확대, 최대 3배까지
       
       setScale(newScale);
       setTranslateX(0);
@@ -512,7 +521,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                     display: 'block', // 항상 표시
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
+                    objectFit: 'cover', // 웹캠은 cover 유지
                     borderRadius: '12px',
                     opacity: videoShown ? 1 : 0,
                     transition: 'opacity 0.2s ease', // 트랜지션 시간 단축
@@ -723,7 +732,7 @@ const SmallWebcamContainer = styled.div`
   width: 100%;
   max-width: 360px;
   height: 0;
-  padding-bottom: 75%; /* 4:3 비율로 줄임 */
+  padding-bottom: 100%; /* 4:3 비율에서 1:1 정사각형으로 변경 */
   overflow: hidden;
   border-radius: 12px;
   background-color: #000;
@@ -800,7 +809,7 @@ const SmallImageContainer = styled.div`
   width: 100%;
   max-width: 360px;
   height: 0;
-  padding-bottom: 75%; /* 4:3 비율 */
+  padding-bottom: 100%; /* 4:3 비율에서 1:1 정사각형으로 변경 */
   position: relative;
   overflow: hidden;
   border-radius: 12px;
@@ -814,8 +823,9 @@ const CapturedImage = styled.img`
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* cover 대신 contain으로 변경하여 비율 유지 */
   border-radius: 12px;
+  background-color: #000; /* 배경 추가 */
 `;
 
 const ButtonContainer = styled.div`
