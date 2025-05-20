@@ -13,9 +13,10 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [cameraType, setCameraType] = useState<'user' | 'environment'>('user'); // front or back camera
   const [error, setError] = useState<string | null>(null);
-  const [uploadMode, setUploadMode] = useState<boolean>(!isMobile); // PC에서는 기본값으로 업로드 모드 사용
+  const [uploadMode, setUploadMode] = useState<boolean>(true); // 기본값을 업로드 모드로 변경
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>(false);
   const [isInitializing, setIsInitializing] = useState<boolean>(true); // 초기 로딩 상태 추가
+  const [videoShown, setVideoShown] = useState<boolean>(false); // 비디오 표시 상태 추가
   
   const webcamRef = useRef<Webcam>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,6 +32,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const initializeCamera = useCallback(() => {
     setIsInitializing(true);
     setIsCameraReady(false);
+    setVideoShown(false); // 비디오 표시 상태 초기화
     
     if (webcamRef.current && webcamRef.current.video && webcamRef.current.video.srcObject) {
       try {
@@ -87,6 +89,11 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     setIsCameraReady(true);
     setError(null);
     setIsInitializing(false);
+    
+    // 비디오 표시 설정 - 추가
+    setTimeout(() => {
+      setVideoShown(true);
+    }, 300); // 웹캠이 준비된 후 약간의 지연을 두고 표시
   }, []);
   
   // 웹캠 에러 처리
@@ -227,11 +234,13 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                   onUserMediaError={handleUserMediaError}
                   mirrored={cameraType === 'user'}
                   style={{
-                    display: isCameraReady ? 'block' : 'none',
+                    display: 'block', // 항상 표시하되 투명도로 제어
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
                     borderRadius: '12px',
+                    opacity: videoShown ? 1 : 0, // 비디오 표시 상태에 따라 투명도 조절
+                    transition: 'opacity 0.3s ease',
                   }}
                 />
                 {isCameraReady && !capturedImage && (
@@ -248,16 +257,6 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
       <ButtonContainer>
         <ModeToggleButtons>
           <ModeButton 
-            active={!uploadMode} 
-            onClick={() => {
-              if (uploadMode) toggleUploadMode();
-            }}
-            disabled={isLoading || (!uploadMode && !hasCameraPermission)}
-          >
-            📸 카메라 촬영
-          </ModeButton>
-          
-          <ModeButton 
             active={uploadMode} 
             onClick={() => {
               if (!uploadMode) toggleUploadMode();
@@ -266,24 +265,33 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
           >
             🖼️ 이미지 업로드
           </ModeButton>
+          
+          <ModeButton 
+            active={!uploadMode} 
+            onClick={() => {
+              if (uploadMode) toggleUploadMode();
+            }}
+            disabled={isLoading || (!uploadMode && !hasCameraPermission)}
+          >
+            📸 카메라 촬영
+          </ModeButton>
         </ModeToggleButtons>
-        
-        {!uploadMode && !capturedImage && isCameraReady && (
-          <CameraButton onClick={toggleCamera} disabled={isLoading}>
-            📱 카메라 전환
-          </CameraButton>
-        )}
         
         {!capturedImage ? (
           <>
-            {!uploadMode && (
-              <CaptureButton 
-                onClick={handleCapture} 
-                disabled={!isCameraReady || isLoading}
-                pulse={isCameraReady && !isLoading}
-              >
-                📸 사진 촬영
-              </CaptureButton>
+            {!uploadMode && isCameraReady && (
+              <ButtonGroup>
+                <CameraButton onClick={toggleCamera} disabled={isLoading}>
+                  📱 카메라 전환
+                </CameraButton>
+                <CaptureButton 
+                  onClick={handleCapture} 
+                  disabled={!isCameraReady || isLoading}
+                  pulse={isCameraReady && !isLoading}
+                >
+                  📸 사진 촬영
+                </CaptureButton>
+              </ButtonGroup>
             )}
             
             {uploadMode && (
@@ -477,6 +485,7 @@ const ModeButton = styled.button<{ active: boolean }>`
 `;
 
 const CameraButton = styled.button`
+  flex: 1;
   padding: 0.8rem;
   background-color: #2d3748;
   color: white;
@@ -563,6 +572,7 @@ const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
   width: 100%;
+  margin-top: 0.5rem;
 `;
 
 const RetakeButton = styled.button`
