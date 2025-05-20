@@ -17,16 +17,16 @@ enum Step {
 
 // 로딩 중 보여줄 위트있는 메시지 배열
 const wittyLoadingMessages = [
-  "천기를 읽는 중...",
-  "타로신과 사주신이 토론하는 중...",
-  "당신의 얼굴에 담긴 비밀을 분석하는 중...", 
-  "운명의 라인을 따라가는 중...",
-  "눈과 코의 비율로 성격을 파악하는 중...",
-  "관상학 고서를 참고하는 중...",
-  "인공지능이 당신의 면상을 스캔하는 중...",
-  "옛 선인들의 지혜를 불러오는 중...",
-  "우주의 기운을 모으는 중...",
-  "관상 데이터베이스를 검색하는 중...",
+  "얼굴 특징 스캔 중...",
+  "성격 분석 알고리즘 적용 중...",
+  "얼굴 비율 계산 중...",
+  "표정과 특징 패턴 분석 중...",
+  "심리 프로필 생성 중...",
+  "시각적 특성 매핑 중...",
+  "인공지능 분석 진행 중...",
+  "얼굴 특징 데이터베이스 참고 중...",
+  "당신만의 특별한 프로필 만드는 중...",
+  "결과 최적화 중..."
 ];
 
 // 비밀번호 검증 로직 - 직접적인 비밀번호 노출 방지
@@ -288,12 +288,12 @@ const FaceReadingPage: React.FC = () => {
       
       {currentStep === Step.LOADING && (
         <LoadingContainer>
-          <LoadingText>관상 분석 중...</LoadingText>
+          <LoadingText>얼굴 분석 중...</LoadingText>
           <LoadingBarContainer>
             <LoadingBar width={loadingProgress} />
           </LoadingBarContainer>
           <LoadingDescription>
-            AI가 당신의 얼굴에서 운명의 패턴을 찾고 있습니다.
+            AI가 당신의 얼굴 특징을 분석하여 성격 프로필을 만들고 있습니다.
           </LoadingDescription>
           <LoadingMessage>{currentLoadingMessage}</LoadingMessage>
         </LoadingContainer>
