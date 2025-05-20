@@ -40,7 +40,7 @@ const defaultServicePlan: ServicePlanConfig = {
       free: '4o-mini',  // 무료 플랜은 4o-mini 사용
       premium: '4o-mini'  // 프리미엄도 사진 없는 경우 4o-mini 사용
     },
-    faceReading: 'gpt-4.1-turbo'  // GPT-4.1 모델로 업그레이드 (최상위 모델 사용)
+    faceReading: 'gpt-4o'  // GPT-4o 모델 사용 (비전 기능 지원)
   },
   features: {
     free: ['사주 기반 운세'],
@@ -64,7 +64,7 @@ export const getPromptConfig = (promptId: string, isVision = false, imageUrl = '
   if (isVision) {
     // Facereading Vision 모델 설정
     return {
-      model: 'gpt-4.1-turbo',  // 최신 모델로 변경
+      model: 'gpt-4o',  // 비전 기능이 있는 GPT-4o 모델 사용
       messages: [
         {
           role: 'system',
