@@ -2,8 +2,9 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import styled from '@emotion/styled';
 import Webcam from 'react-webcam';
 import { isMobile } from 'react-device-detect';
-import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+// 임시로 react-image-crop 관련 기능을 제거하여 빌드 오류 해결
+// import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
+// import 'react-image-crop/dist/ReactCrop.css';
 
 interface FaceCaptureProps {
   onCapture: (imageSrc: string) => void;
@@ -11,7 +12,7 @@ interface FaceCaptureProps {
 }
 
 // 이미지 크롭 함수 - 크롭된 이미지를 base64 문자열로 반환
-function getCroppedImg(image: HTMLImageElement, crop: PixelCrop): Promise<string> {
+function getCroppedImg(image: HTMLImageElement, crop: any): Promise<string> {
   const canvas = document.createElement('canvas');
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
@@ -54,20 +55,15 @@ function centerAspectCrop(
   mediaWidth: number,
   mediaHeight: number,
   aspect: number
-): Crop {
-  return centerCrop(
-    makeAspectCrop(
-      {
-        unit: '%',
-        width: 90,
-      },
-      aspect,
-      mediaWidth,
-      mediaHeight
-    ),
-    mediaWidth,
-    mediaHeight
-  );
+): any {
+  // centerCrop과 makeAspectCrop을 대체하는 임시 함수
+  return {
+    unit: '%',
+    x: 25,
+    y: 25,
+    width: 50,
+    height: 50,
+  };
 }
 
 const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false }) => {
@@ -81,8 +77,8 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const [videoShown, setVideoShown] = useState<boolean>(false); // 비디오 표시 상태 추가
   
   // 이미지 크롭 관련 상태
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [crop, setCrop] = useState<any>();
+  const [completedCrop, setCompletedCrop] = useState<any>();
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -329,13 +325,8 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
               </SmallImageContainer>
             ) : isCropping && originalImage ? (
               <CropContainer>
-                <ReactCrop
-                  crop={crop}
-                  onChange={(c) => setCrop(c)}
-                  onComplete={(c) => setCompletedCrop(c)}
-                  aspect={1}
-                  circularCrop
-                >
+                {/* ReactCrop 컴포넌트 대신 일반 이미지로 대체 */}
+                <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
                   <img
                     ref={imgRef}
                     alt="얼굴 크롭"
@@ -343,16 +334,27 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                     onLoad={onImageLoad}
                     style={{ maxWidth: '100%', maxHeight: '400px' }}
                   />
-                </ReactCrop>
+                  {/* 임시 크롭 가이드 표시 */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: '25%', 
+                    left: '25%', 
+                    width: '50%', 
+                    height: '50%',
+                    border: '2px dashed white',
+                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+                    borderRadius: '50%'
+                  }}></div>
+                </div>
                 <CropInstructions>
-                  얼굴 부분을 드래그해서 선택해주세요
+                  지금은 크롭 기능이 제한되어 있습니다. 얼굴이 중앙에 오도록 이미지를 업로드하세요.
                 </CropInstructions>
                 <CropButtonGroup>
                   <CancelCropButton onClick={handleCancelCrop}>
                     취소
                   </CancelCropButton>
                   <ConfirmCropButton onClick={handleCropComplete}>
-                    크롭 완료
+                    이 이미지 사용하기
                   </ConfirmCropButton>
                 </CropButtonGroup>
               </CropContainer>
