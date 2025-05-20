@@ -17,21 +17,18 @@ enum Step {
 
 // 로딩 중 보여줄 위트있는 메시지 배열
 const wittyLoadingMessages = [
-  "영혼의 기억을 검색 중...",
-  "전생의 데이터베이스 탐색 중...",
-  "운명의 실타래 풀어내는 중...",
-  "과거와 현재 연결 중...",
-  "신비한 이야기 짜맞추는 중...",
-  "영적 영감 수집 중...",
-  "창작의 에너지 충전 중...",
-  "우주에서 메시지 수신 중...",
-  "별자리의 지혜 참고 중...",
-  "영적 가이드와 교신 중...",
-  "이야기의 조각 모으는 중...",
-  "상상력 주문 발동 중...",
-  "신비한 차원 접속 중...",
-  "운명의 책 펼치는 중...",
-  "시간의 문 여는 중..."
+  '얼굴의 운명선을 분석 중...',
+  '이마와 눈의 기운을 읽는 중...',
+  '인중과 입술에 담긴 재능을 발견 중...',
+  '귀와 턱의 복(福)을 해석 중...',
+  '관상학의 고서를 참고하는 중...',
+  '전생의 인연을 확인하는 중...',
+  '얼굴에 숨겨진 운명의 코드를 해독 중...',
+  '눈썹 위치로 인생 운세를 계산 중...',
+  '이목구비의 조화를 분석 중...',
+  '귀신지능(鬼神智能)의 힘을 빌리는 중...',
+  '코와 입술의 재물선을 살피는 중...',
+  '천기(天機)와 지기(地機)를 읽는 중...',
 ];
 
 // 비밀번호 검증 로직 - 직접적인 비밀번호 노출 방지
@@ -228,11 +225,11 @@ const FaceReadingPage: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title>AI 운명 이야기</Title>
+        <Title>AI 관상 분석</Title>
         <Subtitle>
           {currentStep === Step.PLAN_CHECK 
-            ? '프리미엄 서비스로 당신만의 독특한 운명 이야기를 들려드립니다' 
-            : '아이(AI)보살이 들려주는 신비로운 당신의 이야기'}
+            ? '프리미엄 서비스로 당신의 얼굴에 담긴 운명의 비밀을 풀어드립니다' 
+            : '아이(AI)보살이 보는 당신의 관상과 운명'}
         </Subtitle>
       </Header>
       
@@ -240,20 +237,20 @@ const FaceReadingPage: React.FC = () => {
 
       {currentStep === Step.PLAN_CHECK && (
         <PremiumFeatureSection>
-          <FeatureTitle>AI 운명 이야기 서비스</FeatureTitle>
+          <FeatureTitle>AI 관상 분석 서비스</FeatureTitle>
           <FeatureDescription>
-            당신의 이미지에서 영감을 받아 과거 전생과 미래의 가능성을 창의적으로 연결한
-            신비로운 이야기를 들려드리는 프리미엄 전용 서비스입니다.
+            5000년 전통 동양 관상학의 지혜와 현대 AI 기술을 결합하여
+            당신의 얼굴에 담긴 운명과 잠재력을 창의적으로 해석해 드립니다.
           </FeatureDescription>
           
           <ModelBadge>고급 GPT-4o 모델 사용</ModelBadge>
           
           <FeaturesList>
-            <FeatureItem>✓ 전생 스토리 창작</FeatureItem>
-            <FeatureItem>✓ 신비로운 운명선 해석</FeatureItem>
-            <FeatureItem>✓ 숨겨진 재능 발견</FeatureItem>
-            <FeatureItem>✓ 인연과 관계의 비밀</FeatureItem>
-            <FeatureItem>✓ 영적 조언과 메시지</FeatureItem>
+            <FeatureItem>✓ 전생 이야기 해석</FeatureItem>
+            <FeatureItem>✓ 얼굴 부위별 관상 풀이</FeatureItem>
+            <FeatureItem>✓ 타고난 운명과 기질 분석</FeatureItem>
+            <FeatureItem>✓ 인연과 대인관계 해석</FeatureItem>
+            <FeatureItem>✓ 운명의 조언과 지혜</FeatureItem>
           </FeaturesList>
           <PlanSelector onSelect={handlePlanSelect} />
           <BackLink onClick={handleReturn}>
@@ -293,12 +290,12 @@ const FaceReadingPage: React.FC = () => {
       
       {currentStep === Step.LOADING && (
         <LoadingContainer>
-          <LoadingText>신비한 이야기 창작 중...</LoadingText>
+          <LoadingText>관상 분석 중...</LoadingText>
           <LoadingBarContainer>
             <LoadingBar width={loadingProgress} />
           </LoadingBarContainer>
           <LoadingDescription>
-            아이(AI)보살이 당신만을 위한 재미있는 이야기를 만들고 있습니다.
+            아이(AI)보살이 당신의 얼굴에서 운명의 흔적을 찾고 있습니다.
           </LoadingDescription>
           <LoadingMessage>{currentLoadingMessage}</LoadingMessage>
         </LoadingContainer>
@@ -308,8 +305,8 @@ const FaceReadingPage: React.FC = () => {
         <>
           <ModelInfo>
             <ModelInfoText>
-              신비로운 운명 이야기는 AI의 창작력을 극대화하기 위해 일반 모델보다 더 고성능인 
-              <strong> GPT-4o 모델</strong>을 사용합니다. 이미지는 단지 영감을 주는 소재로만 활용됩니다.
+              전통 관상학의 지혜를 AI가 창의적으로 해석하기 위해 일반 모델보다 더 고성능인 
+              <strong> GPT-4o 모델</strong>을 사용합니다. 사진이 명확할수록 더 흥미로운 관상 해석이 가능합니다.
             </ModelInfoText>
           </ModelInfo>
           <FaceCapture 
@@ -339,12 +336,12 @@ const FaceReadingPage: React.FC = () => {
       
       <DisclaimerSection>
         <Disclaimer>
-          * 이 서비스는 순수한 엔터테인먼트 목적으로 제공되는 창작 게임입니다.
-          모든 이야기와 해석은 AI의 창의적 상상력으로 만들어진 것이며,
-          실제 분석이나 예측을 의미하지 않습니다.
+          * 이 서비스는 전통 관상학을 창의적으로 해석한 엔터테인먼트 콘텐츠입니다.
+          모든 해석과 이야기는 재미와 영감을 위해 제공되며,
+          과학적 분석이나 확정적인 예측으로 받아들이지 마세요.
         </Disclaimer>
         <Disclaimer>
-          * 이미지는 오직 창작 영감을 위한 소재로만 사용되며, 서버에 영구 저장되지 않습니다.
+          * 촬영 또는 업로드한 이미지는 관상 해석을 위한 영감의 소재로만 사용되며, 서버에 영구 저장되지 않습니다.
         </Disclaimer>
       </DisclaimerSection>
     </Container>

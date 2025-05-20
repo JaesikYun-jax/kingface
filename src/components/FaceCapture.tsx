@@ -32,7 +32,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const initializeCamera = useCallback(() => {
     setIsInitializing(true);
     setIsCameraReady(false);
-    setVideoShown(false); // 비디오 표시 상태 초기화
+    
+    // 비디오 숨김 처리 제거 - 항상 표시
+    // setVideoShown(false);
     
     if (webcamRef.current && webcamRef.current.video && webcamRef.current.video.srcObject) {
       try {
@@ -55,6 +57,8 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
       console.log('카메라 스트림 초기화 성공');
       setHasCameraPermission(true);
       setError(null);
+      // 바로 이미지가 표시되도록 설정
+      setVideoShown(true);
     })
     .catch((err) => {
       console.error('카메라 초기화 오류:', err);
@@ -90,10 +94,8 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     setError(null);
     setIsInitializing(false);
     
-    // 비디오 표시 설정 - 추가
-    setTimeout(() => {
-      setVideoShown(true);
-    }, 300); // 웹캠이 준비된 후 약간의 지연을 두고 표시
+    // 비디오 표시 즉시 설정 (지연 없이)
+    setVideoShown(true);
   }, []);
   
   // 웹캠 에러 처리
@@ -141,9 +143,16 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
 
   // 촬영/업로드 모드 전환
   const toggleUploadMode = useCallback(() => {
-    setUploadMode(prev => !prev);
+    const newUploadMode = !uploadMode;
+    setUploadMode(newUploadMode);
     setCapturedImage(null);
-  }, []);
+    
+    // 카메라 모드로 전환 시 카메라 초기화 즉시 수행
+    if (!newUploadMode) {
+      console.log("카메라 모드로 전환: 카메라 초기화");
+      setTimeout(() => initializeCamera(), 100); // 약간의 지연으로 상태 업데이트 보장
+    }
+  }, [uploadMode, initializeCamera]);
   
   // 파일 업로드 처리
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,11 +185,11 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   
   return (
     <Container>
-      <Title>AI 운명 이야기</Title>
+      <Title>AI 관상 분석</Title>
       <SubTitle>
         {uploadMode 
-          ? '사진을 업로드하고 당신만의 신비로운 이야기를 들어보세요' 
-          : '사진을 찍고 당신만의 신비로운 이야기를 들어보세요'}
+          ? '얼굴 사진을 업로드하여 AI 관상 분석을 받아보세요' 
+          : '얼굴 사진을 찍어 AI 관상 분석을 받아보세요'}
       </SubTitle>
       
       {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -234,13 +243,13 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                   onUserMediaError={handleUserMediaError}
                   mirrored={cameraType === 'user'}
                   style={{
-                    display: 'block', // 항상 표시하되 투명도로 제어
+                    display: 'block', // 항상 표시
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
                     borderRadius: '12px',
-                    opacity: videoShown ? 1 : 0, // 비디오 표시 상태에 따라 투명도 조절
-                    transition: 'opacity 0.3s ease',
+                    opacity: videoShown ? 1 : 0,
+                    transition: 'opacity 0.2s ease', // 트랜지션 시간 단축
                   }}
                 />
                 {isCameraReady && !capturedImage && (
@@ -279,9 +288,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
         
         {!capturedImage ? (
           <>
-            {!uploadMode && isCameraReady && (
+            {!uploadMode && (
               <ButtonGroup>
-                <CameraButton onClick={toggleCamera} disabled={isLoading}>
+                <CameraButton onClick={toggleCamera} disabled={!isCameraReady || isLoading}>
                   📱 카메라 전환
                 </CameraButton>
                 <CaptureButton 
