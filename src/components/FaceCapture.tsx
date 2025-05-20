@@ -12,28 +12,41 @@ interface FaceCaptureProps {
 }
 
 // 이미지 크롭 함수 - 크롭된 이미지를 base64 문자열로 반환
-function getCroppedImg(image: HTMLImageElement, crop: any): Promise<string> {
+function getCroppedImg(image: HTMLImageElement, cropData: { 
+  scale: number, 
+  translateX: number, 
+  translateY: number, 
+  containerSize: number 
+}): Promise<string> {
+  const { scale, translateX, translateY, containerSize } = cropData;
   const canvas = document.createElement('canvas');
-  const scaleX = image.naturalWidth / image.width;
-  const scaleY = image.naturalHeight / image.height;
-  canvas.width = crop.width;
-  canvas.height = crop.height;
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
     throw new Error('Canvas context is not available');
   }
 
+  // 결과 이미지 크기 설정 (정사각형)
+  canvas.width = containerSize;
+  canvas.height = containerSize;
+
+  // 크롭할 영역 계산
+  const sourceX = (containerSize / 2 - translateX) / scale;
+  const sourceY = (containerSize / 2 - translateY) / scale;
+  const sourceWidth = containerSize / scale;
+  const sourceHeight = containerSize / scale;
+
+  // 이미지를 캔버스 전체 영역에 그리기
   ctx.drawImage(
     image,
-    crop.x * scaleX,
-    crop.y * scaleY,
-    crop.width * scaleX,
-    crop.height * scaleY,
-    0,
-    0,
-    crop.width,
-    crop.height
+    sourceX, 
+    sourceY, 
+    sourceWidth, 
+    sourceHeight,
+    0, 
+    0, 
+    containerSize, 
+    containerSize
   );
 
   return new Promise((resolve) => {
@@ -46,24 +59,8 @@ function getCroppedImg(image: HTMLImageElement, crop: any): Promise<string> {
       reader.onloadend = () => {
         resolve(reader.result as string);
       };
-    }, 'image/jpeg');
+    }, 'image/jpeg', 0.95); // 95% 품질로 압축
   });
-}
-
-// 기본 정사각형 크롭 생성 함수
-function centerAspectCrop(
-  mediaWidth: number,
-  mediaHeight: number,
-  aspect: number
-): any {
-  // centerCrop과 makeAspectCrop을 대체하는 임시 함수
-  return {
-    unit: '%',
-    x: 25,
-    y: 25,
-    width: 50,
-    height: 50,
-  };
 }
 
 const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false }) => {
@@ -77,11 +74,17 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const [videoShown, setVideoShown] = useState<boolean>(false); // 비디오 표시 상태 추가
   
   // 이미지 크롭 관련 상태
-  const [crop, setCrop] = useState<any>();
-  const [completedCrop, setCompletedCrop] = useState<any>();
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const cropContainerRef = useRef<HTMLDivElement>(null);
+  
+  // 새로운 이미지 조작 상태
+  const [scale, setScale] = useState<number>(1);
+  const [translateX, setTranslateX] = useState<number>(0);
+  const [translateY, setTranslateY] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragStart, setDragStart] = useState<{ x: number, y: number } | null>(null);
   
   const webcamRef = useRef<Webcam>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,18 +96,106 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     facingMode: cameraType,
   };
   
-  // 이미지 로드 시 기본 크롭 영역 설정
+  // 이미지 로드 시 초기 위치 설정
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
-    const cropAspect = 1; // 정사각형 크롭
-    setCrop(centerAspectCrop(width, height, cropAspect));
+    const img = e.currentTarget;
+    const container = cropContainerRef.current;
+    
+    if (img && container) {
+      // 이미지와 컨테이너의 비율 계산
+      const containerSize = container.clientWidth;
+      const imageAspect = img.naturalWidth / img.naturalHeight;
+      
+      // 초기 스케일 계산 (이미지가 컨테이너에 맞도록)
+      let newScale = 1;
+      if (imageAspect > 1) {
+        // 이미지가 가로로 더 긴 경우
+        newScale = containerSize / (img.naturalHeight * imageAspect);
+      } else {
+        // 이미지가 세로로 더 긴 경우
+        newScale = containerSize / img.naturalHeight;
+      }
+      
+      // 약간 축소해서 시작 (전체 이미지가 보이도록)
+      newScale = Math.min(newScale * 0.8, 1);
+      
+      setScale(newScale);
+      setTranslateX(0);
+      setTranslateY(0);
+    }
+  }, []);
+  
+  // 드래그 시작 핸들러
+  const handleDragStart = useCallback((e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    
+    // 마우스 또는 터치 이벤트의 좌표 가져오기
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    setDragStart({ x: clientX - translateX, y: clientY - translateY });
+  }, [translateX, translateY]);
+  
+  // 드래그 중 핸들러
+  const handleDrag = useCallback((e: MouseEvent | TouchEvent) => {
+    if (isDragging && dragStart) {
+      e.preventDefault();
+      
+      // 마우스 또는 터치 이벤트의 좌표 가져오기
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      
+      setTranslateX(clientX - dragStart.x);
+      setTranslateY(clientY - dragStart.y);
+    }
+  }, [isDragging, dragStart]);
+  
+  // 드래그 종료 핸들러
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+  
+  // 크롭 영역 외부 이벤트 리스너 설정
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => handleDrag(e);
+    const handleTouchMove = (e: TouchEvent) => handleDrag(e);
+    const handleMouseUp = () => handleDragEnd();
+    const handleTouchEnd = () => handleDragEnd();
+    
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging, handleDrag, handleDragEnd]);
+  
+  // 확대/축소 핸들러
+  const handleScaleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newScale = parseFloat(e.target.value);
+    setScale(newScale);
   }, []);
   
   // 크롭 완료 처리
   const handleCropComplete = useCallback(async () => {
-    if (imgRef.current && completedCrop?.width && completedCrop?.height) {
+    if (imgRef.current && cropContainerRef.current) {
       try {
-        const croppedImageUrl = await getCroppedImg(imgRef.current, completedCrop);
+        const containerSize = cropContainerRef.current.clientWidth;
+        const cropData = {
+          scale,
+          translateX,
+          translateY,
+          containerSize
+        };
+        
+        const croppedImageUrl = await getCroppedImg(imgRef.current, cropData);
         setCapturedImage(croppedImageUrl);
         setIsCropping(false);
       } catch (err) {
@@ -112,9 +203,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
         setError('이미지 크롭 중 오류가 발생했습니다.');
       }
     } else {
-      setError('크롭할 영역을 지정해주세요.');
+      setError('이미지 참조를 찾을 수 없습니다.');
     }
-  }, [completedCrop]);
+  }, [scale, translateX, translateY]);
   
   // 크롭 취소
   const handleCancelCrop = useCallback(() => {
@@ -325,30 +416,56 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
               </SmallImageContainer>
             ) : isCropping && originalImage ? (
               <CropContainer>
-                {/* ReactCrop 컴포넌트 대신 일반 이미지로 대체 */}
-                <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
-                  <img
-                    ref={imgRef}
-                    alt="얼굴 크롭"
-                    src={originalImage}
-                    onLoad={onImageLoad}
-                    style={{ maxWidth: '100%', maxHeight: '400px' }}
+                {/* 정사각형 크롭 영역 */}
+                <SquareCropArea 
+                  ref={cropContainerRef}
+                  onMouseDown={handleDragStart}
+                  onTouchStart={handleDragStart}
+                >
+                  <CropImageWrapper
+                    style={{
+                      transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                      cursor: isDragging ? 'grabbing' : 'grab'
+                    }}
+                  >
+                    <img
+                      ref={imgRef}
+                      alt="얼굴 크롭"
+                      src={originalImage}
+                      onLoad={onImageLoad}
+                      style={{ 
+                        width: '100%',
+                        height: 'auto',
+                        transformOrigin: 'center',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                      }}
+                      draggable="false"
+                    />
+                  </CropImageWrapper>
+                  
+                  {/* 크롭 영역 가이드 원 */}
+                  <CropCircleOverlay />
+                </SquareCropArea>
+                
+                {/* 확대/축소 슬라이더 */}
+                <ZoomControl>
+                  <ZoomIcon>🔍-</ZoomIcon>
+                  <ZoomSlider 
+                    type="range" 
+                    min="0.5" 
+                    max="3" 
+                    step="0.01" 
+                    value={scale}
+                    onChange={handleScaleChange}
                   />
-                  {/* 임시 크롭 가이드 표시 */}
-                  <div style={{ 
-                    position: 'absolute', 
-                    top: '25%', 
-                    left: '25%', 
-                    width: '50%', 
-                    height: '50%',
-                    border: '2px dashed white',
-                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-                    borderRadius: '50%'
-                  }}></div>
-                </div>
+                  <ZoomIcon>+🔍</ZoomIcon>
+                </ZoomControl>
+                
                 <CropInstructions>
-                  지금은 크롭 기능이 제한되어 있습니다. 얼굴이 중앙에 오도록 이미지를 업로드하세요.
+                  이미지를 드래그하여 위치를 조정하고, 슬라이더로 확대/축소하세요.
                 </CropInstructions>
+                
                 <CropButtonGroup>
                   <CancelCropButton onClick={handleCancelCrop}>
                     취소
@@ -479,6 +596,99 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   );
 };
 
+// 새로 추가된 스타일 컴포넌트
+const SquareCropArea = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  height: 0;
+  padding-bottom: 100%; /* 정사각형 */
+  margin: 0 auto;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  touch-action: none; /* 터치 액션 방지 */
+`;
+
+const CropImageWrapper = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform; /* 성능 최적화 */
+  transition: transform 0.05s ease-out; /* 드래그 시 부드러운 효과 */
+`;
+
+const CropCircleOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  border: 2px dashed white;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+`;
+
+const ZoomControl = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 300px;
+  margin: 1rem auto 0.5rem;
+  padding: 0 0.5rem;
+`;
+
+const ZoomIcon = styled.span`
+  font-size: 1rem;
+  color: #4a5568;
+`;
+
+const ZoomSlider = styled.input`
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #cbd5e0;
+  outline: none;
+  transition: background 0.2s;
+  
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #6b46c1;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+      background: #553c9a;
+      transform: scale(1.1);
+    }
+  }
+  
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: #6b46c1;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+      background: #553c9a;
+      transform: scale(1.1);
+    }
+  }
+`;
+
+// 기존 스타일 컴포넌트 (변경되지 않은 부분은 생략)
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -887,7 +1097,7 @@ const CropContainer = styled.div`
   align-items: center;
   gap: 1rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 360px;
   margin: 0 auto;
   padding: 1rem 0;
 `;
