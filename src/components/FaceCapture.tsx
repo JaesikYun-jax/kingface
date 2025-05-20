@@ -15,6 +15,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const [error, setError] = useState<string | null>(null);
   const [uploadMode, setUploadMode] = useState<boolean>(!isMobile); // PC에서는 기본값으로 업로드 모드 사용
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>(false);
+  const [isInitializing, setIsInitializing] = useState<boolean>(true); // 초기 로딩 상태 추가
   
   const webcamRef = useRef<Webcam>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,27 +27,66 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     facingMode: cameraType,
   };
   
+  // 카메라 스트림 초기화 함수
+  const initializeCamera = useCallback(() => {
+    setIsInitializing(true);
+    setIsCameraReady(false);
+    
+    if (webcamRef.current && webcamRef.current.video && webcamRef.current.video.srcObject) {
+      try {
+        const tracks = (webcamRef.current.video.srcObject as MediaStream).getTracks();
+        tracks.forEach(track => track.stop());
+      } catch (err) {
+        console.error('카메라 스트림 중지 오류:', err);
+      }
+    }
+    
+    // 새로운 카메라 스트림 설정 시도
+    navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        facingMode: cameraType,
+        width: { ideal: videoConstraints.width },
+        height: { ideal: videoConstraints.height }
+      } 
+    })
+    .then(() => {
+      console.log('카메라 스트림 초기화 성공');
+      setHasCameraPermission(true);
+      setError(null);
+    })
+    .catch((err) => {
+      console.error('카메라 초기화 오류:', err);
+      setHasCameraPermission(false);
+      setError('카메라에 접근할 수 없습니다. 권한을 확인하거나 이미지 업로드를 이용해주세요.');
+      setUploadMode(true);
+    })
+    .finally(() => {
+      setIsInitializing(false);
+    });
+  }, [cameraType, videoConstraints.width, videoConstraints.height]);
+  
   // 컴포넌트 마운트 시 카메라 권한 확인
   useEffect(() => {
     if (!uploadMode) {
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(() => {
-          setHasCameraPermission(true);
-          setError(null);
-        })
-        .catch((err) => {
-          console.log('Camera permission error:', err);
-          setHasCameraPermission(false);
-          setUploadMode(true); // 카메라 권한이 없으면 업로드 모드로 전환
-          setError('카메라에 접근할 수 없어 이미지 업로드 모드로 전환합니다.');
-        });
+      initializeCamera();
+    } else {
+      setIsInitializing(false);
     }
-  }, [uploadMode]);
+  }, [uploadMode, initializeCamera]);
+  
+  // 카메라 타입이 변경될 때마다 스트림 재초기화
+  useEffect(() => {
+    if (!uploadMode && hasCameraPermission) {
+      initializeCamera();
+    }
+  }, [cameraType, uploadMode, hasCameraPermission, initializeCamera]);
   
   // 웹캠이 준비되었을 때 호출되는 함수
   const handleUserMedia = useCallback(() => {
+    console.log('웹캠 준비 완료');
     setIsCameraReady(true);
     setError(null);
+    setIsInitializing(false);
   }, []);
   
   // 웹캠 에러 처리
@@ -55,6 +95,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     setError('카메라에 접근할 수 없습니다. 권한을 확인하거나 이미지 업로드를 이용해주세요.');
     setIsCameraReady(false);
     setUploadMode(true); // 에러 발생 시 업로드 모드로 전환
+    setIsInitializing(false);
   }, []);
   
   // 사진 찍기
@@ -73,28 +114,11 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const resetImage = useCallback(() => {
     setCapturedImage(null);
     
-    // Webcam 컴포넌트 참조 초기화
-    if (webcamRef.current) {
-      // 카메라 스트림 재설정을 위한 지연 추가
-      setTimeout(() => {
-        if (webcamRef.current) {
-          try {
-            // 카메라 스트림 강제 재설정
-            const video = webcamRef.current.video;
-            if (video && video.srcObject) {
-              const tracks = (video.srcObject as MediaStream).getTracks();
-              tracks.forEach(track => track.stop());
-            }
-            // 웹캠 컴포넌트 내부 상태 재설정
-            webcamRef.current.stream = null;
-            webcamRef.current.video = null;
-          } catch (err) {
-            console.error("카메라 초기화 오류:", err);
-          }
-        }
-      }, 100);
+    if (!uploadMode && webcamRef.current) {
+      // 카메라 스트림 재설정
+      initializeCamera();
     }
-  }, [webcamRef]);
+  }, [uploadMode, initializeCamera]);
   
   // 카메라 전환 (전면/후면)
   const toggleCamera = useCallback(() => {
@@ -187,8 +211,12 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
               </SmallImageContainer>
             ) : (
               <SmallWebcamContainer>
-                {!isCameraReady && !error && (
-                  <LoadingMessage>카메라 로딩 중...</LoadingMessage>
+                {(isInitializing || !isCameraReady) && !error && (
+                  <LoadingOverlay>
+                    <LoadingSpinner />
+                    <LoadingMessage>카메라 로딩 중...</LoadingMessage>
+                    <LoadingHint>카메라 권한을 요청하면 '허용'을 눌러주세요</LoadingHint>
+                  </LoadingOverlay>
                 )}
                 <Webcam
                   ref={webcamRef}
@@ -206,6 +234,11 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                     borderRadius: '12px',
                   }}
                 />
+                {isCameraReady && !capturedImage && (
+                  <CaptureHintOverlay>
+                    <CaptureHintText>아래 '사진 촬영' 버튼을 눌러 사진을 찍으세요</CaptureHintText>
+                  </CaptureHintOverlay>
+                )}
               </SmallWebcamContainer>
             )}
           </>
@@ -247,6 +280,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
               <CaptureButton 
                 onClick={handleCapture} 
                 disabled={!isCameraReady || isLoading}
+                pulse={isCameraReady && !isLoading}
               >
                 📸 사진 촬영
               </CaptureButton>
@@ -317,15 +351,68 @@ const SmallWebcamContainer = styled.div`
   margin: 0 auto;
 `;
 
-const LoadingMessage = styled.div`
+// 로딩 오버레이 추가
+const LoadingOverlay = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 5;
+  border-radius: 12px;
+`;
+
+// 로딩 스피너 추가
+const LoadingSpinner = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+const LoadingMessage = styled.div`
   color: white;
   font-size: 1.2rem;
   font-weight: 500;
-  z-index: 1;
+  text-align: center;
+  margin-bottom: 0.5rem;
+`;
+
+const LoadingHint = styled.div`
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  text-align: center;
+  max-width: 80%;
+`;
+
+// 촬영 힌트 오버레이 추가
+const CaptureHintOverlay = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+  z-index: 3;
+`;
+
+const CaptureHintText = styled.div`
+  color: white;
+  font-size: 0.9rem;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 `;
 
 // 작은 이미지 컨테이너로 대체
@@ -410,7 +497,8 @@ const CameraButton = styled.button`
   }
 `;
 
-const CaptureButton = styled.button`
+// 사진 촬영 버튼 - 눈에 띄는 애니메이션 추가
+const CaptureButton = styled.button<{ pulse?: boolean }>`
   padding: 1rem;
   background-color: #6b46c1;
   color: white;
@@ -419,15 +507,34 @@ const CaptureButton = styled.button`
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.2s;
+  box-shadow: ${props => props.pulse ? '0 0 0 0 rgba(107, 70, 193, 0.7)' : 'none'};
+  animation: ${props => props.pulse ? 'pulse 2s infinite' : 'none'};
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(107, 70, 193, 0.7);
+    }
+    70% {
+      transform: scale(1.02);
+      box-shadow: 0 0 0 10px rgba(107, 70, 193, 0);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(107, 70, 193, 0);
+    }
+  }
   
   &:hover:not(:disabled) {
     background-color: #553c9a;
+    transform: translateY(-2px);
   }
   
   &:disabled {
     background-color: #a0aec0;
     cursor: not-allowed;
+    animation: none;
   }
 `;
 
