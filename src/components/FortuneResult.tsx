@@ -100,25 +100,25 @@ ${result.advice}
         <SubTitle>{currentDate} 기준</SubTitle>
       </ResultHeader>
 
+      {/* 카드와 사주 정보 표시 */}
+      <InfoSection>
+        {selectedCard && (
+          <CardContainer>
+            <CardImage src={selectedCard.image} alt={selectedCard.name} />
+            <CardInfo>
+              <CardName>{selectedCard.name}</CardName>
+              <CardMeaning>{selectedCard.meaning}</CardMeaning>
+            </CardInfo>
+          </CardContainer>
+        )}
+      </InfoSection>
+
+      {/* 신비로운 문구 표시 */}
+      <MysticPhraseBox>
+        <MysticPhrase>{mysticPhrase}</MysticPhrase>
+      </MysticPhraseBox>
+
       <OriginalContent>
-        {/* 카드와 사주 정보 표시 */}
-        <InfoSection>
-          {selectedCard && (
-            <CardContainer>
-              <CardImage src={selectedCard.image} alt={selectedCard.name} />
-              <CardInfo>
-                <CardName>{selectedCard.name}</CardName>
-                <CardMeaning>{selectedCard.meaning}</CardMeaning>
-              </CardInfo>
-            </CardContainer>
-          )}
-        </InfoSection>
-
-        {/* 신비로운 문구 표시 */}
-        <MysticPhraseBox>
-          <MysticPhrase>{mysticPhrase}</MysticPhrase>
-        </MysticPhraseBox>
-
         {/* 아이보살 사주 분석 결과 제목 */}
         <ResultTitle>아이보살의 사주 분석 결과</ResultTitle>
         
@@ -152,42 +152,55 @@ const Container = styled.div`
   padding: 0;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  
+  @media (max-width: 768px) {
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0;
+  }
 `;
 
 const ResultHeader = styled.div`
   background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
-  padding: 2rem;
+  padding: 2rem 1rem;
   color: white;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
 `;
 
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  
+  @media (max-width: 768px) {
+    font-size: 1.7rem;
+  }
 `;
 
 const SubTitle = styled.p`
   font-size: 1rem;
   font-weight: 500;
   opacity: 0.9;
-`;
-
-const OriginalContent = styled.div`
-  padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin: 1rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const InfoSection = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin: 1.5rem 1rem;
+  
+  @media (max-width: 768px) {
+    margin: 1rem 0.5rem;
+  }
 `;
 
 const CardContainer = styled.div`
@@ -197,10 +210,16 @@ const CardContainer = styled.div`
   background: linear-gradient(135deg, rgba(107, 70, 193, 0.3) 0%, rgba(159, 122, 234, 0.3) 100%);
   border-radius: 16px;
   padding: 1.5rem;
-  width: 250px;
+  max-width: 250px;
+  width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(5px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    max-width: 220px;
+  }
 `;
 
 const CardImage = styled.img`
@@ -209,6 +228,11 @@ const CardImage = styled.img`
   margin-bottom: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  
+  @media (max-width: 768px) {
+    width: 120px;
+    margin-bottom: 1rem;
+  }
 `;
 
 const CardInfo = styled.div`
@@ -221,6 +245,10 @@ const CardName = styled.h4`
   color: white;
   margin-bottom: 0.5rem;
   text-shadow: 0 0 5px rgba(107, 70, 193, 0.3);
+  
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
 `;
 
 const CardMeaning = styled.p`
@@ -228,17 +256,27 @@ const CardMeaning = styled.p`
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const MysticPhraseBox = styled.div`
   background: linear-gradient(135deg, rgba(107, 70, 193, 0.4) 0%, rgba(45, 55, 72, 0.4) 100%);
   border-radius: 12px;
   padding: 1.2rem;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1.5rem;
   max-width: 90%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(5px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 0 auto 1rem;
+    max-width: 95%;
+  }
 `;
 
 const MysticPhrase = styled.p`
@@ -249,6 +287,10 @@ const MysticPhrase = styled.p`
   font-style: italic;
   text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
   line-height: 1.5;
+  
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
 `;
 
 // 아이보살 결과 제목 스타일
@@ -257,29 +299,145 @@ const ResultTitle = styled.h2`
   font-weight: 700;
   color: white;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+`;
+
+const OriginalContent = styled.div`
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  margin: 0 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 0 0.5rem 1rem;
+    border-radius: 8px;
+  }
+  
+  h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
+    
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+    }
+  }
+  
+  h3 {
+    color: #e9d8fd;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 0 5px rgba(107, 70, 193, 0.3);
+    
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+      margin-top: 1.2rem;
+    }
+  }
+  
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+      margin-bottom: 0.8rem;
+    }
+  }
+  
+  ul, ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    
+    @media (max-width: 768px) {
+      padding-left: 1.2rem;
+    }
+  }
+  
+  li {
+    margin-bottom: 0.5rem;
+    
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+  }
+  
+  strong {
+    color: #e9d8fd;
+    font-weight: bold;
+  }
+  
+  em {
+    color: #c3dafe;
+    font-style: italic;
+  }
+  
+  a {
+    color: #90cdf4;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  code {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #e9d8fd;
+  }
+  
+  blockquote {
+    border-left: 3px solid rgba(255, 255, 255, 0.2);
+    padding-left: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+  }
 `;
 
 const MarkdownContainer = styled.div`
   color: white;
   line-height: 1.7;
   white-space: pre-wrap;
-  background-color: rgba(107, 70, 193, 0.1);
-  padding: 2rem;
+  padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
   
   h2 {
     font-size: 1.5rem;
     font-weight: 600;
     color: white;
-    margin: 2rem 0 1rem;
+    margin: 1.5rem 0 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
+    
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+      margin: 1.2rem 0 0.8rem;
+    }
   }
   
   p {
@@ -287,6 +445,12 @@ const MarkdownContainer = styled.div`
     margin-bottom: 1rem;
     color: rgba(255, 255, 255, 0.95);
     line-height: 1.8;
+    
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+      line-height: 1.6;
+    }
   }
   
   strong {
@@ -302,11 +466,21 @@ const MarkdownContainer = styled.div`
   ul, ol {
     margin-bottom: 1.5rem;
     padding-left: 1.5rem;
+    
+    @media (max-width: 768px) {
+      margin-bottom: 1.2rem;
+      padding-left: 1.2rem;
+    }
   }
   
   li {
     margin-bottom: 0.75rem;
     color: rgba(255, 255, 255, 0.95);
+    
+    @media (max-width: 768px) {
+      margin-bottom: 0.6rem;
+      font-size: 0.95rem;
+    }
   }
 `;
 
@@ -315,7 +489,12 @@ const Disclaimer = styled.p`
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
   text-align: center;
-  margin: 2rem 0;
+  margin: 1.5rem 1rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    margin: 1rem 0.5rem;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -323,11 +502,13 @@ const ButtonContainer = styled.div`
   justify-content: center;
   gap: 1rem;
   padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(0, 0, 0, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
+    padding: 1rem;
     flex-direction: column;
+    gap: 0.8rem;
   }
 `;
 
@@ -356,8 +537,10 @@ const ActionButton = styled.button<{ color: string }>`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     width: 100%;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
   }
 `;
 
