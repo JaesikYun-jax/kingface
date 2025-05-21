@@ -152,6 +152,7 @@ const Container = styled.div`
   padding: 0;
   border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 `;
 
 const ResultHeader = styled.div`
@@ -176,9 +177,11 @@ const SubTitle = styled.p`
 
 const OriginalContent = styled.div`
   padding: 2rem;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1rem;
 `;
 
 const InfoSection = styled.div`
@@ -195,8 +198,9 @@ const CardContainer = styled.div`
   border-radius: 16px;
   padding: 1.5rem;
   width: 250px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 `;
 
 const CardImage = styled.img`
@@ -216,32 +220,34 @@ const CardName = styled.h4`
   font-weight: 700;
   color: white;
   margin-bottom: 0.5rem;
+  text-shadow: 0 0 5px rgba(107, 70, 193, 0.3);
 `;
 
 const CardMeaning = styled.p`
   font-size: 1rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
 
 const MysticPhraseBox = styled.div`
-  background: linear-gradient(135deg, rgba(107, 70, 193, 0.6) 0%, rgba(45, 55, 72, 0.6) 100%);
+  background: linear-gradient(135deg, rgba(107, 70, 193, 0.4) 0%, rgba(45, 55, 72, 0.4) 100%);
   border-radius: 12px;
   padding: 1.2rem;
   margin: 0 auto 2rem;
   max-width: 90%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 `;
 
 const MysticPhrase = styled.p`
   font-size: 1.2rem;
   font-weight: 500;
-  color: #e9d8fd;
+  color: white;
   text-align: center;
   font-style: italic;
-  text-shadow: 0 0 10px rgba(233, 216, 253, 0.3);
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
   line-height: 1.5;
 `;
 
@@ -249,11 +255,11 @@ const MysticPhrase = styled.p`
 const ResultTitle = styled.h2`
   font-size: 1.8rem;
   font-weight: 700;
-  color: #e9d8fd;
+  color: white;
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid rgba(233, 216, 253, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
   text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
 `;
 
@@ -261,11 +267,15 @@ const MarkdownContainer = styled.div`
   color: white;
   line-height: 1.7;
   white-space: pre-wrap;
+  background-color: rgba(107, 70, 193, 0.1);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   
   h2 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #e9d8fd;
+    color: white;
     margin: 2rem 0 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -275,22 +285,34 @@ const MarkdownContainer = styled.div`
   p {
     font-size: 1.1rem;
     margin-bottom: 1rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.8;
   }
   
   strong {
     color: #e9d8fd;
+    font-weight: 700;
   }
   
   em {
     color: #c3dafe;
     font-style: italic;
   }
+  
+  ul, ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  
+  li {
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.95);
+  }
 `;
 
 const Disclaimer = styled.p`
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   font-style: italic;
   text-align: center;
   margin: 2rem 0;
@@ -301,6 +323,8 @@ const ButtonContainer = styled.div`
   justify-content: center;
   gap: 1rem;
   padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   
   @media (max-width: 640px) {
     flex-direction: column;
