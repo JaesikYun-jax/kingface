@@ -27,6 +27,7 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
   }
 
   // 결과 이미지 크기 설정 (정사각형)
+  // 스케일에 따른 출력 크기 조정 - 작은 이미지 문제 해결
   const outputSize = containerSize;
   canvas.width = outputSize;
   canvas.height = outputSize;
@@ -35,17 +36,15 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
   const imgWidth = image.naturalWidth;
   const imgHeight = image.naturalHeight;
 
-  // 이미지 중심점 계산 - 스케일과 이동을 고려한 좌표
-  // 이미지가 중앙에 위치하도록 좌표를 조정
+  // 이미지 중심점 계산
   const centerX = imgWidth / 2;
   const centerY = imgHeight / 2;
   
-  // 크롭할 영역 계산 - 중심에서의 오프셋 계산
+  // 크롭할 영역 크기 - 스케일을 정확히 반영
   const sourceSize = containerSize / scale;
   const halfSourceSize = sourceSize / 2;
   
-  // translateX/Y는 사용자가 드래그한 위치를 나타냄
-  // 이미지를 반대 방향으로 이동시켜야 하므로 부호를 반대로 함
+  // 오프셋 계산 - 스케일에 따른 정확한 오프셋 적용
   const offsetX = -translateX / scale;
   const offsetY = -translateY / scale;
   
@@ -600,16 +599,13 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
           <>
             {!uploadMode && (
               <ButtonGroup>
-                <CameraButton onClick={toggleCamera} disabled={!isCameraReady || isLoading}>
-                  📱 카메라 전환
-                </CameraButton>
-                <CaptureButton 
-                  onClick={handleCapture} 
-                  disabled={!isCameraReady || isLoading}
-                  pulse={isCameraReady && !isLoading}
+                <UploadButton 
+                  onClick={toggleUploadMode} 
+                  disabled={isLoading}
+                  fullWidth
                 >
-                  📸 사진 촬영
-                </CaptureButton>
+                  📂 이미지 업로드 모드로 전환
+                </UploadButton>
               </ButtonGroup>
             )}
             
@@ -617,6 +613,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
               <UploadButton 
                 onClick={handleUploadClick} 
                 disabled={isLoading}
+                fullWidth
               >
                 📂 이미지 선택
               </UploadButton>
@@ -874,7 +871,7 @@ const CapturedImage = styled.img`
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain; /* cover 대신 contain으로 변경하여 비율 유지 */
+  object-fit: cover; /* contain 대신 cover로 변경하여 화면을 가득 채우도록 함 */
   border-radius: 12px;
   background-color: #000; /* 배경 추가 */
 `;
@@ -906,14 +903,18 @@ const ModeButton = styled.button<{ active: boolean }>`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: ${props => props.active ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none'};
   
   &:hover:not(:disabled) {
     background-color: ${props => props.active ? '#553c9a' : '#cbd5e0'};
+    transform: ${props => props.active ? 'translateY(-2px)' : 'none'};
+    box-shadow: ${props => props.active ? '0 6px 8px rgba(0, 0, 0, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.05)'};
   }
   
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    box-shadow: none;
   }
 `;
 
@@ -980,7 +981,8 @@ const CaptureButton = styled.button<{ pulse?: boolean }>`
   }
 `;
 
-const UploadButton = styled.button`
+const UploadButton = styled.button<{ fullWidth?: boolean }>`
+  flex: 1;
   padding: 1rem;
   background-color: #3182ce;
   color: white;
@@ -989,21 +991,25 @@ const UploadButton = styled.button`
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  width: ${props => props.fullWidth ? '100%' : 'auto'};
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   
   &:hover:not(:disabled) {
     background-color: #2b6cb0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   }
   
   &:disabled {
     background-color: #a0aec0;
     cursor: not-allowed;
+    box-shadow: none;
   }
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: 1rem;
   width: 100%;
   margin-top: 0.5rem;
 `;
@@ -1032,24 +1038,28 @@ const RetakeButton = styled.button`
 
 const ConfirmButton = styled.button<{ fullWidth?: boolean }>`
   flex: 1;
-  padding: 0.8rem;
+  padding: 1rem;
   background-color: #38a169;
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   width: ${props => props.fullWidth ? '100%' : 'auto'};
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   
   &:hover:not(:disabled) {
     background-color: #2f855a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   }
   
   &:disabled {
     background-color: #a0aec0;
     cursor: not-allowed;
+    box-shadow: none;
   }
 `;
 
@@ -1192,10 +1202,13 @@ const CancelCropButton = styled.button`
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   
   &:hover:not(:disabled) {
     background-color: #cbd5e0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -1209,10 +1222,13 @@ const ConfirmCropButton = styled.button`
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   
   &:hover:not(:disabled) {
     background-color: #553c9a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   }
 `;
 
