@@ -190,19 +190,11 @@ const FaceReadingPage: React.FC = () => {
     if (!result) return;
     
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'AI 관상 분석 결과',
-          text: `AI가 분석한 나의 관상: ${result.personalityTraits.join(', ')}`,
-          url: window.location.href,
-        });
-      } else {
-        // 클립보드에 복사 - 원본 마크다운 내용과 홍보 문구 추가
-        const shareText = `${result.content}\n\n------------------\n\n당신의 운명이 궁금하다면? 아이보살이 도와드립니다 💫\n⭐ kingface.difflabs.xyz ⭐`;
-        
-        await navigator.clipboard.writeText(shareText);
-        alert('분석 결과가 클립보드에 복사되었습니다!');
-      }
+      // 클립보드에 복사 - 원본 마크다운 내용과 홍보 문구 추가
+      const shareText = `${result.content}\n\n------------------\n\n당신의 운명이 궁금하다면? 아이보살이 도와드립니다 💫\n⭐ kingface.difflabs.xyz ⭐`;
+      
+      await navigator.clipboard.writeText(shareText);
+      alert('분석 결과가 클립보드에 복사되었습니다!');
     } catch (err) {
       console.error('Sharing failed:', err);
       alert('결과 공유에 실패했습니다.');

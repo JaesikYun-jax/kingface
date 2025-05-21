@@ -133,17 +133,10 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
           </ActionButton>
         )}
         
-        {onShare ? (
-          <ActionButton onClick={onShare} color="#6b46c1">
-            <ButtonIcon>📤</ButtonIcon>
-            결과 공유하기
-          </ActionButton>
-        ) : (
-          <ActionButton onClick={copyToClipboard} color="#6b46c1">
-            <ButtonIcon>📋</ButtonIcon>
-            결과 복사하기
-          </ActionButton>
-        )}
+        <ActionButton onClick={onShare || copyToClipboard} color="#6b46c1">
+          <ButtonIcon>📋</ButtonIcon>
+          결과 복사하기
+        </ActionButton>
       </ButtonContainer>
     </Container>
   );
