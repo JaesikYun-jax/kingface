@@ -18,8 +18,10 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
 }) => {
   // 디버그 모달 상태 관리
   const [showDebugModal, setShowDebugModal] = useState<boolean>(false);
-  // 원본 분석 결과 표시 여부
-  const [showOriginalContent, setShowOriginalContent] = useState<boolean>(false);
+  // 원본 분석 결과 표시 여부 - 기본값을 true로 변경
+  const [showOriginalContent, setShowOriginalContent] = useState<boolean>(true);
+  // 파싱된 결과 표시 여부 - 새로 추가
+  const [showParsedContent, setShowParsedContent] = useState<boolean>(false);
 
   // 현재 날짜 포맷팅
   const currentDate = new Date().toLocaleDateString('ko-KR', {
@@ -84,7 +86,28 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
         <Title>당신의 관상 분석 결과</Title>
         <SubTitle>{currentDate} 기준</SubTitle>
       </ResultHeader>
+
+      {/* 원본 마크다운 콘텐츠 - 기본적으로 표시됨 */}
+      {showOriginalContent && (
+        <OriginalContent>
+          <ReactMarkdown>{result.content || '분석 결과가 없습니다.'}</ReactMarkdown>
+        </OriginalContent>
+      )}
       
+      {/* 토글 버튼 - 파싱된 결과 보기/숨기기 */}
+      <ButtonContainer style={{ padding: '0 2rem 1rem', borderTop: 'none' }}>
+        <ActionButton 
+          onClick={() => setShowParsedContent(!showParsedContent)} 
+          color="#4a5568"
+          style={{ width: 'auto', margin: '0 auto' }}
+        >
+          <ButtonIcon>{showParsedContent ? '📁' : '📂'}</ButtonIcon>
+          {showParsedContent ? '파싱된 분석 결과 숨기기' : '파싱된 분석 결과 보기'}
+        </ActionButton>
+      </ButtonContainer>
+      
+      {/* 파싱된 결과 섹션 - 토글 가능 */}
+      {showParsedContent && (
       <ResultSection>
         <ImageSection>
           {result.imageUrl && (
@@ -152,24 +175,6 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
           </AdviceCard>
         </AnalysisSection>
       </ResultSection>
-      
-      {/* 원본 콘텐츠 토글 버튼 */}
-      <ButtonContainer style={{ padding: '0 2rem 1rem', borderTop: 'none' }}>
-        <ActionButton 
-          onClick={() => setShowOriginalContent(!showOriginalContent)} 
-          color="#4a5568"
-          style={{ width: 'auto', margin: '0 auto' }}
-        >
-          <ButtonIcon>{showOriginalContent ? '📁' : '📂'}</ButtonIcon>
-          {showOriginalContent ? '원본 분석 결과 숨기기' : '원본 분석 결과 보기'}
-        </ActionButton>
-      </ButtonContainer>
-      
-      {/* 원본 관상 분석 콘텐츠 */}
-      {showOriginalContent && (
-        <OriginalContent>
-          <ReactMarkdown>{result.content || '분석 결과가 없습니다.'}</ReactMarkdown>
-        </OriginalContent>
       )}
       
       <Disclaimer>
@@ -866,42 +871,64 @@ const DebugTable = styled.table`
 
 // 원본 관상 분석 콘텐츠 렌더링을 위한 컴포넌트 추가
 const OriginalContent = styled.div`
-  margin-top: 2rem;
-  padding: 1.5rem;
   background-color: white;
+  padding: 2rem;
+  margin: 0 2rem 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-
+  
   h2 {
-    font-size: 1.4rem;
     color: #4a5568;
+    font-size: 1.5rem;
     margin-bottom: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 0.5rem;
   }
-
+  
   h3 {
-    font-size: 1.2rem;
     color: #4a5568;
-    margin: 1.5rem 0 0.5rem;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
   }
-
+  
   p {
-    margin: 0.75rem 0;
-    line-height: 1.8;
+    margin-bottom: 1rem;
+    line-height: 1.6;
   }
-
+  
   ul, ol {
-    margin: 0.75rem 0;
+    margin-bottom: 1rem;
     padding-left: 1.5rem;
   }
-
+  
   li {
-    margin: 0.5rem 0;
+    margin-bottom: 0.5rem;
   }
-
-  em, strong {
+  
+  strong, em {
+    color: #6b46c1;
+  }
+  
+  a {
+    color: #3182ce;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  code {
+    background-color: #f1f5f9;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+  
+  blockquote {
+    border-left: 3px solid #cbd5e0;
+    padding-left: 1rem;
     color: #4a5568;
+    font-style: italic;
   }
 `;
 
