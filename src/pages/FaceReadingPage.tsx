@@ -344,28 +344,32 @@ const FaceReadingPage: React.FC = () => {
 const PasswordContainer = styled.div`
   text-align: center;
   padding: 2rem;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
   max-width: 500px;
   margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const SecurityIcon = styled.div`
   font-size: 3rem;
   margin-bottom: 1rem;
+  color: #e9d8fd;
 `;
 
 const PasswordTitle = styled.h3`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #2d3748;
+  color: white;
   margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
 
 const PasswordDescription = styled.p`
   font-size: 1rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 2rem;
   line-height: 1.6;
 `;
@@ -407,7 +411,7 @@ const SubmitButton = styled.button`
 `;
 
 const PasswordErrorMessage = styled.div`
-  color: #c53030;
+  color: #feb2b2;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 `;
@@ -428,7 +432,8 @@ const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #2d3748;
+  color: white;
+  text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
   
   @media (max-width: 768px) {
     font-size: 2rem;
@@ -437,7 +442,7 @@ const Title = styled.h1`
 
 const Subtitle = styled.p`
   font-size: 1.2rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -466,15 +471,16 @@ const LoadingContainer = styled.div`
 const LoadingText = styled.h3`
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2d3748;
+  color: white;
   margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
 `;
 
 const LoadingBarContainer = styled.div`
   width: 100%;
   max-width: 400px;
   height: 12px;
-  background-color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: 1.5rem;
@@ -490,7 +496,7 @@ const LoadingBar = styled.div<{ width: number }>`
 
 const LoadingDescription = styled.p`
   font-size: 1rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   max-width: 500px;
   line-height: 1.6;
   margin-bottom: 0.5rem;
@@ -500,7 +506,7 @@ const LoadingDescription = styled.p`
 const LoadingMessage = styled.p`
   font-size: 0.95rem;
   font-style: italic;
-  color: #805ad5;
+  color: #e9d8fd;
   max-width: 500px;
   line-height: 1.6;
   animation: pulse 2s infinite;
@@ -519,12 +525,12 @@ const ResultContainer = styled.div`
 const DisclaimerSection = styled.div`
   margin-top: 3rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const Disclaimer = styled.p`
   font-size: 0.9rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 0.8rem;
   line-height: 1.5;
 `;
@@ -533,55 +539,53 @@ const Disclaimer = styled.p`
 const PremiumFeatureSection = styled.div`
   text-align: center;
   padding: 2rem;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  margin: 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
-const FeatureTitle = styled.h3`
+const FeatureTitle = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #2d3748;
+  color: white;
   margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
 
 const FeatureDescription = styled.p`
   font-size: 1.1rem;
-  color: #4a5568;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+  line-height: 1.6;
 `;
 
-const FeaturesList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0 auto 2rem auto;
-  max-width: 500px;
-  text-align: left;
-`;
-
-const FeatureItem = styled.li`
-  padding: 0.75rem 0;
-  color: #4a5568;
-  font-size: 1.1rem;
+const FeaturesList = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
+  margin-bottom: 2rem;
+`;
+
+const FeatureItem = styled.div`
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
 `;
 
 const BackLink = styled.button`
   background: none;
   border: none;
-  color: #6b46c1;
+  color: #e9d8fd;
   font-size: 1rem;
   text-decoration: underline;
   cursor: pointer;
   margin-top: 1.5rem;
   
   &:hover {
-    color: #553c9a;
+    color: #d6bcfa;
   }
 `;
 
@@ -606,13 +610,14 @@ const PlanBadge = styled.div<{ isPremium: boolean }>`
 
 const ModelBadge = styled.div`
   display: inline-block;
-  background-color: #e9d8fd;
-  color: #6b46c1;
+  background-color: rgba(233, 216, 253, 0.2);
+  color: #e9d8fd;
   font-size: 0.9rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  margin: 0.75rem 0 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(233, 216, 253, 0.3);
 `;
 
 const ModelInfo = styled.div`

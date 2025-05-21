@@ -352,10 +352,11 @@ const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;
   padding: 0;
-  background-color: #f8fafc;
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
 `;
 
 const ResultHeader = styled.div`
@@ -399,16 +400,17 @@ const CenteredUserImage = styled.img`
 const ResultTitle = styled.h2`
   font-size: 1.8rem;
   font-weight: 700;
-  color: #6b46c1;
+  color: #e9d8fd;
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e9d8fd;
+  border-bottom: 2px solid rgba(233, 216, 253, 0.3);
+  text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
 `;
 
 const Disclaimer = styled.p`
   font-size: 0.85rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.6);
   text-align: center;
   margin: 0;
   padding: 1rem 2rem 2rem;
@@ -419,9 +421,9 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 1rem;
-  background-color: white;
+  background-color: rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   
   @media (max-width: 640px) {
     flex-direction: column;
@@ -538,16 +540,17 @@ const DebugModalBody = styled.div`
   padding: 1rem;
   overflow-y: auto;
   max-height: calc(90vh - 60px);
+  background-color: #1a202c;
   
   h3 {
     margin-top: 1rem;
     margin-bottom: 0.5rem;
     font-size: 1rem;
-    color: #4a5568;
+    color: #e2e8f0;
   }
   
   pre {
-    background-color: #f1f5f9;
+    background-color: #2d3748;
     padding: 1rem;
     border-radius: 8px;
     overflow-x: auto;
@@ -555,7 +558,7 @@ const DebugModalBody = styled.div`
     line-height: 1.5;
     margin-bottom: 1rem;
     white-space: pre-wrap;
-    color: #334155;
+    color: #e2e8f0;
   }
 `;
 
@@ -566,58 +569,71 @@ const DebugTable = styled.table`
   
   td {
     padding: 0.5rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #4a5568;
     font-size: 0.85rem;
+    color: #e2e8f0;
   }
   
   td:first-of-type {
     width: 120px;
     font-weight: bold;
-    background-color: #f1f5f9;
+    background-color: #2d3748;
   }
 `;
 
 // 원본 관상 분석 콘텐츠 렌더링을 위한 컴포넌트 추가
 const OriginalContent = styled.div`
-  background-color: white;
+  background-color: rgba(0, 0, 0, 0.2);
   padding: 2rem;
   margin: 0 2rem 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
   
   h2 {
-    color: #4a5568;
+    color: white;
     font-size: 1.5rem;
     margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
   }
   
   h3 {
-    color: #4a5568;
+    color: #e9d8fd;
     font-size: 1.2rem;
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
+    text-shadow: 0 0 5px rgba(107, 70, 193, 0.3);
   }
   
   p {
     margin-bottom: 1rem;
     line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
   }
   
   ul, ol {
     margin-bottom: 1rem;
     padding-left: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
   }
   
   li {
     margin-bottom: 0.5rem;
   }
   
-  strong, em {
-    color: #6b46c1;
+  strong {
+    color: #e9d8fd;
+    font-weight: bold;
+  }
+  
+  em {
+    color: #c3dafe;
+    font-style: italic;
   }
   
   a {
-    color: #3182ce;
+    color: #90cdf4;
     text-decoration: none;
     
     &:hover {
@@ -626,16 +642,17 @@ const OriginalContent = styled.div`
   }
   
   code {
-    background-color: #f1f5f9;
+    background-color: rgba(0, 0, 0, 0.3);
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
     font-family: monospace;
+    color: #e9d8fd;
   }
   
   blockquote {
-    border-left: 3px solid #cbd5e0;
+    border-left: 3px solid rgba(255, 255, 255, 0.2);
     padding-left: 1rem;
-    color: #4a5568;
+    color: rgba(255, 255, 255, 0.8);
     font-style: italic;
   }
 `;
