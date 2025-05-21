@@ -197,11 +197,11 @@ const FaceReadingPage: React.FC = () => {
           url: window.location.href,
         });
       } else {
-        // 클립보드에 복사
-        await navigator.clipboard.writeText(
-          `AI 관상 분석 결과\n\n성격: ${result.personalityTraits.join(', ')}\n전체 운세: ${result.overallFortune}\n직업 적성: ${result.careerSuitability}\n대인 관계: ${result.relationships}\n조언: ${result.advice}`
-        );
-        alert('결과가 클립보드에 복사되었습니다.');
+        // 클립보드에 복사 - 원본 마크다운 내용과 홍보 문구 추가
+        const shareText = `${result.content}\n\n------------------\n\n당신의 운명이 궁금하다면? 아이보살이 도와드립니다 💫\n⭐ kingface.difflabs.xyz ⭐`;
+        
+        await navigator.clipboard.writeText(shareText);
+        alert('분석 결과가 클립보드에 복사되었습니다!');
       }
     } catch (err) {
       console.error('Sharing failed:', err);

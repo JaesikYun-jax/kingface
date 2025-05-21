@@ -20,8 +20,6 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
   const [showDebugModal, setShowDebugModal] = useState<boolean>(false);
   // 원본 분석 결과 표시 여부 - 기본값을 true로 변경
   const [showOriginalContent, setShowOriginalContent] = useState<boolean>(true);
-  // 파싱된 결과 표시 여부 - 새로 추가
-  const [showParsedContent, setShowParsedContent] = useState<boolean>(false);
 
   // 현재 날짜 포맷팅
   const currentDate = new Date().toLocaleDateString('ko-KR', {
@@ -30,8 +28,21 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
     day: 'numeric'
   });
 
-  // 얼굴 부위별 분석 데이터 추출
-  const facialFeatureAnalysis = extractFacialFeatureAnalysis(result.content || '');
+  // 클립보드에 복사 함수
+  const copyToClipboard = async () => {
+    if (!result.content) return;
+    
+    try {
+      // 마크다운 원본 내용에 홍보 문구 추가
+      const shareText = `${result.content}\n\n------------------\n\n당신의 운명이 궁금하다면? 아이보살이 도와드립니다 💫\n⭐ kingface.difflabs.xyz ⭐`;
+      
+      await navigator.clipboard.writeText(shareText);
+      alert('분석 결과가 클립보드에 복사되었습니다!');
+    } catch (err) {
+      console.error('클립보드 복사 실패:', err);
+      alert('클립보드 복사에 실패했습니다.');
+    }
+  };
 
   return (
     <Container>
@@ -90,91 +101,19 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
       {/* 원본 마크다운 콘텐츠 - 기본적으로 표시됨 */}
       {showOriginalContent && (
         <OriginalContent>
+          {/* 분석 이미지 상단에 표시 */}
+          {result.imageUrl && (
+            <UserImageContainer>
+              <CenteredUserImage src={result.imageUrl} alt="분석된 얼굴" />
+            </UserImageContainer>
+          )}
+
+          {/* 아이보살 분석 결과 제목 */}
+          <ResultTitle>아이보살의 관상 분석 결과</ResultTitle>
+          
+          {/* 원본 마크다운 콘텐츠 */}
           <ReactMarkdown>{result.content || '분석 결과가 없습니다.'}</ReactMarkdown>
         </OriginalContent>
-      )}
-      
-      {/* 토글 버튼 - 파싱된 결과 보기/숨기기 */}
-      <ButtonContainer style={{ padding: '0 2rem 1rem', borderTop: 'none' }}>
-        <ActionButton 
-          onClick={() => setShowParsedContent(!showParsedContent)} 
-          color="#4a5568"
-          style={{ width: 'auto', margin: '0 auto' }}
-        >
-          <ButtonIcon>{showParsedContent ? '📁' : '📂'}</ButtonIcon>
-          {showParsedContent ? '파싱된 분석 결과 숨기기' : '파싱된 분석 결과 보기'}
-        </ActionButton>
-      </ButtonContainer>
-      
-      {/* 파싱된 결과 섹션 - 토글 가능 */}
-      {showParsedContent && (
-      <ResultSection>
-        <ImageSection>
-          {result.imageUrl && (
-            <ImageWrapper>
-              <UserImage src={result.imageUrl} alt="분석된 얼굴" />
-              <ImageOverlay />
-            </ImageWrapper>
-          )}
-          <PersonalityTraitsCard>
-            <TraitsHeader>핵심 성격 키워드</TraitsHeader>
-            <PersonalityTraits>
-              {result.personalityTraits.map((trait, index) => (
-                <PersonalityTrait key={index}>{trait}</PersonalityTrait>
-              ))}
-            </PersonalityTraits>
-          </PersonalityTraitsCard>
-        </ImageSection>
-        
-        {/* 얼굴 부위별 분석 섹션 추가 */}
-        <FacialFeaturesSection>
-          <FeaturesHeader>얼굴 부위별 분석</FeaturesHeader>
-          
-          {facialFeatureAnalysis.map((feature, index) => (
-            <FeatureCard key={index}>
-              <FeatureIcon>{feature.icon}</FeatureIcon>
-              <FeatureTitle>{feature.title}</FeatureTitle>
-              <FeatureContent>
-                <ReactMarkdown>{feature.content}</ReactMarkdown>
-              </FeatureContent>
-            </FeatureCard>
-          ))}
-        </FacialFeaturesSection>
-        
-        <AnalysisSection>
-          <AnalysisCard>
-            <SectionIcon>🔮</SectionIcon>
-            <SectionTitle>종합 운세</SectionTitle>
-            <SectionContent>
-              <ReactMarkdown>{result.overallFortune}</ReactMarkdown>
-            </SectionContent>
-          </AnalysisCard>
-          
-          <AnalysisCard>
-            <SectionIcon>💼</SectionIcon>
-            <SectionTitle>직업 적성</SectionTitle>
-            <SectionContent>
-              <ReactMarkdown>{result.careerSuitability}</ReactMarkdown>
-            </SectionContent>
-          </AnalysisCard>
-          
-          <AnalysisCard>
-            <SectionIcon>👥</SectionIcon>
-            <SectionTitle>대인 관계</SectionTitle>
-            <SectionContent>
-              <ReactMarkdown>{result.relationships}</ReactMarkdown>
-            </SectionContent>
-          </AnalysisCard>
-          
-          <AdviceCard>
-            <AdviceIcon>💡</AdviceIcon>
-            <AdviceTitle>금주의 기운과 조언</AdviceTitle>
-            <AdviceContent>
-              <ReactMarkdown>{result.advice}</ReactMarkdown>
-            </AdviceContent>
-          </AdviceCard>
-        </AnalysisSection>
-      </ResultSection>
       )}
       
       <Disclaimer>
@@ -200,9 +139,9 @@ const FaceReadingResult: React.FC<FaceReadingResultProps> = ({
             결과 공유하기
           </ActionButton>
         ) : (
-          <ActionButton onClick={() => window.print()} color="#6b46c1">
-            <ButtonIcon>💾</ButtonIcon>
-            결과 저장하기
+          <ActionButton onClick={copyToClipboard} color="#6b46c1">
+            <ButtonIcon>📋</ButtonIcon>
+            결과 복사하기
           </ActionButton>
         )}
       </ButtonContainer>
@@ -446,191 +385,32 @@ const SubTitle = styled.p`
   opacity: 0.9;
 `;
 
-const ResultSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
-  
-  @media (min-width: 768px) {
-    flex-direction: row;
-  }
-`;
-
-const ImageSection = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const ImageWrapper = styled.div`
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-`;
-
-const UserImage = styled.img`
+// 사용자 이미지 컨테이너 스타일
+const UserImageContainer = styled.div`
   width: 100%;
-  height: auto;
-  display: block;
-  
-  @media (min-width: 768px) {
-    max-width: 100%;
-  }
-`;
-
-const ImageOverlay = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
-`;
-
-const PersonalityTraitsCard = styled.div`
-  background-color: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-`;
-
-const TraitsHeader = styled.h3`
-  color: #4a5568;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-align: center;
-`;
-
-const PersonalityTraits = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
   justify-content: center;
+  margin-bottom: 2rem;
 `;
 
-const PersonalityTrait = styled.span`
-  display: inline-block;
-  background-color: #e9d8fd;
+const CenteredUserImage = styled.img`
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #6b46c1;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+`;
+
+// 아이보살 결과 제목 스타일
+const ResultTitle = styled.h2`
+  font-size: 1.8rem;
+  font-weight: 700;
   color: #6b46c1;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const AnalysisSection = styled.div`
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const AnalysisCard = styled.div`
-  background-color: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  position: relative;
-  transition: transform 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const SectionIcon = styled.span`
-  font-size: 1.5rem;
-  margin-right: 0.75rem;
-  vertical-align: middle;
-`;
-
-const SectionTitle = styled.h3`
-  display: inline-block;
-  color: #4a5568;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  vertical-align: middle;
-`;
-
-const SectionContent = styled.div`
-  color: #2d3748;
-  font-size: 1rem;
-  line-height: 1.8;
-  
-  p {
-    margin: 0.5rem 0;
-  }
-  
-  strong, em {
-    color: #2d3748;
-    font-weight: 600;
-  }
-  
-  ul, ol {
-    padding-left: 1.5rem;
-    margin: 0.5rem 0;
-  }
-  
-  li {
-    margin-bottom: 0.25rem;
-  }
-`;
-
-const AdviceCard = styled(AnalysisCard)`
-  background-color: #f0fff4;
-  border-left: 4px solid #38a169;
-`;
-
-const AdviceIcon = styled.span`
-  font-size: 1.5rem;
-  margin-right: 0.75rem;
-  vertical-align: middle;
-`;
-
-const AdviceTitle = styled.h3`
-  display: inline-block;
-  color: #2f855a;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  vertical-align: middle;
-`;
-
-const AdviceContent = styled.div`
-  color: #2d3748;
-  font-size: 1rem;
-  line-height: 1.8;
-  
-  p {
-    margin: 0.5rem 0;
-  }
-  
-  strong, em {
-    color: #2d3748;
-    font-weight: 600;
-  }
-  
-  ul, ol {
-    padding-left: 1.5rem;
-    margin: 0.5rem 0;
-  }
-  
-  li {
-    margin-bottom: 0.25rem;
-  }
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e9d8fd;
 `;
 
 const Disclaimer = styled.p`
@@ -682,71 +462,6 @@ const ActionButton = styled.button<{ color: string }>`
   
   @media (max-width: 640px) {
     width: 100%;
-  }
-`;
-
-// 얼굴 부위별 분석 섹션 스타일
-const FacialFeaturesSection = styled.div`
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background-color: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin-top: 1rem;
-  
-  @media (min-width: 768px) {
-    margin-top: 0;
-  }
-`;
-
-const FeaturesHeader = styled.h2`
-  color: #4a5568;
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  text-align: center;
-`;
-
-const FeatureCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: #f8fafc;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-`;
-
-const FeatureIcon = styled.div`
-  font-size: 1.5rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-`;
-
-const FeatureTitle = styled.h3`
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.75rem;
-  display: flex;
-  align-items: center;
-`;
-
-const FeatureContent = styled.div`
-  font-size: 0.95rem;
-  color: #4a5568;
-  line-height: 1.6;
-  
-  p {
-    margin: 0.5rem 0;
-  }
-  
-  strong {
-    color: #2d3748;
-    font-weight: 600;
   }
 `;
 
