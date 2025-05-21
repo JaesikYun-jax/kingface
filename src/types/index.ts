@@ -7,6 +7,7 @@ export interface BirthInfo {
   minute: number;
   calendar: 'solar' | 'lunar';
   gender: 'male' | 'female';
+  timeSlot?: string; // 12시신 선택을 위한 속성 추가
 }
 
 // 타로 카드 타입

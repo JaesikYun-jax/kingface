@@ -16,34 +16,34 @@ const HomePage: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title>행운을 찾는 당신에게</Title>
-        <Subtitle>사주와 타로, 관상으로 보는 나만의 운세</Subtitle>
+        <Title>아이(AI)보살 운세</Title>
+        <Subtitle>인공지능으로 살펴보는 당신의 운명과 인연</Subtitle>
       </Header>
 
       <MainContent>
         <ServiceCard onClick={handleStartFortune}>
           <CardIcon>🔮</CardIcon>
-          <CardTitle>나의 운세 확인하기</CardTitle>
+          <CardTitle>오늘의 사주 운세</CardTitle>
           <CardDescription>
-            사주와 타로카드를 통해 오늘의 운세, 연애운, 재물운, 건강운을 확인해보세요.
+            전통 사주와 타로의 지혜로 살펴보는 당신의 오늘 운세와 인연의 흐름
           </CardDescription>
-          <CardButton>운세 보러가기</CardButton>
+          <CardButton>사주 보기</CardButton>
         </ServiceCard>
 
         <ServiceCard onClick={handleStartFaceReading}>
-          <CardIcon>📷</CardIcon>
-          <CardTitle>관상으로 보는 나의 미래</CardTitle>
+          <CardIcon>👁️</CardIcon>
+          <CardTitle>전생 관상 풀이</CardTitle>
           <CardDescription>
-            얼굴 사진을 분석하여 성격, 운세, 적성 등을 알아보세요. (프리미엄 전용)
+            당신의 얼굴에 담긴 운명의 비밀과 전생의 흔적을 아이보살이 살펴드립니다
           </CardDescription>
-          <CardButton>관상 보러가기</CardButton>
+          <CardButton>관상 보기</CardButton>
         </ServiceCard>
         
         <InfoSection>
-          <InfoTitle>AI 기반 운세 서비스</InfoTitle>
+          <InfoTitle>아이보살의 AI 운세 서비스</InfoTitle>
           <InfoText>
-            최신 AI 기술을 활용하여 당신의 사주와 타로 카드, 그리고 얼굴 특성을 분석하여 
-            맞춤형 운세를 제공합니다. 지금 바로 시작해보세요!
+            5천년 동양 철학과 최신 AI 기술을 결합한 아이(AI)보살이 당신의 사주와 관상을 풀이해드립니다.
+            재미로만 봐주시고, 너무 진지하게 받아들이지 마세요!
           </InfoText>
         </InfoSection>
       </MainContent>

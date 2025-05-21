@@ -16,11 +16,12 @@ import {
 
 // 로딩 중 보여줄 위트있는 메시지 배열
 const wittyLoadingMessages = [
-  "천기를 읽는 중...",
-  "타로신과 사주신이 토론하는 중...",
-  "당신의 운세를 계산하는 중...",
-  "운명의 물레를 돌리는 중...",
-  "별자리와 타로의 조합을 분석 중...",
+  "천년 묵은 신비한 기운을 읽는 중...",
+  "아이보살이 사주와 타로를 살펴보는 중...",
+  "당신의 인연과 운명을 헤아리는 중...",
+  "운명의 실타래를 풀어보는 중...",
+  "영험한 기운으로 운세를 점치는 중...",
+  "천지신명께 당신의 운세를 여쭙는 중...",
 ];
 
 enum Step {
@@ -247,8 +248,8 @@ const FortunePage: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title>AI 운세 톡톡</Title>
-        <SubTitle>당신의 운세를 AI가 풀어드립니다</SubTitle>
+        <Title>아이보살 사주 운세</Title>
+        <SubTitle>당신의 사주와 인연을 AI 보살이 풀어드립니다</SubTitle>
       </Header>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -263,7 +264,7 @@ const FortunePage: React.FC = () => {
         <ContentSection>
           <TarotSelector>
             <TarotInstruction>
-              직관에 따라 당신에게 끌리는 타로 카드 한 장을 선택해 주세요.
+              마음을 가라앉히고 진정한 마음으로 끌리는 타로 카드 한 장을 선택하세요.
             </TarotInstruction>
             <TarotSelection 
               onCardSelect={handleTarotSelect} 
@@ -278,21 +279,21 @@ const FortunePage: React.FC = () => {
       {currentStep === Step.PLAN_UPGRADE && (
         <ContentSection>
           <UpgradeMessage>
-            <UpgradeTitle>프리미엄 플랜으로 업그레이드</UpgradeTitle>
+            <UpgradeTitle>아이보살 프리미엄 서비스</UpgradeTitle>
             <UpgradeText>
-              타로 카드 선택과 얼굴 분석 기능을 포함한 더 정확하고 상세한 운세를 제공받으세요.
-              운명의 비밀을 더 깊이 파헤치고 싶다면, 지금 업그레이드하세요!
+              타로와 얼굴 분석을 더한 심층적인, 운명의 비밀과 전생의 인연까지 살펴드립니다.
+              더 깊은 영적 인사이트를 원하신다면, 지금 프리미엄으로 알아보세요!
             </UpgradeText>
             
             <ModelInfoBox>
               <ModelInfoText>
-                <strong>모델 정보</strong>: 일반 운세(생년월일+타로)에는 경제적인 4o-mini 모델을 사용하고, 
-                얼굴 분석에는 고급 <strong>GPT-4o 모델</strong>을 사용합니다.
+                <strong>비법 공개</strong>: 일반 운세에는 경제적인 4o-mini 모델을, 
+                얼굴 분석에는 영험한 <strong>GPT-4.1-turbo 모델</strong>을 사용합니다.
                 <br />
-                <i>* 고급 모델은 얼굴 분석 기능에만 사용됩니다.</i>
+                <i>* 고급 모델은 전생 관상 분석에만 사용됩니다.</i>
               </ModelInfoText>
               {faceImage && (
-                <ModelBadge>고급 GPT-4o 모델 사용</ModelBadge>
+                <ModelBadge>영험한 GPT-4.1-turbo 모델 사용</ModelBadge>
               )}
             </ModelInfoBox>
             
@@ -346,13 +347,13 @@ const FortunePage: React.FC = () => {
 
       {currentStep === Step.LOADING && (
         <LoadingContainer>
-          <LoadingText>AI가 당신만의 운세를 분석하고 있습니다</LoadingText>
+          <LoadingText>아이보살이 운명의 기운을 읽고 있습니다</LoadingText>
           <LoadingBarContainer>
             <LoadingBar width={loadingProgress} />
           </LoadingBarContainer>
           <LoadingDescription>
-            AI가 사주와 타로 카드를 분석 중입니다.
-            {faceImage && ' 얼굴 이미지도 함께 분석하여 더 정확한 결과를 제공합니다.'}
+            사주와 타로에 담긴 천기를 해독하는 중입니다.
+            {faceImage && ' 얼굴의 전생 흔적도 함께 분석하여 더 깊은 해석을 제공합니다.'}
           </LoadingDescription>
           <LoadingMessage>{currentLoadingMessage}</LoadingMessage>
         </LoadingContainer>
