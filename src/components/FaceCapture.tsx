@@ -11,6 +11,7 @@ interface FaceCaptureProps {
   isLoading?: boolean;
 }
 
+/* 크롭 관련 코드 주석 처리
 // 이미지 크롭 함수 - 크롭된 이미지를 base64 문자열로 반환
 function getCroppedImg(image: HTMLImageElement, cropData: { 
   scale: number, 
@@ -93,12 +94,14 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
     }, 'image/jpeg', 0.95); // 95% 품질로 압축
   });
 }
+*/
 
 const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false }) => {
-  // 카메라 관련 상태를 제거하고 항상 업로드 모드만 사용
+  // 기본 상태
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   
+  /* 크롭 관련 상태 주석 처리
   // 이미지 크롭 관련 상태
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const [originalImage, setOriginalImage] = useState<string | null>(null);
@@ -111,9 +114,11 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const [translateY, setTranslateY] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number, y: number } | null>(null);
+  */
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  /* 크롭 관련 함수 주석 처리
   // 이미지 로드 시 초기 위치 설정
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -236,12 +241,13 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
       setCapturedImage(originalImage);
     }
   }, [originalImage]);
+  */
   
-  // 사진 다시 찍기 (이제 resetImage로 리네이밍)
+  // 이미지 초기화
   const resetImage = useCallback(() => {
     setCapturedImage(null);
-    setOriginalImage(null);
-    setIsCropping(false);
+    // setOriginalImage(null);
+    // setIsCropping(false);
   }, []);
   
   // 파일 업로드 처리
@@ -259,8 +265,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
       reader.onloadend = () => {
         const imageResult = reader.result as string;
         setCapturedImage(imageResult);
-        setOriginalImage(imageResult); // 원본 이미지 저장
-        setIsCropping(true); // 크롭 모드 활성화
+        // 크롭 관련 코드 주석 처리
+        // setOriginalImage(imageResult); // 원본 이미지 저장
+        // setIsCropping(true); // 크롭 모드 활성화
       };
       
       reader.onerror = () => {
@@ -276,6 +283,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     fileInputRef.current?.click();
   }, [fileInputRef]);
   
+  /* 크롭 관련 함수 주석 처리
   // 이미지 크롭 버튼 클릭
   const handleCropClick = useCallback(() => {
     if (capturedImage) {
@@ -283,6 +291,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
       setIsCropping(true);
     }
   }, [capturedImage]);
+  */
   
   // 확인 (분석 시작)
   const handleConfirm = useCallback(() => {
@@ -308,15 +317,25 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
             style={{ display: 'none' }} 
           />
           
-          {capturedImage && !isCropping ? (
+          {capturedImage ? (
             <SmallImageContainer>
               <CapturedImage src={capturedImage} alt="업로드된 이미지" />
               <CloseButton onClick={resetImage}>✕</CloseButton>
+              {/* 크롭 버튼 주석 처리
               <EditButton onClick={handleCropClick}>✎</EditButton>
+              */}
             </SmallImageContainer>
-          ) : isCropping && originalImage ? (
+          ) : (
+            <UploadArea onClick={handleUploadClick}>
+              <UploadIcon>📷</UploadIcon>
+              <UploadText>클릭하여 이미지 업로드</UploadText>
+              <UploadSubText>JPG, PNG 형식 지원</UploadSubText>
+            </UploadArea>
+          )}
+          
+          {/* 크롭 모드 UI 주석 처리
+          {isCropping && originalImage && (
             <CropContainer>
-              {/* 정사각형 크롭 영역 */}
               <SquareCropArea 
                 ref={cropContainerRef}
                 onMouseDown={handleDragStart}
@@ -344,11 +363,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                   />
                 </CropImageWrapper>
                 
-                {/* 크롭 영역 가이드 원 */}
                 <CropCircleOverlay />
               </SquareCropArea>
               
-              {/* 확대/축소 슬라이더 */}
               <ZoomControl>
                 <ZoomIcon>🔍-</ZoomIcon>
                 <ZoomSlider 
@@ -377,18 +394,13 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                 </ConfirmCropButton>
               </CropButtonGroup>
             </CropContainer>
-          ) : (
-            <UploadArea onClick={handleUploadClick}>
-              <UploadIcon>📷</UploadIcon>
-              <UploadText>클릭하여 이미지 업로드</UploadText>
-              <UploadSubText>JPG, PNG 형식 지원</UploadSubText>
-            </UploadArea>
           )}
+          */}
         </UploadContainer>
       </Content>
       
       <ButtonContainer>
-        {!isCropping && !capturedImage ? (
+        {!capturedImage ? (
           <UploadButton 
             onClick={handleUploadClick} 
             disabled={isLoading}
@@ -396,11 +408,11 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
           >
             📂 이미지 선택
           </UploadButton>
-        ) : !isCropping && capturedImage ? (
+        ) : (
           <ConfirmButton onClick={handleConfirm} disabled={isLoading} fullWidth>
             {isLoading ? '분석 중...' : '확인'}
           </ConfirmButton>
-        ) : null}
+        )}
       </ButtonContainer>
       
       <PrivacyNote>
@@ -626,6 +638,7 @@ const PrivacyNote = styled.p`
   margin-top: 0.5rem;
 `;
 
+/* 크롭 관련 스타일 컴포넌트 주석 처리
 // 새로운 크롭 관련 컴포넌트들
 const CropContainer = styled.div`
   display: flex;
@@ -637,12 +650,12 @@ const CropContainer = styled.div`
 const SquareCropArea = styled.div`
   position: relative;
   width: 100%;
-  padding-bottom: 100%; /* 정사각형 유지 */
+  padding-bottom: 100%; // 정사각형 유지
   margin-bottom: 1rem;
   overflow: hidden;
-  background-color: #000; /* 검은 배경으로 변경 */
+  background-color: #000; // 검은 배경으로 변경 
   border-radius: 8px;
-  touch-action: none; /* 모바일에서 스크롤 방지 */
+  touch-action: none; // 모바일에서 스크롤 방지
 `;
 
 const CropImageWrapper = styled.div`
@@ -654,7 +667,7 @@ const CropImageWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: transform; /* 성능 최적화 */
+  will-change: transform; // 성능 최적화
 `;
 
 const CropCircleOverlay = styled.div`
@@ -770,5 +783,6 @@ const ConfirmCropButton = styled(ButtonBase)`
     background-color: #553c9a;
   }
 `;
+*/
 
 export default FaceCapture; 
