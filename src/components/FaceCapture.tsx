@@ -31,14 +31,27 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
   canvas.width = outputSize;
   canvas.height = outputSize;
 
-  // 크롭할 영역 계산 - 중심 기준 좌표 계산
-  const sourceX = (containerSize / 2 - translateX) / scale;
-  const sourceY = (containerSize / 2 - translateY) / scale;
-  const sourceSize = containerSize / scale;
+  // 이미지의 원래 크기 가져오기
+  const imgWidth = image.naturalWidth;
+  const imgHeight = image.naturalHeight;
 
-  // 이미지 영역 계산
-  const sourceWidth = sourceSize;
-  const sourceHeight = sourceSize;
+  // 이미지 중심점 계산 - 스케일과 이동을 고려한 좌표
+  // 이미지가 중앙에 위치하도록 좌표를 조정
+  const centerX = imgWidth / 2;
+  const centerY = imgHeight / 2;
+  
+  // 크롭할 영역 계산 - 중심에서의 오프셋 계산
+  const sourceSize = containerSize / scale;
+  const halfSourceSize = sourceSize / 2;
+  
+  // translateX/Y는 사용자가 드래그한 위치를 나타냄
+  // 이미지를 반대 방향으로 이동시켜야 하므로 부호를 반대로 함
+  const offsetX = -translateX / scale;
+  const offsetY = -translateY / scale;
+  
+  // 최종 소스 좌표 계산 (이미지 중심에서 오프셋 적용)
+  const sourceX = centerX - halfSourceSize + offsetX;
+  const sourceY = centerY - halfSourceSize + offsetY;
 
   // 캔버스 배경을 검정색으로 설정 (투명 배경을 방지)
   ctx.fillStyle = '#000000';
@@ -49,13 +62,21 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
     image,
     sourceX, 
     sourceY, 
-    sourceWidth, 
-    sourceHeight,
+    sourceSize, 
+    sourceSize,
     0, 
     0, 
     outputSize, 
     outputSize
   );
+
+  // 디버깅을 위한 로그
+  console.log('Crop params:', {
+    imgWidth, imgHeight,
+    scale, translateX, translateY,
+    sourceX, sourceY, sourceSize,
+    outputSize
+  });
 
   // 고품질 이미지로 반환
   return new Promise((resolve) => {
@@ -126,8 +147,18 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
       }
       
       // 이미지가 프레임을 더 많이 채우도록 확대
-      newScale = Math.min(newScale * 1.5, 3); // 1.5배 확대, 최대 3배까지
+      // 1.2배로 줄여서 이미지가 크롭 영역을 충분히 채우면서도 너무 확대되지 않도록 함
+      newScale = Math.min(newScale * 1.2, 3); // 1.2배 확대, 최대 3배까지
       
+      console.log('Image loaded:', {
+        imageWidth: img.naturalWidth,
+        imageHeight: img.naturalHeight,
+        containerSize,
+        imageAspect,
+        initialScale: newScale
+      });
+      
+      // 스케일 설정 및 초기 위치를 0으로 설정 (중앙 정렬)
       setScale(newScale);
       setTranslateX(0);
       setTranslateY(0);
@@ -472,7 +503,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
                 </ZoomControl>
                 
                 <CropInstructions>
-                  이미지를 드래그하여 위치를 조정하고, 슬라이더로 확대/축소하세요.
+                  <strong>얼굴을 원 안에 맞추세요:</strong><br />
+                  이미지를 드래그하여 위치를 조정하고, 슬라이더로 확대/축소하세요.<br />
+                  얼굴 전체가 잘 보이도록 중앙에 맞춰주세요.
                 </CropInstructions>
                 
                 <CropButtonGroup>
@@ -632,15 +665,33 @@ const CropImageWrapper = styled.div`
 
 const CropCircleOverlay = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  height: 80%;
-  border-radius: 50%;
-  border: 2px dashed white;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &::after {
+    content: '';
+    width: 96%;
+    height: 96%;
+    border: 2px dashed rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.3);
+  }
+  
+  &::before {
+    content: '+';
+    position: absolute;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
 `;
 
 const ZoomControl = styled.div`
@@ -1112,11 +1163,16 @@ const CropContainer = styled.div`
   padding: 1rem 0;
 `;
 
-const CropInstructions = styled.p`
+const CropInstructions = styled.div`
+  margin-top: 1rem;
   font-size: 0.9rem;
   color: #4a5568;
   text-align: center;
-  margin: 0.5rem 0;
+  line-height: 1.4;
+  
+  strong {
+    color: #6b46c1;
+  }
 `;
 
 const CropButtonGroup = styled.div`
