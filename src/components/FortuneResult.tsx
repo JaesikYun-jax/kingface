@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { FortuneResult as FortuneResultType, TarotCard } from '../types';
+import ReactMarkdown from 'react-markdown';
 
 interface FortuneResultProps {
   result: FortuneResultType;
@@ -13,155 +14,283 @@ const FortuneResult: React.FC<FortuneResultProps> = ({
   selectedCard, 
   onRestart 
 }) => {
+  // 사주와 타로 조합에 대한 랜덤 미스틱 문구
+  const [mysticPhrase, setMysticPhrase] = useState<string>("");
+  
+  // 마크다운 형식으로 변환한 결과
+  const [markdownContent, setMarkdownContent] = useState<string>("");
+  
+  useEffect(() => {
+    // 랜덤 미스틱 문구 생성
+    const phrases = [
+      "천년의 지혜가 당신의 사주에서 빛나고 있습니다.",
+      "우주의 별들이 당신의 운명에 빛을 비추고 있습니다.",
+      "고대의 신비가 당신의 사주 속에 감춰져 있습니다.",
+      "운명의 실타래가 당신을 향해 펼쳐지고 있습니다.",
+      "별들의 노래가 당신의 미래를 속삭입니다.",
+      "시간의 강물이 당신의 운명을 비추고 있습니다.",
+      "타로의 지혜와 사주의 비밀이 만나는 순간입니다.",
+      "당신의 운명에 신성한 빛이 내려앉았습니다.",
+      "과거와 미래가 현재에서 만나 당신의 길을 밝힙니다.",
+      "천궁의 별자리가 당신의 사주와 공명하고 있습니다."
+    ];
+    
+    const randomIndex = Math.floor(Math.random() * phrases.length);
+    setMysticPhrase(phrases[randomIndex]);
+    
+    // 마크다운 형식으로 결과 변환 - 이미 마크다운 형식으로 응답받는 경우 원본 사용
+    if (result.overall.includes('#')) {
+      setMarkdownContent(result.overall);
+    } else {
+      // 기존 포맷을 마크다운 형식으로 변환
+      const markdownResult = `
+## ✨ 전체 운세
+
+${result.overall}
+
+## 💕 사랑
+
+${result.love}
+
+## 🏢 직업
+
+${result.career}
+
+## 🌿 건강
+
+${result.health}
+
+## 💌 아이보살의 조언
+
+${result.advice}
+      `;
+      
+      setMarkdownContent(markdownResult);
+    }
+  }, [result]);
+
   const handleShare = () => {
+    const shareText = `🔮 아이보살의 운세 풀이 🔮\n\n${mysticPhrase}\n\n${result.overall.substring(0, 100)}...\n\n당신의 운명이 궁금하다면? 아이보살이 도와드립니다 💫\n⭐ kingface.difflabs.xyz ⭐`;
+    
     if (navigator.share) {
       navigator.share({
-        title: '나의 오늘의 운세',
-        text: `오늘의 운세: ${result.overall.substring(0, 100)}...`,
+        title: '나의 사주와 운명',
+        text: shareText,
         url: window.location.href,
       }).catch(error => console.log('공유하기 실패:', error));
     } else {
-      alert('공유하기 기능을 지원하지 않는 브라우저입니다.');
+      // 클립보드에 복사
+      navigator.clipboard.writeText(shareText)
+        .then(() => alert('운세 결과가 클립보드에 복사되었습니다.'))
+        .catch(() => alert('클립보드 복사에 실패했습니다.'));
     }
   };
 
+  // 현재 날짜 포맷팅
+  const currentDate = new Date().toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
     <Container>
-      <Title>오늘의 운세</Title>
+      <ResultHeader>
+        <Title>아이보살의 사주 풀이</Title>
+        <SubTitle>{currentDate} 기준</SubTitle>
+      </ResultHeader>
 
-      {selectedCard && (
-        <CardSection>
-          <SectionTitle>선택한 타로 카드</SectionTitle>
-          <CardDisplay>
-            <img 
-              src={selectedCard.image} 
-              alt={selectedCard.name}
-              style={{
-                width: '150px',
-                height: 'auto',
-                borderRadius: '10px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)'
-              }}
-            />
-            <CardInfo>
-              <CardName>{selectedCard.name}</CardName>
-              <CardMeaning>{selectedCard.meaning}</CardMeaning>
-              <CardDescription>{selectedCard.description}</CardDescription>
-            </CardInfo>
-          </CardDisplay>
-        </CardSection>
-      )}
+      <OriginalContent>
+        {/* 카드와 사주 정보 표시 */}
+        <InfoSection>
+          {selectedCard && (
+            <CardContainer>
+              <CardImage src={selectedCard.image} alt={selectedCard.name} />
+              <CardInfo>
+                <CardName>{selectedCard.name}</CardName>
+                <CardMeaning>{selectedCard.meaning}</CardMeaning>
+              </CardInfo>
+            </CardContainer>
+          )}
+        </InfoSection>
 
-      <ResultSection>
-        <SectionTitle>전체 운세</SectionTitle>
-        <ResultText>{result.overall}</ResultText>
-      </ResultSection>
+        {/* 신비로운 문구 표시 */}
+        <MysticPhraseBox>
+          <MysticPhrase>{mysticPhrase}</MysticPhrase>
+        </MysticPhraseBox>
 
-      <ResultSection>
-        <SectionTitle>사랑</SectionTitle>
-        <ResultText>{result.love}</ResultText>
-      </ResultSection>
-
-      <ResultSection>
-        <SectionTitle>직업</SectionTitle>
-        <ResultText>{result.career}</ResultText>
-      </ResultSection>
-
-      <ResultSection>
-        <SectionTitle>건강</SectionTitle>
-        <ResultText>{result.health}</ResultText>
-      </ResultSection>
-
-      <ResultSection>
-        <SectionTitle>조언</SectionTitle>
-        <ResultText>{result.advice}</ResultText>
-      </ResultSection>
+        {/* 아이보살 사주 분석 결과 제목 */}
+        <ResultTitle>아이보살의 사주 분석 결과</ResultTitle>
+        
+        {/* 마크다운 결과 표시 */}
+        <MarkdownContainer>
+          <ReactMarkdown>{markdownContent}</ReactMarkdown>
+        </MarkdownContainer>
+      </OriginalContent>
 
       <Disclaimer>
         * 이 운세는 AI에 의해 생성된 것으로, 참고용으로만 활용해주세요.
       </Disclaimer>
 
       <ButtonContainer>
-        <ActionButton primary onClick={onRestart}>다시 시작하기</ActionButton>
-        <ActionButton onClick={handleShare}>공유하기</ActionButton>
+        <ActionButton onClick={onRestart} color="#4a5568">
+          <ButtonIcon>🔄</ButtonIcon>
+          다시 시작하기
+        </ActionButton>
+        <ActionButton onClick={handleShare} color="#6b46c1">
+          <ButtonIcon>📋</ButtonIcon>
+          결과 공유하기
+        </ActionButton>
       </ButtonContainer>
     </Container>
   );
 };
 
 const Container = styled.div`
-  padding: 1rem 0;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
 `;
 
-const Title = styled.h2`
+const ResultHeader = styled.div`
+  background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
+  padding: 2rem;
+  color: white;
+  text-align: center;
+`;
+
+const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
-  color: #2d3748;
-  text-align: center;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const SubTitle = styled.p`
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.9;
+`;
+
+const OriginalContent = styled.div`
+  padding: 2rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+`;
+
+const InfoSection = styled.div`
+  display: flex;
+  justify-content: center;
   margin-bottom: 2rem;
 `;
 
-const SectionTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #4a5568;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-`;
-
-const CardSection = styled.div`
-  margin-bottom: 2.5rem;
-`;
-
-const CardDisplay = styled.div`
+const CardContainer = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
+  background: linear-gradient(135deg, rgba(107, 70, 193, 0.3) 0%, rgba(159, 122, 234, 0.3) 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 250px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+`;
+
+const CardImage = styled.img`
+  width: 150px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 `;
 
 const CardInfo = styled.div`
-  flex: 1;
+  text-align: center;
 `;
 
 const CardName = styled.h4`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2d3748;
+  color: white;
   margin-bottom: 0.5rem;
 `;
 
 const CardMeaning = styled.p`
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #6b46c1;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 0.5rem;
 `;
 
-const CardDescription = styled.p`
-  font-size: 1rem;
-  color: #4a5568;
-  line-height: 1.6;
+const MysticPhraseBox = styled.div`
+  background: linear-gradient(135deg, rgba(107, 70, 193, 0.6) 0%, rgba(45, 55, 72, 0.6) 100%);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 0 auto 2rem;
+  max-width: 90%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
 `;
 
-const ResultSection = styled.div`
+const MysticPhrase = styled.p`
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #e9d8fd;
+  text-align: center;
+  font-style: italic;
+  text-shadow: 0 0 10px rgba(233, 216, 253, 0.3);
+  line-height: 1.5;
+`;
+
+// 아이보살 결과 제목 스타일
+const ResultTitle = styled.h2`
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #e9d8fd;
+  text-align: center;
   margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(233, 216, 253, 0.3);
+  text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
 `;
 
-const ResultText = styled.p`
-  font-size: 1.1rem;
-  color: #2d3748;
+const MarkdownContainer = styled.div`
+  color: white;
   line-height: 1.7;
   white-space: pre-wrap;
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #e9d8fd;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
+  }
+  
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  strong {
+    color: #e9d8fd;
+  }
+  
+  em {
+    color: #c3dafe;
+    font-style: italic;
+  }
 `;
 
 const Disclaimer = styled.p`
   font-size: 0.9rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.6);
   font-style: italic;
   text-align: center;
   margin: 2rem 0;
@@ -171,32 +300,39 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: 2rem;
+  padding: 1.5rem;
   
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     flex-direction: column;
-    gap: 0.5rem;
   }
 `;
 
-const ActionButton = styled.button<{ primary?: boolean }>`
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+const ButtonIcon = styled.span`
+  margin-right: 0.5rem;
+`;
+
+const ActionButton = styled.button<{ color: string }>`
+  padding: 0.8rem 1.5rem;
+  background-color: ${props => props.color === '#6b46c1' ? '#6b46c1' : 'white'};
+  color: ${props => props.color === '#6b46c1' ? 'white' : props.color};
+  border: 1px solid ${props => props.color};
+  font-size: 0.95rem;
   font-weight: 600;
-  border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  
-  background-color: ${props => props.primary ? '#6b46c1' : 'white'};
-  color: ${props => props.primary ? 'white' : '#6b46c1'};
-  border: ${props => props.primary ? 'none' : '1px solid #6b46c1'};
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   
   &:hover {
-    background-color: ${props => props.primary ? '#553c9a' : '#f8f4ff'};
+    background-color: ${props => props.color};
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     width: 100%;
   }
 `;

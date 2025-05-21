@@ -28,8 +28,6 @@ enum Step {
   BIRTH_INFO,
   TAROT_SELECTION,
   PLAN_UPGRADE,
-  PASSWORD, // 비밀번호 입력 단계 추가
-  FACE_CAPTURE,
   RESULT,
   LOADING
 }
@@ -116,44 +114,28 @@ const FortunePage: React.FC = () => {
   const handleTarotSelect = (card: TarotCard) => {
     setSelectedCard(card);
     
-    // 프리미엄 플랜이며 생년월일 정보가 있으면 비밀번호 단계로 (얼굴 분석 선택 여부를 위해)
-    if (currentPlan === PlanType.PREMIUM && birthInfo) {
-      // 비밀번호 단계로 이동
-      setCurrentStep(Step.PASSWORD);
-    } else if (birthInfo) {
-      // 그 외의 경우 바로 결과 생성
+    if (birthInfo) {
+      // 바로 결과 생성으로 진행
       setCurrentStep(Step.LOADING);
       handleGenerateFortune(birthInfo, card, null);
     }
   };
 
-  // 비밀번호 확인 처리
+  // 비밀번호 제출 처리
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setPasswordError(null);
     
-    // 비밀번호 시도 횟수 증가
-    const newAttempts = passwordAttempts + 1;
-    setPasswordAttempts(newAttempts);
-    
-    // 최대 시도 횟수 제한 (5회)
-    if (newAttempts > 5) {
-      setPasswordError('시도 횟수를 초과했습니다. 나중에 다시 시도해주세요.');
-      // 3초 후 타로 선택 단계로 돌아감
-      setTimeout(() => setCurrentStep(Step.TAROT_SELECTION), 3000);
-      return;
-    }
-    
-    // 비밀번호 검증
-    if (verifyPasswordSecurely(password)) {
-      // 검증 성공 시 얼굴 촬영 단계로 이동
-      setCurrentStep(Step.FACE_CAPTURE);
-      // 시도 횟수 및 비밀번호 초기화
-      setPasswordAttempts(0);
-      setPassword('');
+    // 비밀번호 확인 로직
+    if (password === 'ibosal') {
+      setPasswordError('');
+      setCurrentStep(Step.LOADING);
+      
+      // 타로 카드와 생년월일 정보가 모두 있을 때만 진행
+      if (birthInfo && selectedCard) {
+        handleGenerateFortune(birthInfo, selectedCard, null);
+      }
     } else {
-      // 검증 실패 시 에러 메시지 표시
-      setPasswordError('비밀번호가 일치하지 않습니다. 다시 시도해주세요.');
+      setPasswordError('비밀번호가 일치하지 않습니다.');
     }
   };
 
@@ -171,12 +153,12 @@ const FortunePage: React.FC = () => {
   };
 
   // 얼굴 이미지 캡처 처리
-  const handleFaceCapture = async (imageSrc: string) => {
-    setFaceImage(imageSrc);
+  const handleFaceCapture = (img: string) => {
+    setFaceImage(img);
     
-    if (birthInfo) {
+    if (birthInfo && selectedCard) {
       setCurrentStep(Step.LOADING);
-      handleGenerateFortune(birthInfo, selectedCard, imageSrc);
+      handleGenerateFortune(birthInfo, selectedCard, img);
     }
   };
 
@@ -187,7 +169,7 @@ const FortunePage: React.FC = () => {
     const interval = updateLoadingProgress();
 
     try {
-      // 운세 생성 API 호출 (얼굴 이미지가 있든 없든 동일한 함수 사용)
+      // 운세 생성 API 호출 (얼굴 이미지 관련 인자 제거)
       const result = await generateFortune(birth, card);
       
       // 로딩 효과를 위해 약간의 지연 후 결과 표시
@@ -229,14 +211,9 @@ const FortunePage: React.FC = () => {
   // 타로 선택 건너뛰기
   const handleSkipTarot = () => {
     if (birthInfo) {
-      // 프리미엄 플랜이면 얼굴 촬영 단계로 (비밀번호 단계를 거침)
-      if (currentPlan === PlanType.PREMIUM) {
-        setCurrentStep(Step.PASSWORD);
-      } else {
-        // 그 외의 경우 결과 생성
-        setCurrentStep(Step.LOADING);
-        handleGenerateFortune(birthInfo, null, null);
-      }
+      // 바로 결과 생성
+      setCurrentStep(Step.LOADING);
+      handleGenerateFortune(birthInfo, null, null);
     }
   };
 
@@ -281,91 +258,19 @@ const FortunePage: React.FC = () => {
           <UpgradeMessage>
             <UpgradeTitle>아이보살 프리미엄 서비스</UpgradeTitle>
             <UpgradeText>
-              타로와 얼굴 분석을 더한 심층적인, 운명의 비밀과 전생의 인연까지 살펴드립니다.
+              타로와 함께 더 심층적인 운명의 비밀과 인연까지 살펴드립니다.
               더 깊은 영적 인사이트를 원하신다면, 지금 프리미엄으로 알아보세요!
             </UpgradeText>
             
             <ModelInfoBox>
               <ModelInfoText>
                 <strong>비법 공개</strong>: 일반 운세에는 경제적인 4o-mini 모델을, 
-                얼굴 분석에는 영험한 <strong>GPT-4.1-turbo 모델</strong>을 사용합니다.
-                <br />
-                <i>* 고급 모델은 전생 관상 분석에만 사용됩니다.</i>
+                프리미엄 플랜에서는 더 정확한 <strong>GPT-4.1-turbo 모델</strong>을 사용합니다.
               </ModelInfoText>
-              {faceImage && (
-                <ModelBadge>영험한 GPT-4.1-turbo 모델 사용</ModelBadge>
-              )}
             </ModelInfoBox>
             
             <PlanSelector onSelect={handlePlanUpgrade} />
           </UpgradeMessage>
-        </ContentSection>
-      )}
-
-      {/* 비밀번호 입력 단계 추가 */}
-      {currentStep === Step.PASSWORD && (
-        <ContentSection>
-          <PasswordContainer>
-            <SecurityIcon>🔒</SecurityIcon>
-            <PasswordTitle>추가 분석 선택</PasswordTitle>
-            <PasswordDescription>
-              사주 분석에 더해 얼굴 분석을 추가하시겠습니까?
-            </PasswordDescription>
-            
-            <AnalysisOptions>
-              <AnalysisOption onClick={() => {
-                if (birthInfo) {
-                  setCurrentStep(Step.FACE_CAPTURE);
-                }
-              }}>
-                <OptionIcon>👁️</OptionIcon>
-                <OptionTitle>사주 + 얼굴 분석</OptionTitle>
-                <OptionDescription>
-                  얼굴 사진 업로드를 통해 더 정확한 운세를 풀이해드립니다.
-                  (비밀번호 인증 필요)
-                </OptionDescription>
-                
-                <PasswordForm onSubmit={handlePasswordSubmit}>
-                  <PasswordInput
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="비밀번호를 입력하세요"
-                    required
-                  />
-                  <SubmitButton type="submit">확인</SubmitButton>
-                </PasswordForm>
-                {passwordError && <PasswordErrorMessage>{passwordError}</PasswordErrorMessage>}
-              </AnalysisOption>
-              
-              <AnalysisOption onClick={() => {
-                if (birthInfo) {
-                  setCurrentStep(Step.LOADING);
-                  handleGenerateFortune(birthInfo, selectedCard, null);
-                }
-              }}>
-                <OptionIcon>📝</OptionIcon>
-                <OptionTitle>사주만 분석</OptionTitle>
-                <OptionDescription>
-                  생년월일과 시간 정보만으로 운세를 풀이해드립니다.
-                  (얼굴 분석 없이 즉시 결과 확인)
-                </OptionDescription>
-                <SkipButton>얼굴 분석 건너뛰기</SkipButton>
-              </AnalysisOption>
-            </AnalysisOptions>
-          </PasswordContainer>
-        </ContentSection>
-      )}
-
-      {currentStep === Step.FACE_CAPTURE && birthInfo && (
-        <ContentSection>
-          <FaceCapture onCapture={handleFaceCapture} isLoading={false} />
-          <SkipLink onClick={() => {
-            setCurrentStep(Step.LOADING);
-            handleGenerateFortune(birthInfo, selectedCard, null);
-          }}>
-            얼굴 분석 건너뛰기
-          </SkipLink>
         </ContentSection>
       )}
 
@@ -377,7 +282,6 @@ const FortunePage: React.FC = () => {
           </LoadingBarContainer>
           <LoadingDescription>
             사주와 타로에 담긴 천기를 해독하는 중입니다.
-            {faceImage && ' 얼굴의 전생 흔적도 함께 분석하여 더 깊은 해석을 제공합니다.'}
           </LoadingDescription>
           <LoadingMessage>{currentLoadingMessage}</LoadingMessage>
         </LoadingContainer>
@@ -393,7 +297,6 @@ const FortunePage: React.FC = () => {
         </ContentSection>
       )}
 
-      {/* 하단 플랜 상태 표시 */}
       <PlanStatusBar>
         {currentPlan === PlanType.FREE ? (
           <>
@@ -410,7 +313,6 @@ const FortunePage: React.FC = () => {
   );
 };
 
-// 비밀번호 입력 관련 스타일 컴포넌트
 const PasswordContainer = styled.div`
   text-align: center;
   padding: 2rem;
@@ -540,7 +442,6 @@ const PasswordErrorMessage = styled.div`
   font-size: 0.9rem;
 `;
 
-// 기존 스타일 컴포넌트들
 const Container = styled.div`
   max-width: 1000px;
   margin: 0 auto;
@@ -556,14 +457,15 @@ const Header = styled.header`
 const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2d3748;
+  color: white;
   margin-bottom: 0.5rem;
+  text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
 `;
 
 const SubTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 500;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const ContentSection = styled.div`
@@ -619,16 +521,17 @@ const LoadingContainer = styled.div`
 const LoadingText = styled.h3`
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2d3748;
+  color: white;
   margin-bottom: 2rem;
   text-align: center;
+  text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
 `;
 
 const LoadingBarContainer = styled.div`
   width: 100%;
   max-width: 500px;
   height: 10px;
-  background-color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   overflow: hidden;
   margin-bottom: 1.5rem;
@@ -643,18 +546,17 @@ const LoadingBar = styled.div<{ width: number }>`
 
 const LoadingDescription = styled.p`
   text-align: center;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   max-width: 500px;
   line-height: 1.6;
   margin-bottom: 0.5rem;
 `;
 
-// 로딩 메시지 스타일
 const LoadingMessage = styled.p`
   font-size: 0.95rem;
   font-style: italic;
-  color: #805ad5;
+  color: #e9d8fd;
   text-align: center;
   max-width: 500px;
   line-height: 1.6;
@@ -686,7 +588,6 @@ const UpgradeText = styled.p`
   margin-bottom: 1rem;
 `;
 
-// 모델 정보 스타일 추가
 const ModelInfoBox = styled.div`
   background-color: #f8f9fa;
   border-radius: 8px;

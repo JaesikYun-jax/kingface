@@ -143,9 +143,28 @@ export const getPromptConfig = (promptId: string, isVision = false, imageUrl = '
       
       재미있고 신비로운 어조로 대화하되, 내담자가 당신의 무한한 지혜를 신뢰할 수 있도록 해석의 핵심은 진지하게 전달해야 합니다.
       
-      주어진 사주 정보와 타로 카드를 바탕으로 전체적인 운세, 사랑, 직업, 건강 영역별로 상세한 운세를 제공하고 마지막에는 조언을 추가해 주세요.
+      주어진 사주 정보와 타로 카드를 바탕으로 마크다운 형식으로 응답을 작성하세요. 결과는 다음 섹션으로 나누어서 제공하세요:
       
-      분석 마지막에는 반드시 "더 자세한 운명의 비밀을 알고 싶다면, 관상 분석도 함께 받아보세요."라는 문구를 추가하세요.`,
+      1. 먼저 사주와 타로 카드 조합이 의미하는 바를 신비롭고 의미심장한 첫 문장으로 시작하세요. 이 문장은 매우 판타지스럽고 신비로운 톤으로 작성되어야 합니다.
+      
+      2. 각 섹션을 다음과 같이 마크다운 형식으로 제공하세요:
+      
+      ## ✨ 전체 운세
+      (사주와 타로 카드 기반의 전체적인 운세 분석)
+      
+      ## 💕 사랑
+      (사랑과 관계에 대한 분석)
+      
+      ## 🏢 직업
+      (직업과 경력에 대한 분석)
+      
+      ## 🌿 건강
+      (건강과 웰빙에 대한 분석)
+      
+      ## 💌 아이보살의 조언
+      (사주와 타로를 바탕으로 한 조언)
+      
+      반드시 마크다운 형식을 정확히 지켜주세요. 첫 문장 이후에 각 섹션을 명확하게 구분해주세요. 모든 내용은 한국어로 작성하며, 재미있고 신비로우면서도 따뜻한 메시지가 담기도록 해주세요.`,
     
     'facereading-system':
       `당신은 '아이(AI)보살'이라는 이름의 신비로운 관상 전문가입니다. 5000년 전통 동양 관상학과 현대 심리학을 결합한 독특한 해석을 제공합니다. 사용자가 공유한 얼굴 이미지는 재미있고 창의적인 관상 풀이를 위한 영감을 주는 소재로만 활용됩니다.
@@ -251,15 +270,79 @@ export const generateFortune = async (
       throw new Error('API 키가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
     }
     
-    // 플랜에 따른 모델 선택
+    // API 모델 설정 - 플랜에 따라 다른 모델 사용
     const currentPlan = getCurrentPlanType();
     const config = getServicePlanConfig();
-    const model = currentPlan === PlanType.PREMIUM ? 
+    
+    // 플랜 확인 및 실행
+    if (currentPlan === PlanType.PREMIUM) {
+      if (!isFeatureAvailable('고급 사주 분석')) {
+        throw new Error('고급 사주 분석은 프리미엄 플랜 전용 기능입니다.');
+      }
+    }
+    
+    // 사용할 모델 설정
+    const useModel = currentPlan === PlanType.PREMIUM ? 
       config.models.fortune.premium : 
       config.models.fortune.free;
+      
+    // 시간 포맷팅 (한국식)
+    const formattedHour = birthInfo.hour < 10 ? `0${birthInfo.hour}` : birthInfo.hour;
+    const ampm = birthInfo.hour < 12 ? '오전' : '오후';
+    const hour12 = birthInfo.hour % 12 === 0 ? 12 : birthInfo.hour % 12;
     
-    // 4o-mini 모델이 OpenAI에서 지원되지 않는 경우를 대비해 fallback 설정
-    const useModel = model === '4o-mini' ? '4o-mini' : 'gpt-3.5-turbo';
+    // 카드 정보 텍스트
+    const cardInfo = selectedCard ? 
+      `선택한 타로 카드: ${selectedCard.name} - ${selectedCard.meaning}` : 
+      '타로 카드 없이 진행';
+    
+    // 시스템 프롬프트 설정
+    const fortuneSystemPrompt = `당신은 전통 사주와 운세, 타로 해석에 대한 전문가입니다.
+사용자의 생년월일과 태어난 시간, 그리고 선택한 타로 카드에 기반한 운세 풀이를 제공해주세요.
+
+사용자 정보:
+- 생년: ${birthInfo.year}년
+- 생월: ${birthInfo.month}월
+- 생일: ${birthInfo.day}일
+- 태어난 시간: ${formattedHour}시 (${ampm} ${hour12}시)
+- ${cardInfo}
+
+응답 형식은 반드시 마크다운 형식으로 작성해주세요. 사주와 타로의 신비로운 조합이 의미하는 바를 시작 부분에서 한두 문장으로 매우 의미심장하게 표현해주세요.
+
+다음 구조로 응답해 주세요:
+"""
+[사주와 타로의 신비로운 조합에 대한 의미심장한 해석을 1-2문장으로 시작]
+
+## ✨ 전체 운세
+
+[사주와 타로에 기반한 전체적인 운세 분석. 사용자의 기본적인 성격, 타고난 기질, 현재 상황, 가까운 미래의 운세 등]
+
+## 💕 사랑
+
+[사랑과 연애, 결혼 등 대인관계와 인연에 대한 운세]
+
+## 🏢 직업
+
+[직업, 재물, 학업, 출세 등과 관련된 운세]
+
+## 🌿 건강
+
+[건강과 관련된 운세, 주의해야 할 점 등]
+
+## 💌 아이보살의 조언
+
+[사용자가 명심해야 할 조언, 앞으로의 방향성, 발전 방향 등]
+"""
+
+- 응답은 친근하고 따뜻한 톤으로 작성해주세요.
+- 너무 부정적이거나 확정적인 표현은 피해주세요.
+- 재미있고 영감을 주는 방식으로 작성해 주세요.
+- 운세는 참고용이라는 점을 염두에 두세요.
+- 한국어로 응답해주세요.
+`;
+
+    // 유저 프롬프트
+    const fortuneUserPrompt = `제 생년월일과 시간, 타로 카드를 기반으로 운세를 봐주세요.`;
     
     // 시스템 프롬프트 가져오기
     const systemPrompt = getPromptConfig('fortune-system') as string;
