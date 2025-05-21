@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import styled from '@emotion/styled';
 import HomePage from './pages/HomePage';
@@ -8,9 +8,27 @@ import AdminPage from './pages/AdminPage';
 import PlanSelector from './components/PlanSelector';
 import './App.css';
 
+// 로테이션할 이모지 배열
+const mysticEmojis = ['🔮', '✨', '🌙', '🌠', '👁️', '🧿', '🪬', '🧙', '💫', '⚡', '🌟', '🪄'];
+
 const App: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showPricing, setShowPricing] = useState(false);
+  const [currentEmoji, setCurrentEmoji] = useState(mysticEmojis[0]);
+  const [emojiIndex, setEmojiIndex] = useState(0);
+  
+  // 이모지 로테이션 효과
+  useEffect(() => {
+    const emojiInterval = setInterval(() => {
+      setEmojiIndex((prevIndex) => {
+        const newIndex = (prevIndex + 1) % mysticEmojis.length;
+        setCurrentEmoji(mysticEmojis[newIndex]);
+        return newIndex;
+      });
+    }, 2000); // 2초마다 변경
+    
+    return () => clearInterval(emojiInterval);
+  }, []);
   
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -26,7 +44,8 @@ const App: React.FC = () => {
         <Header>
           <HeaderContent>
             <Logo>
-              <Link to="/">사주 & 타로</Link>
+              <RotatingEmoji>{currentEmoji}</RotatingEmoji>
+              <Link to="/">아이보살 1.0</Link>
             </Logo>
             
             <HeaderRight>
@@ -73,7 +92,7 @@ const App: React.FC = () => {
         
         <Footer>
           <FooterText>
-            &copy; {new Date().getFullYear()} 사주 & 타로 - AI 운세 서비스
+            &copy; {new Date().getFullYear()} 아이보살 1.0 - AI 운세 서비스
           </FooterText>
           <FooterText>
             이 서비스는 오락 목적으로 제공되며, 실제 운세 결과와 다를 수 있습니다.
@@ -88,12 +107,14 @@ const AppContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f7fafc;
+  background: linear-gradient(135deg, #2d3748 0%, #4a1551 50%, #252a37 100%);
+  color: white;
 `;
 
 const Header = styled.header`
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -112,17 +133,34 @@ const HeaderRight = styled.div`
   gap: 1rem;
 `;
 
+const RotatingEmoji = styled.span`
+  font-size: 1.8rem;
+  margin-right: 0.5rem;
+  display: inline-block;
+  transition: transform 0.3s ease;
+  animation: float 3s ease-in-out infinite;
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+`;
+
 const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: 700;
+  display: flex;
+  align-items: center;
   
   a {
-    color: #6b46c1;
+    color: white;
     text-decoration: none;
     transition: color 0.3s;
+    text-shadow: 0 0 10px rgba(107, 70, 193, 0.8);
     
     &:hover {
-      color: #553c9a;
+      color: #e9d8fd;
     }
   }
 `;
@@ -133,7 +171,7 @@ const MenuButton = styled.button`
   border: none;
   cursor: pointer;
   display: none;
-  color: #4a5568;
+  color: white;
   
   @media (max-width: 768px) {
     display: block;
@@ -142,16 +180,17 @@ const MenuButton = styled.button`
 
 const PricingButton = styled.button`
   padding: 0.5rem 1rem;
-  background-color: #6b46c1;
+  background-color: rgba(107, 70, 193, 0.7);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
+  backdrop-filter: blur(5px);
   
   &:hover {
-    background-color: #553c9a;
+    background-color: rgba(85, 60, 154, 0.9);
   }
 `;
 
@@ -161,22 +200,24 @@ const PricingModal = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 `;
 
 const PricingModalContent = styled.div`
-  background-color: white;
+  background-color: #1a202c;
   border-radius: 12px;
   padding: 1.5rem;
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const PricingHeader = styled.div`
@@ -188,6 +229,7 @@ const PricingHeader = styled.div`
   h3 {
     margin: 0;
     font-size: 1.5rem;
+    color: white;
   }
 `;
 
@@ -196,7 +238,7 @@ const CloseButton = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #4a5568;
+  color: white;
   padding: 0.5rem;
 `;
 
@@ -209,19 +251,20 @@ const Nav = styled.nav<{ isOpen: boolean }>`
     display: ${props => props.isOpen ? 'flex' : 'none'};
     flex-direction: column;
     padding: 1rem;
-    background-color: white;
+    background-color: #1a202c;
     gap: 1rem;
   }
 `;
 
 const NavLink = styled(Link)`
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
   
   &:hover {
-    color: #6b46c1;
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
   }
 `;
 
@@ -234,17 +277,18 @@ const Main = styled.main`
 `;
 
 const Footer = styled.footer`
-  background-color: #2d3748;
+  background-color: rgba(0, 0, 0, 0.3);
   color: white;
   padding: 1.5rem;
   text-align: center;
   margin-top: auto;
+  backdrop-filter: blur(10px);
 `;
 
 const FooterText = styled.p`
   margin: 0.5rem 0;
   font-size: 0.9rem;
-  color: #cbd5e0;
+  color: rgba(255, 255, 255, 0.7);
 `;
 
 export default App;
