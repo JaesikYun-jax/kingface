@@ -27,7 +27,7 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
   }
 
   // 결과 이미지 크기 설정 (정사각형)
-  // 스케일에 따른 출력 크기 조정 - 작은 이미지 문제 해결
+  // 최종 출력 크기는 컨테이너 크기와 동일하게 유지
   const outputSize = containerSize;
   canvas.width = outputSize;
   canvas.height = outputSize;
@@ -40,11 +40,13 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
   const centerX = imgWidth / 2;
   const centerY = imgHeight / 2;
   
-  // 크롭할 영역 크기 - 스케일을 정확히 반영
+  // 크롭할 영역 크기 - 적절한 크기 계산 조정
+  // 스케일에 정확히 비례하도록 수정
   const sourceSize = containerSize / scale;
   const halfSourceSize = sourceSize / 2;
   
   // 오프셋 계산 - 스케일에 따른 정확한 오프셋 적용
+  // 스케일에 오프셋 값을 나누어 변환 비율 적용
   const offsetX = -translateX / scale;
   const offsetY = -translateY / scale;
   
@@ -93,14 +95,9 @@ function getCroppedImg(image: HTMLImageElement, cropData: {
 }
 
 const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false }) => {
-  const [isCameraReady, setIsCameraReady] = useState<boolean>(false);
+  // 카메라 관련 상태를 제거하고 항상 업로드 모드만 사용
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [cameraType, setCameraType] = useState<'user' | 'environment'>('user'); // front or back camera
   const [error, setError] = useState<string | null>(null);
-  const [uploadMode, setUploadMode] = useState<boolean>(true); // 기본값을 업로드 모드로 변경
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean>(false);
-  const [isInitializing, setIsInitializing] = useState<boolean>(true); // 초기 로딩 상태 추가
-  const [videoShown, setVideoShown] = useState<boolean>(false); // 비디오 표시 상태 추가
   
   // 이미지 크롭 관련 상태
   const [isCropping, setIsCropping] = useState<boolean>(false);
@@ -115,15 +112,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number, y: number } | null>(null);
   
-  const webcamRef = useRef<Webcam>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // 화면 크기에 따른 비디오 설정
-  const videoConstraints = {
-    width: isMobile ? 720 : 640,
-    height: isMobile ? 1280 : 480,
-    facingMode: cameraType,
-  };
   
   // 이미지 로드 시 초기 위치 설정
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -145,9 +134,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
         newScale = containerSize / img.naturalHeight;
       }
       
-      // 이미지가 프레임을 더 많이 채우도록 확대
-      // 1.2배로 줄여서 이미지가 크롭 영역을 충분히 채우면서도 너무 확대되지 않도록 함
-      newScale = Math.min(newScale * 1.2, 3); // 1.2배 확대, 최대 3배까지
+      // 이미지가 프레임을 더 많이 채우도록 조정
+      // 1.1배로 조정하여 적절한 크기로 표시 (과도한 확대 방지)
+      newScale = Math.min(newScale * 1.1, 3); // 1.1배 확대, 최대 3배까지
       
       console.log('Image loaded:', {
         imageWidth: img.naturalWidth,
@@ -177,13 +166,14 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   
   // 드래그 중 핸들러
   const handleDrag = useCallback((e: MouseEvent | TouchEvent) => {
-    if (isDragging && dragStart) {
-      e.preventDefault();
-      
-      // 마우스 또는 터치 이벤트의 좌표 가져오기
-      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-      
+    if (!isDragging) return;
+    
+    // 마우스 또는 터치 이벤트의 좌표 가져오기
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    
+    if (dragStart) {
+      // 새로운 위치 계산
       setTranslateX(clientX - dragStart.x);
       setTranslateY(clientY - dragStart.y);
     }
@@ -194,33 +184,25 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     setIsDragging(false);
   }, []);
   
-  // 크롭 영역 외부 이벤트 리스너 설정
+  // 확대/축소 슬라이더 변경 핸들러
+  const handleScaleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setScale(parseFloat(e.target.value));
+  }, []);
+  
+  // 이벤트 리스너 등록/해제
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => handleDrag(e);
-    const handleTouchMove = (e: TouchEvent) => handleDrag(e);
-    const handleMouseUp = () => handleDragEnd();
-    const handleTouchEnd = () => handleDragEnd();
-    
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchend', handleTouchEnd);
-    }
+    window.addEventListener('mousemove', handleDrag);
+    window.addEventListener('touchmove', handleDrag);
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchend', handleDragEnd);
     
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('mousemove', handleDrag);
+      window.removeEventListener('touchmove', handleDrag);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchend', handleDragEnd);
     };
-  }, [isDragging, handleDrag, handleDragEnd]);
-  
-  // 확대/축소 핸들러
-  const handleScaleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newScale = parseFloat(e.target.value);
-    setScale(newScale);
-  }, []);
+  }, [handleDrag, handleDragEnd]);
   
   // 크롭 완료 처리
   const handleCropComplete = useCallback(async () => {
@@ -255,135 +237,12 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     }
   }, [originalImage]);
   
-  // 카메라 스트림 초기화 함수
-  const initializeCamera = useCallback(() => {
-    setIsInitializing(true);
-    setIsCameraReady(false);
-    
-    // 비디오 숨김 처리 제거 - 항상 표시
-    // setVideoShown(false);
-    
-    if (webcamRef.current && webcamRef.current.video && webcamRef.current.video.srcObject) {
-      try {
-        const tracks = (webcamRef.current.video.srcObject as MediaStream).getTracks();
-        tracks.forEach(track => track.stop());
-      } catch (err) {
-        console.error('카메라 스트림 중지 오류:', err);
-      }
-    }
-    
-    // 새로운 카메라 스트림 설정 시도
-    navigator.mediaDevices.getUserMedia({ 
-      video: { 
-        facingMode: cameraType,
-        width: { ideal: videoConstraints.width },
-        height: { ideal: videoConstraints.height }
-      } 
-    })
-    .then(() => {
-      console.log('카메라 스트림 초기화 성공');
-      setHasCameraPermission(true);
-      setError(null);
-      // 바로 이미지가 표시되도록 설정
-      setVideoShown(true);
-    })
-    .catch((err) => {
-      console.error('카메라 초기화 오류:', err);
-      setHasCameraPermission(false);
-      setError('카메라에 접근할 수 없습니다. 권한을 확인하거나 이미지 업로드를 이용해주세요.');
-      setUploadMode(true);
-    })
-    .finally(() => {
-      setIsInitializing(false);
-    });
-  }, [cameraType, videoConstraints.width, videoConstraints.height]);
-  
-  // 컴포넌트 마운트 시 카메라 권한 확인
-  useEffect(() => {
-    if (!uploadMode) {
-      initializeCamera();
-    } else {
-      setIsInitializing(false);
-    }
-  }, [uploadMode, initializeCamera]);
-  
-  // 카메라 타입이 변경될 때마다 스트림 재초기화
-  useEffect(() => {
-    if (!uploadMode && hasCameraPermission) {
-      initializeCamera();
-    }
-  }, [cameraType, uploadMode, hasCameraPermission, initializeCamera]);
-  
-  // 웹캠이 준비되었을 때 호출되는 함수
-  const handleUserMedia = useCallback(() => {
-    console.log('웹캠 준비 완료');
-    setIsCameraReady(true);
-    setError(null);
-    setIsInitializing(false);
-    
-    // 비디오 표시 즉시 설정 (지연 없이)
-    setVideoShown(true);
-  }, []);
-  
-  // 웹캠 에러 처리
-  const handleUserMediaError = useCallback((err: string | DOMException) => {
-    console.error('Webcam error:', err);
-    setError('카메라에 접근할 수 없습니다. 권한을 확인하거나 이미지 업로드를 이용해주세요.');
-    setIsCameraReady(false);
-    setUploadMode(true); // 에러 발생 시 업로드 모드로 전환
-    setIsInitializing(false);
-  }, []);
-  
-  // 사진 찍기
-  const handleCapture = useCallback(() => {
-    if (webcamRef.current) {
-      const imageSrc = webcamRef.current.getScreenshot();
-      if (imageSrc) {
-        setCapturedImage(imageSrc);
-      } else {
-        setError('사진을 촬영할 수 없습니다. 다시 시도하거나 이미지 업로드를 이용해주세요.');
-      }
-    }
-  }, [webcamRef]);
-  
   // 사진 다시 찍기 (이제 resetImage로 리네이밍)
   const resetImage = useCallback(() => {
     setCapturedImage(null);
     setOriginalImage(null);
     setIsCropping(false);
-    
-    if (!uploadMode && webcamRef.current) {
-      // 카메라 스트림 재설정
-      initializeCamera();
-    }
-  }, [uploadMode, initializeCamera]);
-  
-  // 카메라 전환 (전면/후면)
-  const toggleCamera = useCallback(() => {
-    setCameraType((prev) => (prev === 'user' ? 'environment' : 'user'));
   }, []);
-  
-  // 확인 (분석 시작)
-  const handleConfirm = useCallback(() => {
-    if (capturedImage) {
-      onCapture(capturedImage);
-    }
-  }, [capturedImage, onCapture]);
-
-  // 촬영/업로드 모드 전환
-  const toggleUploadMode = useCallback(() => {
-    const newUploadMode = !uploadMode;
-    setUploadMode(newUploadMode);
-    setCapturedImage(null);
-    setOriginalImage(null);
-    setIsCropping(false);
-    
-    // 카메라 모드로 전환 시 카메라 초기화 즉시 수행
-    if (!newUploadMode) {
-      console.log("카메라 모드로 전환: 카메라 초기화");
-      setTimeout(() => initializeCamera(), 100); // 약간의 지연으로 상태 업데이트 보장
-    }
-  }, [uploadMode, initializeCamera]);
   
   // 파일 업로드 처리
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -425,444 +284,212 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
     }
   }, [capturedImage]);
   
+  // 확인 (분석 시작)
+  const handleConfirm = useCallback(() => {
+    if (capturedImage) {
+      onCapture(capturedImage);
+    }
+  }, [capturedImage, onCapture]);
+  
   return (
     <Container>
       <Title>AI 관상 분석</Title>
-      <SubTitle>
-        {uploadMode 
-          ? '얼굴 사진을 업로드하여 AI 관상 분석을 받아보세요' 
-          : '얼굴 사진을 찍어 AI 관상 분석을 받아보세요'}
-      </SubTitle>
+      <SubTitle>얼굴 사진을 업로드하여 AI 관상 분석을 받아보세요</SubTitle>
       
       {error && <ErrorMessage>{error}</ErrorMessage>}
       
       <Content>
-        {uploadMode ? (
-          <UploadContainer>
-            <input 
-              type="file" 
-              accept="image/*" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              style={{ display: 'none' }} 
-            />
-            
-            {capturedImage && !isCropping ? (
-              <SmallImageContainer>
-                <CapturedImage src={capturedImage} alt="업로드된 이미지" />
-                <CloseButton onClick={resetImage}>✕</CloseButton>
-                <EditButton onClick={handleCropClick}>✎</EditButton>
-              </SmallImageContainer>
-            ) : isCropping && originalImage ? (
-              <CropContainer>
-                {/* 정사각형 크롭 영역 */}
-                <SquareCropArea 
-                  ref={cropContainerRef}
-                  onMouseDown={handleDragStart}
-                  onTouchStart={handleDragStart}
-                >
-                  <CropImageWrapper
-                    style={{
-                      transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
-                      cursor: isDragging ? 'grabbing' : 'grab'
-                    }}
-                  >
-                    <img
-                      ref={imgRef}
-                      alt="얼굴 크롭"
-                      src={originalImage}
-                      onLoad={onImageLoad}
-                      style={{ 
-                        width: '100%',
-                        height: 'auto',
-                        transformOrigin: 'center',
-                        userSelect: 'none',
-                        WebkitUserSelect: 'none',
-                      }}
-                      draggable="false"
-                    />
-                  </CropImageWrapper>
-                  
-                  {/* 크롭 영역 가이드 원 */}
-                  <CropCircleOverlay />
-                </SquareCropArea>
-                
-                {/* 확대/축소 슬라이더 */}
-                <ZoomControl>
-                  <ZoomIcon>🔍-</ZoomIcon>
-                  <ZoomSlider 
-                    type="range" 
-                    min="0.5" 
-                    max="3" 
-                    step="0.01" 
-                    value={scale}
-                    onChange={handleScaleChange}
-                  />
-                  <ZoomIcon>+🔍</ZoomIcon>
-                </ZoomControl>
-                
-                <CropInstructions>
-                  <strong>얼굴을 원 안에 맞추세요:</strong><br />
-                  이미지를 드래그하여 위치를 조정하고, 슬라이더로 확대/축소하세요.<br />
-                  얼굴 전체가 잘 보이도록 중앙에 맞춰주세요.
-                </CropInstructions>
-                
-                <CropButtonGroup>
-                  <CancelCropButton onClick={handleCancelCrop}>
-                    취소
-                  </CancelCropButton>
-                  <ConfirmCropButton onClick={handleCropComplete}>
-                    이 이미지 사용하기
-                  </ConfirmCropButton>
-                </CropButtonGroup>
-              </CropContainer>
-            ) : (
-              <UploadArea onClick={handleUploadClick}>
-                <UploadIcon>📷</UploadIcon>
-                <UploadText>클릭하여 이미지 업로드</UploadText>
-                <UploadSubText>JPG, PNG 형식 지원</UploadSubText>
-              </UploadArea>
-            )}
-          </UploadContainer>
-        ) : (
-          <>
-            {capturedImage ? (
-              <SmallImageContainer>
-                <CapturedImage src={capturedImage} alt="촬영된 얼굴" />
-                <CloseButton onClick={resetImage}>✕</CloseButton>
-                <EditButton onClick={handleCropClick}>✎</EditButton>
-              </SmallImageContainer>
-            ) : (
-              <SmallWebcamContainer>
-                {(isInitializing || !isCameraReady) && !error && (
-                  <LoadingOverlay>
-                    <LoadingSpinner />
-                    <LoadingMessage>카메라 로딩 중...</LoadingMessage>
-                    <LoadingHint>카메라 권한을 요청하면 '허용'을 눌러주세요</LoadingHint>
-                  </LoadingOverlay>
-                )}
-                <Webcam
-                  ref={webcamRef}
-                  audio={false}
-                  videoConstraints={videoConstraints}
-                  screenshotFormat="image/jpeg"
-                  onUserMedia={handleUserMedia}
-                  onUserMediaError={handleUserMediaError}
-                  mirrored={cameraType === 'user'}
+        <UploadContainer>
+          <input 
+            type="file" 
+            accept="image/*" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            style={{ display: 'none' }} 
+          />
+          
+          {capturedImage && !isCropping ? (
+            <SmallImageContainer>
+              <CapturedImage src={capturedImage} alt="업로드된 이미지" />
+              <CloseButton onClick={resetImage}>✕</CloseButton>
+              <EditButton onClick={handleCropClick}>✎</EditButton>
+            </SmallImageContainer>
+          ) : isCropping && originalImage ? (
+            <CropContainer>
+              {/* 정사각형 크롭 영역 */}
+              <SquareCropArea 
+                ref={cropContainerRef}
+                onMouseDown={handleDragStart}
+                onTouchStart={handleDragStart}
+              >
+                <CropImageWrapper
                   style={{
-                    display: 'block', // 항상 표시
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover', // 웹캠은 cover 유지
-                    borderRadius: '12px',
-                    opacity: videoShown ? 1 : 0,
-                    transition: 'opacity 0.2s ease', // 트랜지션 시간 단축
+                    transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                    cursor: isDragging ? 'grabbing' : 'grab'
                   }}
+                >
+                  <img
+                    ref={imgRef}
+                    alt="얼굴 크롭"
+                    src={originalImage}
+                    onLoad={onImageLoad}
+                    style={{ 
+                      width: '100%',
+                      height: 'auto',
+                      transformOrigin: 'center',
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                    }}
+                    draggable="false"
+                  />
+                </CropImageWrapper>
+                
+                {/* 크롭 영역 가이드 원 */}
+                <CropCircleOverlay />
+              </SquareCropArea>
+              
+              {/* 확대/축소 슬라이더 */}
+              <ZoomControl>
+                <ZoomIcon>🔍-</ZoomIcon>
+                <ZoomSlider 
+                  type="range" 
+                  min="0.5" 
+                  max="3" 
+                  step="0.01" 
+                  value={scale}
+                  onChange={handleScaleChange}
                 />
-                {isCameraReady && !capturedImage && (
-                  <CaptureHintOverlay>
-                    <CaptureHintText>아래 '사진 촬영' 버튼을 눌러 사진을 찍으세요</CaptureHintText>
-                  </CaptureHintOverlay>
-                )}
-              </SmallWebcamContainer>
-            )}
-          </>
-        )}
+                <ZoomIcon>+🔍</ZoomIcon>
+              </ZoomControl>
+              
+              <CropInstructions>
+                <strong>얼굴을 원 안에 맞추세요:</strong><br />
+                이미지를 드래그하여 위치를 조정하고, 슬라이더로 확대/축소하세요.<br />
+                얼굴 전체가 잘 보이도록 중앙에 맞춰주세요.
+              </CropInstructions>
+              
+              <CropButtonGroup>
+                <CancelCropButton onClick={handleCancelCrop}>
+                  취소
+                </CancelCropButton>
+                <ConfirmCropButton onClick={handleCropComplete}>
+                  이 이미지 사용하기
+                </ConfirmCropButton>
+              </CropButtonGroup>
+            </CropContainer>
+          ) : (
+            <UploadArea onClick={handleUploadClick}>
+              <UploadIcon>📷</UploadIcon>
+              <UploadText>클릭하여 이미지 업로드</UploadText>
+              <UploadSubText>JPG, PNG 형식 지원</UploadSubText>
+            </UploadArea>
+          )}
+        </UploadContainer>
       </Content>
       
       <ButtonContainer>
-        {!isCropping && (
-          <ModeToggleButtons>
-            <ModeButton 
-              active={uploadMode} 
-              onClick={() => {
-                if (!uploadMode) toggleUploadMode();
-              }}
-              disabled={isLoading}
-            >
-              🖼️ 이미지 업로드
-            </ModeButton>
-            
-            <ModeButton 
-              active={!uploadMode} 
-              onClick={() => {
-                if (uploadMode) toggleUploadMode();
-              }}
-              disabled={isLoading || (!uploadMode && !hasCameraPermission)}
-            >
-              📸 카메라 촬영
-            </ModeButton>
-          </ModeToggleButtons>
-        )}
-        
-        {!capturedImage && !isCropping ? (
-          <>
-            {!uploadMode && (
-              <ButtonGroup>
-                <UploadButton 
-                  onClick={toggleUploadMode} 
-                  disabled={isLoading}
-                  fullWidth
-                >
-                  📂 이미지 업로드 모드로 전환
-                </UploadButton>
-              </ButtonGroup>
-            )}
-            
-            {uploadMode && (
-              <UploadButton 
-                onClick={handleUploadClick} 
-                disabled={isLoading}
-                fullWidth
-              >
-                📂 이미지 선택
-              </UploadButton>
-            )}
-          </>
-        ) : isCropping ? (
-          null // 크롭 버튼은 CropContainer 내부에 있음
-        ) : (
+        {!isCropping && !capturedImage ? (
+          <UploadButton 
+            onClick={handleUploadClick} 
+            disabled={isLoading}
+            fullWidth
+          >
+            📂 이미지 선택
+          </UploadButton>
+        ) : !isCropping && capturedImage ? (
           <ConfirmButton onClick={handleConfirm} disabled={isLoading} fullWidth>
             {isLoading ? '분석 중...' : '확인'}
           </ConfirmButton>
-        )}
+        ) : null}
       </ButtonContainer>
       
       <PrivacyNote>
-        * 촬영 또는 업로드한 이미지는 분석 목적으로만 사용되며, 서버에 영구 저장되지 않습니다.
+        * 업로드한 이미지는 분석 목적으로만 사용되며, 서버에 영구 저장되지 않습니다.
       </PrivacyNote>
     </Container>
   );
 };
 
-// 새로 추가된 스타일 컴포넌트
-const SquareCropArea = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 300px;
-  height: 0;
-  padding-bottom: 100%; /* 정사각형 */
-  margin: 0 auto;
-  overflow: hidden;
-  background-color: #f0f0f0;
-  border-radius: 12px;
-  touch-action: none; /* 터치 액션 방지 */
-`;
-
-const CropImageWrapper = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  will-change: transform; /* 성능 최적화 */
-  transition: transform 0.05s ease-out; /* 드래그 시 부드러운 효과 */
-`;
-
-const CropCircleOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
-  &::after {
-    content: '';
-    width: 96%;
-    height: 96%;
-    border: 2px dashed rgba(255, 255, 255, 0.8);
-    border-radius: 50%;
-    box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.3);
-  }
-  
-  &::before {
-    content: '+';
-    position: absolute;
-    color: white;
-    font-size: 1.5rem;
-    font-weight: 300;
-    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
-    z-index: 1;
-  }
-`;
-
-const ZoomControl = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  max-width: 300px;
-  margin: 1rem auto 0.5rem;
-  padding: 0 0.5rem;
-`;
-
-const ZoomIcon = styled.span`
-  font-size: 1rem;
-  color: #4a5568;
-`;
-
-const ZoomSlider = styled.input`
-  flex: 1;
-  height: 6px;
-  border-radius: 3px;
-  background: #cbd5e0;
-  outline: none;
-  transition: background 0.2s;
-  
-  &::-webkit-slider-thumb {
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #6b46c1;
-    cursor: pointer;
-    transition: all 0.2s;
-    
-    &:hover {
-      background: #553c9a;
-      transform: scale(1.1);
-    }
-  }
-  
-  &::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border: none;
-    border-radius: 50%;
-    background: #6b46c1;
-    cursor: pointer;
-    transition: all 0.2s;
-    
-    &:hover {
-      background: #553c9a;
-      transform: scale(1.1);
-    }
-  }
-`;
-
-// 기존 스타일 컴포넌트 (변경되지 않은 부분은 생략)
+// 스타일드 컴포넌트들 (기존 코드와 동일)
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
   max-width: 500px;
   margin: 0 auto;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const Title = styled.h2`
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-size: 1.75rem;
   text-align: center;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
 `;
 
 const SubTitle = styled.p`
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 1.5rem;
   text-align: center;
+  margin-bottom: 1.5rem;
+  color: #4a5568;
+  font-size: 1rem;
 `;
 
 const Content = styled.div`
-  width: 100%;
   margin-bottom: 1.5rem;
 `;
 
-// 기존 큰 웹캠 컨테이너 대신 작은 크기로 조정
-const SmallWebcamContainer = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 360px;
-  height: 0;
-  padding-bottom: 100%; /* 4:3 비율에서 1:1 정사각형으로 변경 */
-  overflow: hidden;
-  border-radius: 12px;
-  background-color: #000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  margin: 0 auto;
-`;
-
-// 로딩 오버레이 추가
-const LoadingOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 5;
-  border-radius: 12px;
-`;
-
-// 로딩 스피너 추가
-const LoadingSpinner = styled.div`
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
+const ErrorMessage = styled.div`
+  background-color: #fed7d7;
+  color: #c53030;
+  padding: 0.75rem;
   margin-bottom: 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+`;
+
+const UploadContainer = styled.div`
+  width: 100%;
+`;
+
+const UploadArea = styled.div`
+  border: 2px dashed #cbd5e0;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
   
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+  &:hover {
+    border-color: #805ad5;
+    background-color: #f7fafc;
   }
 `;
 
-const LoadingMessage = styled.div`
-  color: white;
-  font-size: 1.2rem;
+const UploadIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
+const UploadText = styled.p`
+  font-size: 1.1rem;
   font-weight: 500;
-  text-align: center;
   margin-bottom: 0.5rem;
+  color: #4a5568;
 `;
 
-const LoadingHint = styled.div`
-  color: rgba(255, 255, 255, 0.8);
+const UploadSubText = styled.p`
   font-size: 0.9rem;
-  text-align: center;
-  max-width: 80%;
+  color: #718096;
 `;
 
-// 촬영 힌트 오버레이 추가
-const CaptureHintOverlay = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
-  z-index: 3;
-`;
-
-const CaptureHintText = styled.div`
-  color: white;
-  font-size: 0.9rem;
-  text-align: center;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-`;
-
-// 작은 이미지 컨테이너로 대체
 const SmallImageContainer = styled.div`
-  width: 100%;
-  max-width: 360px;
-  height: 0;
-  padding-bottom: 100%; /* 4:3 비율에서 1:1 정사각형으로 변경 */
   position: relative;
-  overflow: hidden;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%; /* 정사각형 비율 유지 */
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  margin: 0 auto;
+  overflow: hidden;
+  background-color: #000;
 `;
 
 const CapturedImage = styled.img`
@@ -871,388 +498,276 @@ const CapturedImage = styled.img`
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* contain 대신 cover로 변경하여 화면을 가득 채우도록 함 */
-  border-radius: 12px;
-  background-color: #000; /* 배경 추가 */
+  object-fit: contain;
+  display: block;
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  max-width: 360px;
-  margin-bottom: 1.5rem;
-`;
-
-// 모드 선택 버튼 그룹
-const ModeToggleButtons = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  width: 100%;
-`;
-
-const ModeButton = styled.button<{ active: boolean }>`
-  flex: 1;
-  padding: 0.8rem 0.5rem;
-  background-color: ${props => props.active ? '#6b46c1' : '#e2e8f0'};
-  color: ${props => props.active ? 'white' : '#4a5568'};
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: ${props => props.active ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none'};
-  
-  &:hover:not(:disabled) {
-    background-color: ${props => props.active ? '#553c9a' : '#cbd5e0'};
-    transform: ${props => props.active ? 'translateY(-2px)' : 'none'};
-    box-shadow: ${props => props.active ? '0 6px 8px rgba(0, 0, 0, 0.15)' : '0 2px 4px rgba(0, 0, 0, 0.05)'};
-  }
-  
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-`;
-
-const CameraButton = styled.button`
-  flex: 1;
-  padding: 0.8rem;
-  background-color: #2d3748;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  
-  &:hover:not(:disabled) {
-    background-color: #4a5568;
-  }
-  
-  &:disabled {
-    background-color: #a0aec0;
-    cursor: not-allowed;
-  }
-`;
-
-// 사진 촬영 버튼 - 눈에 띄는 애니메이션 추가
-const CaptureButton = styled.button<{ pulse?: boolean }>`
-  padding: 1rem;
-  background-color: #6b46c1;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
-  box-shadow: ${props => props.pulse ? '0 0 0 0 rgba(107, 70, 193, 0.7)' : 'none'};
-  animation: ${props => props.pulse ? 'pulse 2s infinite' : 'none'};
-  
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(107, 70, 193, 0.7);
-    }
-    70% {
-      transform: scale(1.02);
-      box-shadow: 0 0 0 10px rgba(107, 70, 193, 0);
-    }
-    100% {
-      transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(107, 70, 193, 0);
-    }
-  }
-  
-  &:hover:not(:disabled) {
-    background-color: #553c9a;
-    transform: translateY(-2px);
-  }
-  
-  &:disabled {
-    background-color: #a0aec0;
-    cursor: not-allowed;
-    animation: none;
-  }
-`;
-
-const UploadButton = styled.button<{ fullWidth?: boolean }>`
-  flex: 1;
-  padding: 1rem;
-  background-color: #3182ce;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: ${props => props.fullWidth ? '100%' : 'auto'};
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  
-  &:hover:not(:disabled) {
-    background-color: #2b6cb0;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  }
-  
-  &:disabled {
-    background-color: #a0aec0;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  width: 100%;
-  margin-top: 0.5rem;
-`;
-
-const RetakeButton = styled.button`
-  flex: 1;
-  padding: 0.8rem;
-  background-color: #e53e3e;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  
-  &:hover:not(:disabled) {
-    background-color: #c53030;
-  }
-  
-  &:disabled {
-    background-color: #a0aec0;
-    cursor: not-allowed;
-  }
-`;
-
-const ConfirmButton = styled.button<{ fullWidth?: boolean }>`
-  flex: 1;
-  padding: 1rem;
-  background-color: #38a169;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: ${props => props.fullWidth ? '100%' : 'auto'};
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  
-  &:hover:not(:disabled) {
-    background-color: #2f855a;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  }
-  
-  &:disabled {
-    background-color: #a0aec0;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background-color: #fed7d7;
-  color: #c53030;
-  padding: 0.8rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  text-align: center;
-  width: 100%;
-  font-size: 0.9rem;
-`;
-
-const PrivacyNote = styled.p`
-  font-size: 0.85rem;
-  color: #718096;
-  text-align: center;
-  margin-top: 1rem;
-`;
-
-const UploadContainer = styled.div`
-  width: 100%;
-  max-width: 360px;
-  margin: 0 auto;
-`;
-
-const UploadArea = styled.div`
-  width: 100%;
-  height: 0;
-  padding-bottom: 75%; /* 4:3 비율 */
-  position: relative;
-  background-color: #f7fafc;
-  border: 2px dashed #cbd5e0;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color 0.2s, background-color 0.2s;
-  
-  &:hover {
-    border-color: #6b46c1;
-    background-color: #f0f5ff;
-  }
-`;
-
-const UploadIcon = styled.div`
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-`;
-
-const UploadText = styled.p`
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #4a5568;
-`;
-
-const UploadSubText = styled.p`
-  position: absolute;
-  top: 65%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 0.85rem;
-  color: #718096;
-  margin-top: 0.5rem;
-`;
-
-// 이미지 취소 버튼
 const CloseButton = styled.button`
   position: absolute;
   top: 10px;
   right: 10px;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
-  font-size: 16px;
+  border-radius: 50%;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
-  transition: background-color 0.2s;
   
   &:hover {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.7);
   }
 `;
 
-// 크롭 관련 스타일 컴포넌트 추가
-const CropContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  max-width: 360px;
-  margin: 0 auto;
-  padding: 1rem 0;
-`;
-
-const CropInstructions = styled.div`
-  margin-top: 1rem;
-  font-size: 0.9rem;
-  color: #4a5568;
-  text-align: center;
-  line-height: 1.4;
-  
-  strong {
-    color: #6b46c1;
-  }
-`;
-
-const CropButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-  margin-top: 0.5rem;
-`;
-
-const CancelCropButton = styled.button`
-  flex: 1;
-  padding: 0.8rem;
-  background-color: #e2e8f0;
-  color: #4a5568;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  
-  &:hover:not(:disabled) {
-    background-color: #cbd5e0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const ConfirmCropButton = styled.button`
-  flex: 1;
-  padding: 0.8rem;
-  background-color: #6b46c1;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  
-  &:hover:not(:disabled) {
-    background-color: #553c9a;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  }
-`;
-
-// 이미지 편집 버튼
 const EditButton = styled.button`
   position: absolute;
   top: 10px;
   left: 10px;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
-  font-size: 16px;
+  border-radius: 50%;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
-  transition: background-color 0.2s;
   
   &:hover {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+`;
+
+const ButtonContainer = styled.div`
+  margin-bottom: 1rem;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+`;
+
+const ButtonBase = styled.button<{ fullWidth?: boolean }>`
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: ${props => props.fullWidth ? '100%' : 'auto'};
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+const UploadButton = styled(ButtonBase)`
+  background-color: white;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+  
+  &:hover:not(:disabled) {
+    background-color: #f7fafc;
+    border-color: #a0aec0;
+  }
+`;
+
+const ConfirmButton = styled(ButtonBase)`
+  background-color: #6b46c1;
+  color: white;
+  border: none;
+  
+  &:hover:not(:disabled) {
+    background-color: #553c9a;
+  }
+`;
+
+const ModeToggleButtons = styled.div`
+  display: flex;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+`;
+
+const ModeButton = styled.button<{ active: boolean }>`
+  flex: 1;
+  padding: 0.75rem;
+  background-color: ${props => props.active ? '#6b46c1' : 'white'};
+  color: ${props => props.active ? 'white' : '#4a5568'};
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover:not(:disabled) {
+    background-color: ${props => props.active ? '#553c9a' : '#f7fafc'};
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+const PrivacyNote = styled.p`
+  text-align: center;
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 0.5rem;
+`;
+
+// 새로운 크롭 관련 컴포넌트들
+const CropContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
+
+const SquareCropArea = styled.div`
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; /* 정사각형 유지 */
+  margin-bottom: 1rem;
+  overflow: hidden;
+  background-color: #000; /* 검은 배경으로 변경 */
+  border-radius: 8px;
+  touch-action: none; /* 모바일에서 스크롤 방지 */
+`;
+
+const CropImageWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform; /* 성능 최적화 */
+`;
+
+const CropCircleOverlay = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 75%;
+  height: 75%;
+  border: 2px dashed rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  pointer-events: none;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+const ZoomControl = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 1rem;
+`;
+
+const ZoomIcon = styled.span`
+  font-size: 1rem;
+  color: #4a5568;
+  padding: 0 0.5rem;
+`;
+
+const ZoomSlider = styled.input`
+  flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: #e2e8f0;
+  outline: none;
+  
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #6b46c1;
+    cursor: pointer;
+  }
+  
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #6b46c1;
+    cursor: pointer;
+    border: none;
+  }
+`;
+
+const CropInstructions = styled.div`
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #4a5568;
+  line-height: 1.4;
+`;
+
+const CropButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+`;
+
+const CancelCropButton = styled(ButtonBase)`
+  flex: 1;
+  background-color: white;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+  
+  &:hover {
+    background-color: #f7fafc;
+    border-color: #a0aec0;
+  }
+`;
+
+const ConfirmCropButton = styled(ButtonBase)`
+  flex: 2;
+  background-color: #6b46c1;
+  color: white;
+  border: none;
+  
+  &:hover {
+    background-color: #553c9a;
   }
 `;
 
