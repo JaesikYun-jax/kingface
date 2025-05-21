@@ -64,28 +64,13 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
           >
             <CardInner isFlipped={flippedCards[index]}>
               <CardFront>
-                <img 
-                  src="/tarot/back.jpg" 
-                  alt="Tarot Card Back" 
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    borderRadius: '8px',
-                    objectFit: 'cover'
-                  }}
-                />
+                {/* 뒷면에는 물음표 아이콘 표시 */}
+                <CardBackIcon>?</CardBackIcon>
+                <CardBackText>운명의 카드</CardBackText>
               </CardFront>
               <CardBack>
-                <img 
-                  src={card.image} 
-                  alt={card.name} 
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    borderRadius: '8px',
-                    objectFit: 'cover'
-                  }}
-                />
+                {/* 타로 카드 숫자 크게 표시 */}
+                <CardNumber>{card.id + 1}</CardNumber>
                 <CardTitle>{card.name}</CardTitle>
                 <CardDescription>{card.description}</CardDescription>
               </CardBack>
@@ -93,6 +78,23 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
           </Card>
         ))}
       </CardsContainer>
+      
+      <SelectedCardInfo>
+        {selectedCardIdx !== null && flippedCards[selectedCardIdx] ? (
+          <>
+            <SelectedCardTitle>
+              선택된 카드: {cards[selectedCardIdx].name} ({cards[selectedCardIdx].id + 1}번)
+            </SelectedCardTitle>
+            <SelectedCardMeaning>
+              {cards[selectedCardIdx].meaning}
+            </SelectedCardMeaning>
+          </>
+        ) : (
+          <NoneSelectedText>
+            카드를 선택해주세요
+          </NoneSelectedText>
+        )}
+      </SelectedCardInfo>
       
       <ButtonContainer>
         <Button onClick={handleReset}>카드 재설정</Button>
@@ -188,8 +190,25 @@ const CardFront = styled.div`
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: white;
+  background: linear-gradient(135deg, #4a1551 0%, #2d3748 100%);
+`;
+
+const CardBackIcon = styled.div`
+  font-size: 5rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+`;
+
+const CardBackText = styled.div`
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 2px;
 `;
 
 const CardBack = styled.div`
@@ -206,19 +225,58 @@ const CardBack = styled.div`
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  background: linear-gradient(135deg, #f9f5ff 0%, #e9d8fd 100%);
+`;
+
+const CardNumber = styled.div`
+  font-size: 8rem;
+  font-weight: bold;
+  color: #553c9a;
+  text-align: center;
+  margin: 2rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const CardTitle = styled.h3`
   margin: 0.5rem 0;
   color: #333;
-  font-size: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
 `;
 
 const CardDescription = styled.p`
   margin: 0;
   color: #666;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   line-height: 1.4;
+  text-align: center;
+`;
+
+const SelectedCardInfo = styled.div`
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background-color: #f9f5ff;
+  border-radius: 8px;
+  border-left: 4px solid #6b46c1;
+`;
+
+const SelectedCardTitle = styled.h3`
+  margin: 0 0 0.5rem 0;
+  color: #4a5568;
+  font-size: 1.2rem;
+`;
+
+const SelectedCardMeaning = styled.p`
+  margin: 0;
+  color: #718096;
+  font-size: 1rem;
+  line-height: 1.6;
+`;
+
+const NoneSelectedText = styled.p`
+  color: #718096;
+  font-style: italic;
+  text-align: center;
 `;
 
 const ButtonContainer = styled.div`

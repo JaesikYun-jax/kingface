@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BirthInfo } from '../types';
 import styled from '@emotion/styled';
 import DatePicker from 'react-datepicker';
@@ -14,35 +14,139 @@ interface TimeSlot {
   id: string;
   name: string;
   label: string;
+  hanja: string; // 한자 추가
   hours: [number, number]; // 시작 시간과 끝 시간
 }
 
 // 12시신 데이터
 const timeSlots: TimeSlot[] = [
-  { id: 'rat', name: '자시', label: '자(子) 23:00-01:00', hours: [23, 1] },
-  { id: 'ox', name: '축시', label: '축(丑) 01:00-03:00', hours: [1, 3] },
-  { id: 'tiger', name: '인시', label: '인(寅) 03:00-05:00', hours: [3, 5] },
-  { id: 'rabbit', name: '묘시', label: '묘(卯) 05:00-07:00', hours: [5, 7] },
-  { id: 'dragon', name: '진시', label: '진(辰) 07:00-09:00', hours: [7, 9] },
-  { id: 'snake', name: '사시', label: '사(巳) 09:00-11:00', hours: [9, 11] },
-  { id: 'horse', name: '오시', label: '오(午) 11:00-13:00', hours: [11, 13] },
-  { id: 'sheep', name: '미시', label: '미(未) 13:00-15:00', hours: [13, 15] },
-  { id: 'monkey', name: '신시', label: '신(申) 15:00-17:00', hours: [15, 17] },
-  { id: 'rooster', name: '유시', label: '유(酉) 17:00-19:00', hours: [17, 19] },
-  { id: 'dog', name: '술시', label: '술(戌) 19:00-21:00', hours: [19, 21] },
-  { id: 'pig', name: '해시', label: '해(亥) 21:00-23:00', hours: [21, 23] },
-  { id: 'unknown', name: '모름', label: '시간 모름', hours: [0, 0] }
+  { id: 'rat', name: '자시', label: '자(子) 23:00-01:00', hanja: '子', hours: [23, 1] },
+  { id: 'ox', name: '축시', label: '축(丑) 01:00-03:00', hanja: '丑', hours: [1, 3] },
+  { id: 'tiger', name: '인시', label: '인(寅) 03:00-05:00', hanja: '寅', hours: [3, 5] },
+  { id: 'rabbit', name: '묘시', label: '묘(卯) 05:00-07:00', hanja: '卯', hours: [5, 7] },
+  { id: 'dragon', name: '진시', label: '진(辰) 07:00-09:00', hanja: '辰', hours: [7, 9] },
+  { id: 'snake', name: '사시', label: '사(巳) 09:00-11:00', hanja: '巳', hours: [9, 11] },
+  { id: 'horse', name: '오시', label: '오(午) 11:00-13:00', hanja: '午', hours: [11, 13] },
+  { id: 'sheep', name: '미시', label: '미(未) 13:00-15:00', hanja: '未', hours: [13, 15] },
+  { id: 'monkey', name: '신시', label: '신(申) 15:00-17:00', hanja: '申', hours: [15, 17] },
+  { id: 'rooster', name: '유시', label: '유(酉) 17:00-19:00', hanja: '酉', hours: [17, 19] },
+  { id: 'dog', name: '술시', label: '술(戌) 19:00-21:00', hanja: '戌', hours: [19, 21] },
+  { id: 'pig', name: '해시', label: '해(亥) 21:00-23:00', hanja: '亥', hours: [21, 23] },
+  { id: 'unknown', name: '모름', label: '시간 모름', hanja: '?', hours: [0, 0] }
 ];
 
+// 천간지지 데이터
+const celestialStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+
+// 년간지 계산
+const getYearPillar = (year: number): string => {
+  const stemIndex = (year - 4) % 10;
+  const branchIndex = (year - 4) % 12;
+  return `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`;
+};
+
+// 월간지 계산 (간략화된 계산, 실제 사주에서는 더 복잡)
+const getMonthPillar = (month: number, year: number): string => {
+  // 월지(지지)는 1월=인(寅)부터 시작
+  const branchIndex = (month + 1) % 12;
+  
+  // 월간(천간)은 연간에 따라 달라짐
+  const yearStemIndex = (year - 4) % 10;
+  // 연간이 갑(甲)이나 기(己)이면 월간은 병(丙)부터 시작
+  const baseIndex = (yearStemIndex % 5) * 2;
+  const stemIndex = (baseIndex + month - 1) % 10;
+  
+  return `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`;
+};
+
+// 일간지 계산 (매우 간략화된 방식)
+const getDayPillar = (year: number, month: number, day: number): string => {
+  // 실제 계산에서는 역법에 따른 정확한 계산이 필요합니다
+  // 여기서는 단순화된 공식을 사용합니다
+  const baseDate = new Date(1900, 0, 1);
+  const targetDate = new Date(year, month - 1, day);
+  const daysDiff = Math.floor((targetDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
+  
+  const stemIndex = (daysDiff + 9) % 10;
+  const branchIndex = (daysDiff + 3) % 12;
+  
+  return `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`;
+};
+
+// 시간지 계산
+const getTimePillar = (hour: number, dayStemnIndex: number): string => {
+  // 시지(지지)는 자(子)시부터 시작, 2시간 간격
+  let branchIndex = Math.floor(hour / 2);
+  if (hour === 23) branchIndex = 0; // 23시는 자시(子時)에 포함
+  
+  // 시간에 해당하는 지지 인덱스 계산
+  const adjustedBranchIndex = (branchIndex + 12) % 12;
+  
+  // 시간에 해당하는 천간 계산, 일간(일주 천간)에 따라 달라짐
+  const offset = (dayStemnIndex % 5) * 2;
+  const stemIndex = (offset + Math.floor(hour / 2)) % 10;
+  
+  return `${celestialStems[stemIndex]}${earthlyBranches[adjustedBranchIndex]}`;
+};
+
 const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
-  // 현재 날짜와 시간 생성
-  const now = new Date();
+  // 오늘 날짜에서 20년 전 날짜 계산
+  const getTwentyYearsAgo = (): Date => {
+    const today = new Date();
+    today.setFullYear(today.getFullYear() - 20);
+    return today;
+  };
   
   // 상태 관리
-  const [birthDate, setBirthDate] = useState<Date>(now);
+  const [birthDate, setBirthDate] = useState<Date>(getTwentyYearsAgo());
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [isLunar, setIsLunar] = useState<boolean>(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("unknown");
+  const [sajuText, setSajuText] = useState<string>('');
+
+  // 사주 계산 및 표시
+  useEffect(() => {
+    const year = birthDate.getFullYear();
+    const month = birthDate.getMonth() + 1;
+    const day = birthDate.getDate();
+    
+    let hour = 0;
+    // "모름"이 아닌 경우에만 시간 설정
+    if (selectedTimeSlot !== "unknown") {
+      const timeSlot = timeSlots.find(slot => slot.id === selectedTimeSlot);
+      if (timeSlot) {
+        // 해당 시간대의 중간 시간으로 설정 (자시는 특별 처리)
+        if (timeSlot.id === 'rat') {
+          hour = 0; // 자정으로 설정
+        } else {
+          const startHour = timeSlot.hours[0];
+          const endHour = timeSlot.hours[1];
+          hour = Math.floor((startHour + endHour) / 2);
+        }
+      }
+    }
+    
+    const yearPillar = getYearPillar(year);
+    const monthPillar = getMonthPillar(month, year);
+    const dayPillar = getDayPillar(year, month, day);
+    
+    // 일간(일주 천간) 인덱스 구하기
+    const dayStemnIndex = celestialStems.indexOf(dayPillar[0]);
+    
+    // 시간 지정이 없으면 시주는 표시하지 않음
+    let timePillar = '';
+    if (selectedTimeSlot !== "unknown") {
+      timePillar = getTimePillar(hour, dayStemnIndex);
+    }
+    
+    // 시주가 있을 경우와 없을 경우를 구분해서 사주 텍스트 생성
+    if (timePillar) {
+      setSajuText(`${yearPillar}년 ${monthPillar}월 ${dayPillar}일 ${timePillar}시`);
+    } else {
+      setSajuText(`${yearPillar}년 ${monthPillar}월 ${dayPillar}일`);
+    }
+  }, [birthDate, selectedTimeSlot]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,6 +187,11 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
     onSubmit(birthInfo);
   };
 
+  // 시간 슬롯 선택 핸들러 - 버튼 클릭시 바로 submit되지 않도록 수정
+  const handleTimeSlotSelect = (slotId: string) => {
+    setSelectedTimeSlot(slotId);
+  };
+
   return (
     <FormContainer onSubmit={handleSubmit}>
       <Title>사주 정보 입력</Title>
@@ -114,8 +223,9 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
             <TimeSlotOption
               key={slot.id}
               isSelected={selectedTimeSlot === slot.id}
-              onClick={() => setSelectedTimeSlot(slot.id)}
+              onClick={() => handleTimeSlotSelect(slot.id)}
               isUnknown={slot.id === 'unknown'}
+              type="button" // 버튼 타입을 명시적으로 지정하여 form submit 방지
             >
               <TimeSlotName>{slot.name}</TimeSlotName>
               <TimeSlotLabel>{slot.label}</TimeSlotLabel>
@@ -167,11 +277,54 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
         </InfoText>
       </InfoBox>
 
+      {/* 사주 정보 표시 섹션 추가 */}
+      {sajuText && (
+        <SajuBox>
+          <SajuTitle>사주 정보</SajuTitle>
+          <SajuText>{sajuText}</SajuText>
+          <SajuDescription>
+            위 사주는 입력하신 정보를 기반으로 한 간략한 사주 정보입니다.
+            실제 사주 계산에는 더 복잡한 역법과 계산법이 사용됩니다.
+          </SajuDescription>
+        </SajuBox>
+      )}
+
       <SubmitButton type="submit">다음 단계</SubmitButton>
     </FormContainer>
   );
 };
 
+// 사주 정보 표시를 위한 스타일 컴포넌트
+const SajuBox = styled.div`
+  background-color: #f9f5ff;
+  border: 1px solid #e9d8fd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const SajuTitle = styled.h3`
+  font-size: 1.2rem;
+  color: #553c9a;
+  margin-bottom: 0.8rem;
+`;
+
+const SajuText = styled.p`
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #4a5568;
+  letter-spacing: 2px;
+  margin-bottom: 0.8rem;
+`;
+
+const SajuDescription = styled.p`
+  font-size: 0.8rem;
+  color: #718096;
+  line-height: 1.4;
+`;
+
+// 기존 스타일 컴포넌트들
 const FormContainer = styled.form`
   max-width: 500px;
   margin: 0 auto;

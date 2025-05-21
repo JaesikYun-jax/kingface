@@ -116,9 +116,9 @@ const FortunePage: React.FC = () => {
   const handleTarotSelect = (card: TarotCard) => {
     setSelectedCard(card);
     
-    // 프리미엄 플랜이며 생년월일 정보가 있으면 얼굴 촬영 단계로
+    // 프리미엄 플랜이며 생년월일 정보가 있으면 비밀번호 단계로 (얼굴 분석 선택 여부를 위해)
     if (currentPlan === PlanType.PREMIUM && birthInfo) {
-      // 얼굴 촬영 단계로 이동하기 전에 비밀번호 단계로 먼저 이동
+      // 비밀번호 단계로 이동
       setCurrentStep(Step.PASSWORD);
     } else if (birthInfo) {
       // 그 외의 경우 바로 결과 생성
@@ -307,28 +307,52 @@ const FortunePage: React.FC = () => {
         <ContentSection>
           <PasswordContainer>
             <SecurityIcon>🔒</SecurityIcon>
-            <PasswordTitle>보안 인증</PasswordTitle>
+            <PasswordTitle>추가 분석 선택</PasswordTitle>
             <PasswordDescription>
-              얼굴 분석 API 악용 방지를 위해 비밀번호 인증이 필요합니다.
-              관리자에게 문의하여 비밀번호를 얻으세요.
+              사주 분석에 더해 얼굴 분석을 추가하시겠습니까?
             </PasswordDescription>
             
-            <PasswordForm onSubmit={handlePasswordSubmit}>
-              <PasswordInput
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-                required
-              />
-              <SubmitButton type="submit">확인</SubmitButton>
-            </PasswordForm>
-            
-            {passwordError && <PasswordErrorMessage>{passwordError}</PasswordErrorMessage>}
-            
-            <SkipLink onClick={handleSkipTarot}>
-              얼굴 분석 건너뛰기
-            </SkipLink>
+            <AnalysisOptions>
+              <AnalysisOption onClick={() => {
+                if (birthInfo) {
+                  setCurrentStep(Step.FACE_CAPTURE);
+                }
+              }}>
+                <OptionIcon>👁️</OptionIcon>
+                <OptionTitle>사주 + 얼굴 분석</OptionTitle>
+                <OptionDescription>
+                  얼굴 사진 업로드를 통해 더 정확한 운세를 풀이해드립니다.
+                  (비밀번호 인증 필요)
+                </OptionDescription>
+                
+                <PasswordForm onSubmit={handlePasswordSubmit}>
+                  <PasswordInput
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="비밀번호를 입력하세요"
+                    required
+                  />
+                  <SubmitButton type="submit">확인</SubmitButton>
+                </PasswordForm>
+                {passwordError && <PasswordErrorMessage>{passwordError}</PasswordErrorMessage>}
+              </AnalysisOption>
+              
+              <AnalysisOption onClick={() => {
+                if (birthInfo) {
+                  setCurrentStep(Step.LOADING);
+                  handleGenerateFortune(birthInfo, selectedCard, null);
+                }
+              }}>
+                <OptionIcon>📝</OptionIcon>
+                <OptionTitle>사주만 분석</OptionTitle>
+                <OptionDescription>
+                  생년월일과 시간 정보만으로 운세를 풀이해드립니다.
+                  (얼굴 분석 없이 즉시 결과 확인)
+                </OptionDescription>
+                <SkipButton>얼굴 분석 건너뛰기</SkipButton>
+              </AnalysisOption>
+            </AnalysisOptions>
           </PasswordContainer>
         </ContentSection>
       )}
@@ -390,7 +414,7 @@ const FortunePage: React.FC = () => {
 const PasswordContainer = styled.div`
   text-align: center;
   padding: 2rem;
-  max-width: 500px;
+  max-width: 800px;
   margin: 0 auto;
 `;
 
@@ -413,11 +437,72 @@ const PasswordDescription = styled.p`
   line-height: 1.6;
 `;
 
+const AnalysisOptions = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const AnalysisOption = styled.div`
+  background-color: #f9f5ff;
+  border: 1px solid #e9d8fd;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s;
+  
+  &:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+  }
+`;
+
+const OptionIcon = styled.div`
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+`;
+
+const OptionTitle = styled.h4`
+  font-size: 1.2rem;
+  color: #4a5568;
+  margin-bottom: 0.8rem;
+`;
+
+const OptionDescription = styled.p`
+  font-size: 0.9rem;
+  color: #718096;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+`;
+
+const SkipButton = styled.button`
+  background-color: #6b46c1;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  
+  &:hover {
+    background-color: #553c9a;
+  }
+`;
+
 const PasswordForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  width: 100%;
 `;
 
 const PasswordInput = styled.input`
