@@ -540,7 +540,8 @@ const LoadingBarContainer = styled.div`
 const LoadingBar = styled.div<{ width: number }>`
   height: 100%;
   width: ${props => props.width}%;
-  background-color: #6b46c1;
+  background-image: linear-gradient(135deg, #9796f0 0%, #fbc7d4 100%);
+  border-radius: 5px;
   transition: width 0.3s ease;
 `;
 
