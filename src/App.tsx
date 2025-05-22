@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import FortunePage from './pages/FortunePage';
 import FaceReadingPage from './pages/FaceReadingPage';
 import AdminPage from './pages/AdminPage';
+import FortuneQaPage from './pages/FortuneQaPage';
 import PlanSelector from './components/PlanSelector';
 import './App.css';
 
@@ -87,6 +88,7 @@ const App: React.FC = () => {
             <Route path="/fortune" element={<FortunePage />} />
             <Route path="/facereading" element={<FaceReadingPage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/fortune-qa" element={<FortuneQaPage />} />
           </Routes>
         </Main>
         
