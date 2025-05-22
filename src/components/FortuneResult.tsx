@@ -69,20 +69,19 @@ ${result.advice}
     }
   }, [result]);
 
-  const handleShare = () => {
-    const shareText = `🔮 아이보살의 운세 풀이 🔮\n\n${mysticPhrase}\n\n${result.overall.substring(0, 100)}...\n\n당신의 운명이 궁금하다면? 아이보살이 도와드립니다 💫\n⭐ kingface.difflabs.xyz ⭐`;
+  // 클립보드에 복사 함수 - 관상보기와 동일한 방식으로 변경
+  const copyToClipboard = async () => {
+    if (!markdownContent) return;
     
-    if (navigator.share) {
-      navigator.share({
-        title: '나의 사주와 운명',
-        text: shareText,
-        url: window.location.href,
-      }).catch(error => console.log('공유하기 실패:', error));
-    } else {
-      // 클립보드에 복사
-      navigator.clipboard.writeText(shareText)
-        .then(() => alert('운세 결과가 클립보드에 복사되었습니다.'))
-        .catch(() => alert('클립보드 복사에 실패했습니다.'));
+    try {
+      // 마크다운 원본 내용에 홍보 문구 추가
+      const shareText = `${markdownContent}\n\n------------------\n\n당신의 운명이 궁금하다면? 아이보살이 도와드립니다 💫\n⭐ kingface.difflabs.xyz ⭐`;
+      
+      await navigator.clipboard.writeText(shareText);
+      alert('운세 결과가 클립보드에 복사되었습니다!');
+    } catch (err) {
+      console.error('클립보드 복사 실패:', err);
+      alert('클립보드 복사에 실패했습니다.');
     }
   };
 
@@ -101,15 +100,13 @@ ${result.advice}
       </ResultHeader>
 
       <OriginalContent>
-        {/* 카드와 사주 정보 표시 */}
+        {/* 타로 카드 이미지 표시 - 관상보기의 사용자 이미지와 유사하게 */}
         {selectedCard && (
-          <CardContainer>
-            <CardImage src={selectedCard.image} alt={selectedCard.name} />
-            <CardInfo>
-              <CardName>{selectedCard.name}</CardName>
-              <CardMeaning>{selectedCard.meaning}</CardMeaning>
-            </CardInfo>
-          </CardContainer>
+          <UserImageContainer>
+            <CenteredCardImage src={selectedCard.image} alt={selectedCard.name} />
+            <CardName>{selectedCard.name}</CardName>
+            <CardMeaning>{selectedCard.meaning}</CardMeaning>
+          </UserImageContainer>
         )}
 
         {/* 신비로운 문구 표시 */}
@@ -133,9 +130,9 @@ ${result.advice}
           <ButtonIcon>🔄</ButtonIcon>
           다시 시작하기
         </ActionButton>
-        <ActionButton onClick={handleShare} color="#6b46c1">
+        <ActionButton onClick={copyToClipboard} color="#6b46c1">
           <ButtonIcon>📋</ButtonIcon>
-          결과 공유하기
+          결과 복사하기
         </ActionButton>
       </ButtonContainer>
     </Container>
@@ -192,7 +189,9 @@ const SubTitle = styled.p`
   }
 `;
 
-const CardContainer = styled.div`
+// 사용자 이미지 컨테이너 스타일 - 관상보기와 동일한 형식
+const UserImageContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -203,21 +202,19 @@ const CardContainer = styled.div`
   }
 `;
 
-const CardImage = styled.img`
-  width: 150px;
+const CenteredCardImage = styled.img`
+  width: 180px;
   height: auto;
+  aspect-ratio: 3/5;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 4px solid #6b46c1;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  border: 3px solid #6b46c1;
   
   @media (max-width: 768px) {
-    width: 120px;
+    width: 140px;
   }
-`;
-
-const CardInfo = styled.div`
-  text-align: center;
 `;
 
 const CardName = styled.h4`
@@ -236,7 +233,8 @@ const CardMeaning = styled.p`
   font-size: 1rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.5rem;
+  text-align: center;
+  max-width: 80%;
   
   @media (max-width: 768px) {
     font-size: 0.9rem;
