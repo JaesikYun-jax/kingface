@@ -37,8 +37,8 @@ const getApiKey = (): string => {
 const defaultServicePlan: ServicePlanConfig = {
   models: {
     fortune: {
-      free: '4o-mini',  // 무료 플랜은 4o-mini 사용
-      premium: '4o-mini'  // 프리미엄도 사진 없는 경우 4o-mini 사용
+      free: 'o4-mini-2025-04-16',  // 무료 플랜은 o4-mini-2025-04-16 사용
+      premium: 'o4-mini-2025-04-16'  // 프리미엄도 사진 없는 경우 o4-mini-2025-04-16 사용
     },
     faceReading: 'gpt-4.1'  // GPT-4.1 모델 사용 (비전 기능 지원)
   },

@@ -10,12 +10,14 @@ interface TarotSelectionProps {
 const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   const [cards, setCards] = useState<TarotCard[]>([]);
   const [selectedCardIdx, setSelectedCardIdx] = useState<number | null>(null);
-  const [flippedCards, setFlippedCards] = useState<boolean[]>([false, false, false]);
+  const [flippedCards, setFlippedCards] = useState<boolean[]>([false, false, false, false]);
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    // 랜덤 타로 카드 3장 가져오기
-    setCards(getRandomTarotCards());
+    // 랜덤 타로 카드 4장 가져오기
+    const randomCards = getRandomTarotCards();
+    // 4장만 사용
+    setCards(randomCards.slice(0, 4));
   }, []);
 
   const handleCardClick = (index: number) => {
@@ -36,10 +38,11 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   };
 
   const handleReset = () => {
-    setFlippedCards([false, false, false]);
+    setFlippedCards([false, false, false, false]);
     setSelectedCardIdx(null);
     setShowConfirm(false);
-    setCards(getRandomTarotCards());
+    const randomCards = getRandomTarotCards();
+    setCards(randomCards.slice(0, 4));
   };
 
   if (cards.length === 0) {
@@ -110,17 +113,9 @@ const Container = styled.div`
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem 1rem;
-  background-color: #fff;
+  padding: 0;
+  background-color: transparent;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  
-  @media (max-width: 768px) {
-    padding: 1.5rem 0.5rem;
-    box-shadow: none;
-    border-radius: 0;
-    background-color: transparent;
-  }
 `;
 
 const LoadingContainer = styled.div`
@@ -129,18 +124,19 @@ const LoadingContainer = styled.div`
   align-items: center;
   height: 400px;
   font-size: 1.2rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const Title = styled.h2`
-  color: #333;
+  color: white;
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
   text-align: center;
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
 
 const Description = styled.p`
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   margin-bottom: 2rem;
   text-align: center;
@@ -148,43 +144,35 @@ const Description = styled.p`
 `;
 
 const CardsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
   margin-bottom: 2rem;
+  justify-items: center;
   
-  @media (max-width: 768px) {
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    overflow-x: auto;
-    padding: 0.5rem 0;
-    width: 100%;
-    justify-content: flex-start;
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
   }
 `;
 
 const Card = styled.div<{ isFlipped: boolean; isSelected: boolean }>`
-  width: 240px;
-  height: 400px;
+  width: 140px;
+  height: 240px;
   perspective: 1000px;
   cursor: pointer;
   position: relative;
   transition: transform 0.3s;
-  transform: ${props => props.isSelected ? 'translateY(-20px)' : 'none'};
+  transform: ${props => props.isSelected ? 'translateY(-10px)' : 'none'};
   
   &:hover {
-    transform: ${props => props.isFlipped ? 'none' : 'translateY(-10px)'};
+    transform: ${props => props.isFlipped ? 'none' : 'translateY(-5px)'};
   }
   
-  @media (max-width: 768px) {
-    width: 120px;
-    height: 200px;
-    flex-shrink: 0;
-    transform: ${props => props.isSelected ? 'scale(1.1)' : 'none'};
-    
-    &:hover {
-      transform: ${props => props.isFlipped ? 'none' : 'scale(1.05)'};
-    }
+  @media (min-width: 768px) {
+    width: 160px;
+    height: 280px;
+    transform: ${props => props.isSelected ? 'translateY(-20px)' : 'none'};
   }
 `;
 
@@ -203,7 +191,6 @@ const CardFront = styled.div`
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  background-color: #2c1b5a;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
@@ -212,34 +199,27 @@ const CardFront = styled.div`
   align-items: center;
   color: white;
   background: linear-gradient(135deg, #4a1551 0%, #2d3748 100%);
-  
-  @media (max-width: 768px) {
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
 `;
 
 const CardBackIcon = styled.div`
-  font-size: 5rem;
+  font-size: 4rem;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
   
-  @media (max-width: 768px) {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
+  @media (min-width: 768px) {
+    font-size: 5rem;
   }
 `;
 
 const CardBackText = styled.div`
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.8);
   letter-spacing: 2px;
   
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-    letter-spacing: 1px;
+  @media (min-width: 768px) {
+    font-size: 1.2rem;
   }
 `;
 
@@ -248,86 +228,85 @@ const CardBack = styled.div`
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transform: rotateY(180deg);
-  padding: 1rem;
+  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  background: linear-gradient(135deg, #f9f5ff 0%, #e9d8fd 100%);
+  background: linear-gradient(135deg, #4a1551 0%, #6b46c1 100%);
+  color: white;
   
-  @media (max-width: 768px) {
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    padding: 0.5rem;
+  @media (min-width: 768px) {
+    padding: 1rem;
   }
 `;
 
 const CardNumber = styled.div`
-  font-size: 8rem;
+  font-size: 4rem;
   font-weight: bold;
-  color: #553c9a;
+  color: rgba(255, 255, 255, 0.9);
   text-align: center;
-  margin: 2rem 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   
-  @media (max-width: 768px) {
-    font-size: 4rem;
-    margin: 1rem 0;
+  @media (min-width: 768px) {
+    font-size: 6rem;
+    margin: 1.5rem 0;
   }
 `;
 
 const CardTitle = styled.h3`
-  margin: 0.5rem 0;
-  color: #333;
-  font-size: 1.2rem;
+  margin: 0.2rem 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
   text-align: center;
   
-  @media (max-width: 768px) {
-    font-size: 0.9rem;
-    margin: 0.2rem 0;
+  @media (min-width: 768px) {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
   }
 `;
 
 const CardDescription = styled.p`
   margin: 0;
-  color: #666;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.7rem;
+  line-height: 1.3;
   text-align: center;
   
-  @media (max-width: 768px) {
-    font-size: 0.7rem;
-    line-height: 1.3;
+  @media (min-width: 768px) {
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 `;
 
 const SelectedCardInfo = styled.div`
   margin: 1.5rem 0;
-  padding: 1.5rem;
-  background-color: #f9f5ff;
+  padding: 1rem;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 8px;
-  border-left: 4px solid #6b46c1;
+  border-left: 4px solid #9f7aea;
+  color: white;
 `;
 
 const SelectedCardTitle = styled.h3`
   margin: 0 0 0.5rem 0;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1.2rem;
 `;
 
 const SelectedCardMeaning = styled.p`
   margin: 0;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
   line-height: 1.6;
 `;
 
 const NoneSelectedText = styled.p`
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
   font-style: italic;
   text-align: center;
 `;
@@ -336,10 +315,9 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   
   @media (max-width: 768px) {
-    margin-top: 1rem;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
@@ -348,8 +326,8 @@ const ButtonContainer = styled.div`
 
 const Button = styled.button`
   padding: 0.8rem 1.5rem;
-  background-color: #e2e8f0;
-  color: #4a5568;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   border: none;
   border-radius: 8px;
@@ -357,7 +335,7 @@ const Button = styled.button`
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #cbd5e0;
+    background-color: rgba(0, 0, 0, 0.3);
   }
   
   @media (max-width: 768px) {
@@ -379,7 +357,7 @@ const ConfirmButton = styled.button`
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #553c9a;
+    background-color: #9f7aea;
   }
   
   @media (max-width: 768px) {

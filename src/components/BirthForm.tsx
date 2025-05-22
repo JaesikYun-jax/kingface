@@ -296,31 +296,31 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
 
 // 사주 정보 표시를 위한 스타일 컴포넌트
 const SajuBox = styled.div`
-  background-color: #f9f5ff;
-  border: 1px solid #e9d8fd;
+  background-color: rgba(74, 21, 81, 0.1);
+  border: 1px solid rgba(107, 70, 193, 0.3);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   margin-bottom: 1.5rem;
   text-align: center;
 `;
 
 const SajuTitle = styled.h3`
   font-size: 1.2rem;
-  color: #553c9a;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.8rem;
 `;
 
 const SajuText = styled.p`
   font-size: 1.8rem;
   font-weight: 500;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: 2px;
   margin-bottom: 0.8rem;
 `;
 
 const SajuDescription = styled.p`
   font-size: 0.8rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.4;
 `;
 
@@ -328,23 +328,23 @@ const SajuDescription = styled.p`
 const FormContainer = styled.form`
   max-width: 500px;
   margin: 0 auto;
-  padding: 2rem;
-  background-color: #fff;
+  padding: 0.5rem;
+  background-color: transparent;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 `;
 
 const Title = styled.h2`
-  color: #333;
+  color: white;
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
   text-align: center;
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
 
 const Description = styled.p`
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 `;
 
@@ -355,7 +355,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   display: block;
   font-size: 1rem;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
 
@@ -365,18 +365,19 @@ const DatePickerWrapper = styled.div`
 
   .date-picker-input {
     width: 100%;
-    padding: 0.8rem;
+    padding: 0.5rem;
     font-size: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(107, 70, 193, 0.5);
     border-radius: 8px;
     outline: none;
     transition: border-color 0.3s;
     cursor: pointer;
-    background-color: white;
-    padding-right: 2.5rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
 
     &:focus {
-      border-color: #6b46c1;
+      border-color: #9f7aea;
+      box-shadow: 0 0 0 2px rgba(159, 122, 234, 0.2);
     }
   }
 `;
@@ -387,7 +388,7 @@ const CalendarIcon = styled.span`
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.2rem;
-  color: #6b46c1;
+  color: rgba(255, 255, 255, 0.8);
   pointer-events: none;
 `;
 
@@ -407,13 +408,13 @@ const TimeSlotContainer = styled.div`
 `;
 
 const TimeSlotOption = styled.button<{ isSelected: boolean; isUnknown: boolean }>`
-  padding: 0.6rem 0.2rem;
+  padding: 0.4rem 0.2rem;
   background-color: ${props => props.isSelected ? 
-    (props.isUnknown ? '#f3e8ff' : '#f3e8ff') 
-    : '#f8f9fa'};
-  border: 2px solid ${props => props.isSelected ? 
-    (props.isUnknown ? '#6b46c1' : '#6b46c1') 
-    : '#e2e8f0'};
+    'rgba(107, 70, 193, 0.7)' 
+    : 'rgba(0, 0, 0, 0.2)'};
+  border: 1px solid ${props => props.isSelected ? 
+    '#9f7aea' 
+    : 'rgba(107, 70, 193, 0.3)'};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -421,9 +422,10 @@ const TimeSlotOption = styled.button<{ isSelected: boolean; isUnknown: boolean }
   flex-direction: column;
   align-items: center;
   width: 100%;
+  color: white;
   
   &:hover {
-    background-color: ${props => props.isSelected ? '#f3e8ff' : '#edf2f7'};
+    background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.8)' : 'rgba(107, 70, 193, 0.3)'};
   }
 `;
 
@@ -435,12 +437,12 @@ const TimeSlotName = styled.span`
 
 const TimeSlotLabel = styled.span`
   font-size: 0.7rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
 `;
 
 const TimeNote = styled.p`
   font-size: 0.8rem;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   margin-top: 0.5rem;
 `;
 
@@ -451,19 +453,20 @@ const GenderSelection = styled.div`
 
 const GenderOption = styled.button<{ isSelected: boolean }>`
   flex: 1;
-  padding: 1rem;
+  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: ${props => props.isSelected ? '#f3e8ff' : '#f8f9fa'};
-  border: 2px solid ${props => props.isSelected ? '#6b46c1' : '#e2e8f0'};
+  background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.7)' : 'rgba(0, 0, 0, 0.2)'};
+  border: 1px solid ${props => props.isSelected ? '#9f7aea' : 'rgba(107, 70, 193, 0.3)'};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  color: white;
 
   &:hover {
-    background-color: ${props => props.isSelected ? '#f3e8ff' : '#edf2f7'};
+    background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.8)' : 'rgba(107, 70, 193, 0.3)'};
   }
 `;
 
@@ -485,15 +488,15 @@ const LunarOption = styled.div`
 
 const LunarLabel = styled.label`
   font-size: 0.9rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   margin-left: 0.5rem;
   cursor: pointer;
 `;
 
 const InfoBox = styled.div`
-  background-color: #f3f4f6;
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.5rem;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: flex-start;
@@ -507,13 +510,13 @@ const InfoIcon = styled.span`
 
 const InfoText = styled.p`
   font-size: 0.9rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.5;
 `;
 
 const SubmitButton = styled.button`
   width: 100%;
-  padding: 1rem;
+  padding: 0.5rem;
   background-color: #6b46c1;
   color: white;
   font-size: 1rem;
@@ -524,7 +527,7 @@ const SubmitButton = styled.button`
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #553c9a;
+    background-color: #9f7aea;
   }
 `;
 

@@ -152,8 +152,8 @@ const Container = styled.div`
 
 const LoadingMessage = styled.div`
   text-align: center;
-  padding: 2rem;
-  color: #718096;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
 `;
 
@@ -162,8 +162,8 @@ const SuccessMessage = styled.div`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: #c6f6d5;
-  color: #2f855a;
+  background-color: rgba(107, 70, 193, 0.3);
+  color: rgba(255, 255, 255, 0.9);
   padding: 0.75rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -188,7 +188,7 @@ const SuccessIcon = styled.span`
   justify-content: center;
   width: 24px;
   height: 24px;
-  background-color: #2f855a;
+  background-color: #9f7aea;
   color: white;
   border-radius: 50%;
   font-weight: bold;
@@ -209,21 +209,23 @@ const PlansContainer = styled.div`
 const PlanCard = styled.div<{ isSelected: boolean; isPremium?: boolean }>`
   flex: 1;
   min-width: 250px;
-  background-color: ${props => props.isSelected ? '#f0f5ff' : 'white'};
-  border: 2px solid ${props => {
-    if (props.isSelected && props.isPremium) return '#6b46c1';
-    if (props.isSelected) return '#3182ce';
-    if (props.isPremium) return '#e9d8fd';
-    return '#e2e8f0';
+  background-color: ${props => props.isSelected 
+    ? 'rgba(107, 70, 193, 0.3)' 
+    : 'rgba(0, 0, 0, 0.2)'};
+  border: 1px solid ${props => {
+    if (props.isSelected && props.isPremium) return '#9f7aea';
+    if (props.isSelected) return '#9f7aea';
+    if (props.isPremium) return 'rgba(159, 122, 234, 0.5)';
+    return 'rgba(255, 255, 255, 0.1)';
   }};
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   transition: all 0.2s ease;
   position: relative;
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
   }
   
   @media (max-width: 768px) {
@@ -235,7 +237,7 @@ const PremiumBadge = styled.div`
   position: absolute;
   top: -10px;
   right: 20px;
-  background-color: #6b46c1;
+  background-color: #9f7aea;
   color: white;
   font-size: 0.8rem;
   font-weight: 600;
@@ -252,13 +254,13 @@ const PlanName = styled.h3`
   font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const PlanPrice = styled.div`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const FeatureList = styled.ul`
@@ -272,11 +274,11 @@ const FeatureItem = styled.li`
   align-items: center;
   margin-bottom: 0.75rem;
   font-size: 1rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const FeatureItemDisabled = styled(FeatureItem)`
-  color: #a0aec0;
+  color: rgba(255, 255, 255, 0.5);
 `;
 
 const FeatureCheck = styled.span<{ isPremium?: boolean }>`
@@ -285,7 +287,7 @@ const FeatureCheck = styled.span<{ isPremium?: boolean }>`
   justify-content: center;
   width: 20px;
   height: 20px;
-  background-color: ${props => props.isPremium ? '#6b46c1' : '#4299e1'};
+  background-color: ${props => props.isPremium ? '#9f7aea' : '#9f7aea'};
   color: white;
   border-radius: 50%;
   margin-right: 0.75rem;
@@ -299,8 +301,8 @@ const FeatureCheckDisabled = styled.span`
   justify-content: center;
   width: 20px;
   height: 20px;
-  background-color: #cbd5e0;
-  color: white;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   margin-right: 0.75rem;
   font-size: 0.7rem;
@@ -319,18 +321,18 @@ const PlanButton = styled.button<{ isSelected: boolean; isPremium?: boolean }>`
   transition: background-color 0.2s;
   
   background-color: ${props => {
-    if (props.disabled) return '#e2e8f0';
+    if (props.disabled) return 'rgba(255, 255, 255, 0.1)';
     if (props.isPremium) return '#6b46c1';
-    return '#3182ce';
+    return 'rgba(107, 70, 193, 0.7)';
   }};
   
   color: ${props => {
-    if (props.disabled) return '#718096';
+    if (props.disabled) return 'rgba(255, 255, 255, 0.7)';
     return 'white';
   }};
   
   &:hover:not(:disabled) {
-    background-color: ${props => props.isPremium ? '#553c9a' : '#2c5282'};
+    background-color: ${props => props.isPremium ? '#9f7aea' : '#9f7aea'};
   }
 `;
 
@@ -340,7 +342,7 @@ const SecurityInfo = styled.div`
   justify-content: center;
   margin-top: 0.75rem;
   font-size: 0.8rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
 `;
 
 const SecurityIcon = styled.span`
