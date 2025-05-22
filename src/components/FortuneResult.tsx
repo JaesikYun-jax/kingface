@@ -119,12 +119,14 @@ ${result.advice}
       </MysticPhraseBox>
 
       {/* 아이보살 사주 분석 결과 제목 */}
-      <ContentWrapper>
-        <ResultTitle>아이보살의 사주 분석 결과</ResultTitle>
+      <ContentWrapper className="content-wrapper">
+        <ResultTitle className="result-title">아이보살의 사주 분석 결과</ResultTitle>
         
         {/* 마크다운 결과 표시 */}
-        <MarkdownContainer>
-          <ReactMarkdown>{markdownContent}</ReactMarkdown>
+        <MarkdownContainer className="markdown-container">
+          <div className="markdown-content">
+            <ReactMarkdown>{markdownContent}</ReactMarkdown>
+          </div>
         </MarkdownContainer>
       </ContentWrapper>
 
