@@ -107,12 +107,20 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
 };
 
 const Container = styled.div`
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem 0.5rem;
+    box-shadow: none;
+    border-radius: 0;
+    background-color: transparent;
+  }
 `;
 
 const LoadingContainer = styled.div`
@@ -146,9 +154,12 @@ const CardsContainer = styled.div`
   margin-bottom: 2rem;
   
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    width: 100%;
+    justify-content: flex-start;
   }
 `;
 
@@ -166,8 +177,14 @@ const Card = styled.div<{ isFlipped: boolean; isSelected: boolean }>`
   }
   
   @media (max-width: 768px) {
-    width: 180px;
-    height: 300px;
+    width: 120px;
+    height: 200px;
+    flex-shrink: 0;
+    transform: ${props => props.isSelected ? 'scale(1.1)' : 'none'};
+    
+    &:hover {
+      transform: ${props => props.isFlipped ? 'none' : 'scale(1.05)'};
+    }
   }
 `;
 
@@ -195,6 +212,11 @@ const CardFront = styled.div`
   align-items: center;
   color: white;
   background: linear-gradient(135deg, #4a1551 0%, #2d3748 100%);
+  
+  @media (max-width: 768px) {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
 `;
 
 const CardBackIcon = styled.div`
@@ -203,12 +225,22 @@ const CardBackIcon = styled.div`
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  
+  @media (max-width: 768px) {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
 `;
 
 const CardBackText = styled.div`
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.8);
   letter-spacing: 2px;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+  }
 `;
 
 const CardBack = styled.div`
@@ -226,6 +258,12 @@ const CardBack = styled.div`
   justify-content: space-between;
   overflow: hidden;
   background: linear-gradient(135deg, #f9f5ff 0%, #e9d8fd 100%);
+  
+  @media (max-width: 768px) {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+  }
 `;
 
 const CardNumber = styled.div`
@@ -235,6 +273,11 @@ const CardNumber = styled.div`
   text-align: center;
   margin: 2rem 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    font-size: 4rem;
+    margin: 1rem 0;
+  }
 `;
 
 const CardTitle = styled.h3`
@@ -242,6 +285,11 @@ const CardTitle = styled.h3`
   color: #333;
   font-size: 1.2rem;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    margin: 0.2rem 0;
+  }
 `;
 
 const CardDescription = styled.p`
@@ -250,6 +298,11 @@ const CardDescription = styled.p`
   font-size: 0.9rem;
   line-height: 1.4;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
 `;
 
 const SelectedCardInfo = styled.div`
@@ -284,6 +337,13 @@ const ButtonContainer = styled.div`
   justify-content: center;
   gap: 1rem;
   margin-top: 2rem;
+  
+  @media (max-width: 768px) {
+    margin-top: 1rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
 `;
 
 const Button = styled.button`
@@ -298,6 +358,12 @@ const Button = styled.button`
 
   &:hover {
     background-color: #cbd5e0;
+  }
+  
+  @media (max-width: 768px) {
+    width: 80%;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -314,6 +380,12 @@ const ConfirmButton = styled.button`
 
   &:hover {
     background-color: #553c9a;
+  }
+  
+  @media (max-width: 768px) {
+    width: 80%;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
   }
 `;
 
