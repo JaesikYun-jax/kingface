@@ -100,8 +100,8 @@ ${result.advice}
         <SubTitle>{currentDate} 기준</SubTitle>
       </ResultHeader>
 
-      {/* 카드와 사주 정보 표시 */}
-      <InfoSection>
+      <OriginalContent>
+        {/* 카드와 사주 정보 표시 */}
         {selectedCard && (
           <CardContainer>
             <CardImage src={selectedCard.image} alt={selectedCard.name} />
@@ -111,24 +111,18 @@ ${result.advice}
             </CardInfo>
           </CardContainer>
         )}
-      </InfoSection>
 
-      {/* 신비로운 문구 표시 */}
-      <MysticPhraseBox>
-        <MysticPhrase>{mysticPhrase}</MysticPhrase>
-      </MysticPhraseBox>
+        {/* 신비로운 문구 표시 */}
+        <MysticPhraseBox>
+          <MysticPhrase>{mysticPhrase}</MysticPhrase>
+        </MysticPhraseBox>
 
-      {/* 아이보살 사주 분석 결과 제목 */}
-      <ContentWrapper className="content-wrapper">
-        <ResultTitle className="result-title">아이보살의 사주 분석 결과</ResultTitle>
+        {/* 아이보살 사주 분석 결과 제목 */}
+        <ResultTitle>아이보살의 사주 분석 결과</ResultTitle>
         
         {/* 마크다운 결과 표시 */}
-        <MarkdownContainer className="markdown-container">
-          <div className="markdown-content">
-            <ReactMarkdown>{markdownContent}</ReactMarkdown>
-          </div>
-        </MarkdownContainer>
-      </ContentWrapper>
+        <ReactMarkdown>{markdownContent}</ReactMarkdown>
+      </OriginalContent>
 
       <Disclaimer>
         * 이 운세는 AI에 의해 생성된 것으로, 참고용으로만 활용해주세요.
@@ -152,9 +146,11 @@ const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;
   padding: 0;
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
   
   @media (max-width: 768px) {
     border-radius: 0;
@@ -166,7 +162,7 @@ const Container = styled.div`
 
 const ResultHeader = styled.div`
   background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
-  padding: 2rem 1rem;
+  padding: 2rem;
   color: white;
   text-align: center;
   
@@ -179,7 +175,7 @@ const Title = styled.h1`
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   
   @media (max-width: 768px) {
     font-size: 1.7rem;
@@ -196,45 +192,27 @@ const SubTitle = styled.p`
   }
 `;
 
-const InfoSection = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 1.5rem 0.5rem;
-  
-  @media (max-width: 768px) {
-    margin: 1rem 0.25rem;
-  }
-`;
-
 const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, rgba(107, 70, 193, 0.3) 0%, rgba(159, 122, 234, 0.3) 100%);
-  border-radius: 16px;
-  padding: 1.5rem;
-  max-width: 250px;
-  width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
   
   @media (max-width: 768px) {
-    padding: 1rem;
-    max-width: 220px;
+    margin-bottom: 1.5rem;
   }
 `;
 
 const CardImage = styled.img`
   width: 150px;
   height: auto;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   border-radius: 8px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border: 3px solid #6b46c1;
   
   @media (max-width: 768px) {
     width: 120px;
-    margin-bottom: 1rem;
   }
 `;
 
@@ -277,8 +255,8 @@ const MysticPhraseBox = styled.div`
   
   @media (max-width: 768px) {
     padding: 1rem;
-    margin: 0 auto 1rem;
-    max-width: 98%;
+    margin: 0 auto 1.5rem;
+    max-width: 95%;
     border-radius: 8px;
   }
 `;
@@ -297,81 +275,94 @@ const MysticPhrase = styled.p`
   }
 `;
 
-// 콘텐츠 래퍼 추가
-const ContentWrapper = styled.div`
-  padding: 1.5rem 1rem;
-  margin: 0 0.5rem 1.5rem;
-  color: rgba(255, 255, 255, 0.9);
-  
-  @media (max-width: 768px) {
-    padding: 1rem 0.75rem;
-    margin: 0 0.25rem 1rem;
-  }
-`;
-
 // 아이보살 결과 제목 스타일
 const ResultTitle = styled.h2`
   font-size: 1.8rem;
   font-weight: 700;
-  color: white;
+  color: #e9d8fd;
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(233, 216, 253, 0.3);
   text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
   
   @media (max-width: 768px) {
     font-size: 1.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
   }
 `;
 
-const MarkdownContainer = styled.div`
-  color: white;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  padding: 0.75rem;
+const OriginalContent = styled.div`
   background-color: rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  margin: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
+  color: rgba(255, 255, 255, 0.9);
   
   @media (max-width: 768px) {
-    padding: 0.5rem;
-    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem;
   }
   
   h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
     color: white;
-    margin: 1.5rem 0 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
     text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
     
     @media (max-width: 768px) {
       font-size: 1.3rem;
-      margin: 1.2rem 0 0.8rem;
+      margin-top: 1.5rem;
+    }
+  }
+  
+  h3 {
+    color: #e9d8fd;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 0 5px rgba(107, 70, 193, 0.3);
+    
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
     }
   }
   
   p {
-    font-size: 1.1rem;
     margin-bottom: 1rem;
-    color: rgba(255, 255, 255, 0.95);
-    line-height: 1.8;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
     
     @media (max-width: 768px) {
-      font-size: 1rem;
-      margin-bottom: 0.8rem;
-      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+  }
+  
+  ul, ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    
+    @media (max-width: 768px) {
+      padding-left: 1.2rem;
+    }
+  }
+  
+  li {
+    margin-bottom: 0.5rem;
+    
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
     }
   }
   
   strong {
     color: #e9d8fd;
-    font-weight: 700;
+    font-weight: bold;
   }
   
   em {
@@ -379,37 +370,42 @@ const MarkdownContainer = styled.div`
     font-style: italic;
   }
   
-  ul, ol {
-    margin-bottom: 1.5rem;
-    padding-left: 1.5rem;
+  a {
+    color: #90cdf4;
+    text-decoration: none;
     
-    @media (max-width: 768px) {
-      margin-bottom: 1.2rem;
-      padding-left: 1.2rem;
+    &:hover {
+      text-decoration: underline;
     }
   }
   
-  li {
-    margin-bottom: 0.75rem;
-    color: rgba(255, 255, 255, 0.95);
-    
-    @media (max-width: 768px) {
-      margin-bottom: 0.6rem;
-      font-size: 0.95rem;
-    }
+  code {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #e9d8fd;
+  }
+  
+  blockquote {
+    border-left: 3px solid rgba(255, 255, 255, 0.2);
+    padding-left: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
   }
 `;
 
 const Disclaimer = styled.p`
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
   text-align: center;
-  margin: 1.5rem 0.5rem;
+  margin: 0;
+  padding: 1rem 2rem 2rem;
+  font-style: italic;
   
   @media (max-width: 768px) {
     font-size: 0.8rem;
-    margin: 1rem 0.25rem;
+    padding: 0.5rem 1rem 1.5rem;
   }
 `;
 
@@ -417,14 +413,12 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 1rem;
+  background-color: rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
-  background-color: rgba(0, 0, 0, 0.2);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   
-  @media (max-width: 768px) {
-    padding: 1rem;
+  @media (max-width: 640px) {
     flex-direction: column;
-    gap: 0.8rem;
   }
 `;
 
@@ -453,10 +447,8 @@ const ActionButton = styled.button<{ color: string }>`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     width: 100%;
-    padding: 0.7rem 1rem;
-    font-size: 0.9rem;
   }
 `;
 
