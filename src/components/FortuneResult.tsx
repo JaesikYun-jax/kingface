@@ -38,35 +38,8 @@ const FortuneResult: React.FC<FortuneResultProps> = ({
     const randomIndex = Math.floor(Math.random() * phrases.length);
     setMysticPhrase(phrases[randomIndex]);
     
-    // 마크다운 형식으로 결과 변환 - 이미 마크다운 형식으로 응답받는 경우 원본 사용
-    if (result.overall.includes('#')) {
-      setMarkdownContent(result.overall);
-    } else {
-      // 기존 포맷을 마크다운 형식으로 변환
-      const markdownResult = `
-## ✨ 전체 운세
-
-${result.overall}
-
-## 💕 사랑
-
-${result.love}
-
-## 🏢 직업
-
-${result.career}
-
-## 🌿 건강
-
-${result.health}
-
-## 💌 아이보살의 조언
-
-${result.advice}
-      `;
-      
-      setMarkdownContent(markdownResult);
-    }
+    // API에서 받은 텍스트를 그대로 사용
+    setMarkdownContent(result.overall);
   }, [result]);
 
   // 클립보드에 복사 함수 - 관상보기와 동일한 방식으로 변경
@@ -291,9 +264,10 @@ const ResultTitle = styled.h2`
 `;
 
 const OriginalContent = styled.div`
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: #4a1551;
+  background: linear-gradient(135deg, #4a1551 0%, #2d3748 100%);
   padding: 2rem;
-  margin: 2rem;
+  margin: 0 2rem 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
@@ -301,19 +275,17 @@ const OriginalContent = styled.div`
   
   @media (max-width: 768px) {
     padding: 1.5rem;
-    margin: 1rem;
+    margin: 0 1rem 1.5rem;
   }
   
   h2 {
     color: white;
     font-size: 1.5rem;
     margin-bottom: 1rem;
-    margin-top: 2rem;
     text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
     
     @media (max-width: 768px) {
       font-size: 1.3rem;
-      margin-top: 1.5rem;
     }
   }
   
