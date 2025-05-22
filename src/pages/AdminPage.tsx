@@ -454,7 +454,7 @@ const Content = styled.div`
 const Sidebar = styled.div`
   width: 300px;
   flex-shrink: 0;
-  background-color: #fff;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
@@ -466,10 +466,10 @@ const Sidebar = styled.div`
 
 const SidebarTitle = styled.h2`
   font-size: 1.25rem;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const PromptList = styled.div`
@@ -482,14 +482,14 @@ const PromptList = styled.div`
 const PromptItem = styled.div<{ isSelected: boolean }>`
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background-color: ${props => props.isSelected ? '#e9d8fd' : '#f7fafc'};
-  color: ${props => props.isSelected ? '#553c9a' : '#4a5568'};
+  background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
+  color: ${props => props.isSelected ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)'};
   font-weight: ${props => props.isSelected ? '600' : '400'};
   cursor: pointer;
   transition: all 0.2s;
   
   &:hover {
-    background-color: ${props => props.isSelected ? '#e9d8fd' : '#edf2f7'};
+    background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.5)' : 'rgba(107, 70, 193, 0.3)'};
   }
 `;
 
@@ -512,7 +512,7 @@ const ResetButton = styled.button`
 const MainContent = styled.div<{ fullWidth?: boolean }>`
   flex: 1;
   min-height: 500px;
-  background-color: #fff;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
@@ -524,7 +524,7 @@ const NoSelection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a0aec0;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 1.2rem;
 `;
 
@@ -534,13 +534,13 @@ const PromptHeader = styled.div`
 
 const PromptTitle = styled.h3`
   font-size: 1.5rem;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
 
 const PromptDescription = styled.p`
   font-size: 1rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
 `;
 
 const TextareaContainer = styled.div`
@@ -550,13 +550,15 @@ const TextareaContainer = styled.div`
 const PromptTextarea = styled.textarea`
   width: 100%;
   padding: 1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(107, 70, 193, 0.3);
   border-radius: 8px;
   font-family: monospace;
   font-size: 0.9rem;
   line-height: 1.5;
   resize: vertical;
   min-height: 300px;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.9);
   
   &:focus {
     outline: none;
@@ -612,16 +614,16 @@ const SaveMessage = styled.span`
 const SectionTitle = styled.h2`
   font-size: 1.75rem;
   font-weight: 700;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
 `;
 
 const SectionSubtitle = styled.h3`
   font-size: 1.25rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
 
 const ServicePlanSection = styled.div`
@@ -636,12 +638,12 @@ const FormLabel = styled.label`
   display: block;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const FormHint = styled.p`
   font-size: 0.875rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
   margin-top: 0.5rem;
 `;
 

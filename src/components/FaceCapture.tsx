@@ -613,8 +613,8 @@ const ModeToggleButtons = styled.div`
 const ModeButton = styled.button<{ active: boolean }>`
   flex: 1;
   padding: 0.75rem;
-  background-color: ${props => props.active ? '#6b46c1' : 'white'};
-  color: ${props => props.active ? 'white' : '#4a5568'};
+  background-color: ${props => props.active ? '#6b46c1' : 'rgba(74, 21, 81, 0.3)'};
+  color: ${props => props.active ? 'white' : 'rgba(255, 255, 255, 0.9)'};
   border: none;
   font-size: 0.9rem;
   font-weight: 500;
@@ -622,7 +622,7 @@ const ModeButton = styled.button<{ active: boolean }>`
   transition: all 0.2s;
   
   &:hover:not(:disabled) {
-    background-color: ${props => props.active ? '#553c9a' : '#f7fafc'};
+    background-color: ${props => props.active ? '#553c9a' : 'rgba(107, 70, 193, 0.5)'};
   }
   
   &:disabled {
@@ -763,13 +763,13 @@ const CropButtonGroup = styled.div`
 
 const CancelCropButton = styled(ButtonBase)`
   flex: 1;
-  background-color: white;
-  color: #4a5568;
-  border: 1px solid #cbd5e0;
+  background-color: rgba(74, 21, 81, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(107, 70, 193, 0.3);
   
   &:hover {
-    background-color: #f7fafc;
-    border-color: #a0aec0;
+    background-color: rgba(107, 70, 193, 0.5);
+    border-color: rgba(107, 70, 193, 0.5);
   }
 `;
 

@@ -436,9 +436,9 @@ const ButtonIcon = styled.span`
 
 const ActionButton = styled.button<{ color: string }>`
   padding: 0.8rem 1.5rem;
-  background-color: ${props => props.color === '#6b46c1' ? '#6b46c1' : 'white'};
-  color: ${props => props.color === '#6b46c1' ? 'white' : props.color};
-  border: 1px solid ${props => props.color};
+  background-color: ${props => props.color === '#6b46c1' ? '#6b46c1' : 'rgba(74, 21, 81, 0.3)'};
+  color: ${props => props.color === '#6b46c1' ? 'white' : 'rgba(255, 255, 255, 0.9)'};
+  border: 1px solid ${props => props.color === '#6b46c1' ? props.color : 'rgba(107, 70, 193, 0.5)'};
   font-size: 0.95rem;
   font-weight: 600;
   border-radius: 8px;
@@ -449,7 +449,7 @@ const ActionButton = styled.button<{ color: string }>`
   justify-content: center;
   
   &:hover {
-    background-color: ${props => props.color};
+    background-color: ${props => props.color === '#6b46c1' ? '#553c9a' : 'rgba(107, 70, 193, 0.7)'};
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -503,7 +503,7 @@ const DebugModalContent = styled.div`
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
-  background-color: white;
+  background-color: #1a202c;
   border-radius: 12px;
   padding: 0;
   overflow: hidden;

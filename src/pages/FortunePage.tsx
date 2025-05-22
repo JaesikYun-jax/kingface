@@ -469,10 +469,11 @@ const SubTitle = styled.h2`
 `;
 
 const ContentSection = styled.div`
-  background-color: white;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const ErrorMessage = styled.div`
@@ -490,7 +491,7 @@ const TarotSelector = styled.div`
 `;
 
 const TarotInstruction = styled.p`
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
   margin-bottom: 2rem;
   line-height: 1.6;
@@ -632,7 +633,7 @@ const PlanStatusBar = styled.div`
   justify-content: center;
   margin-top: 2rem;
   padding: 1rem;
-  background-color: white;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
@@ -644,9 +645,9 @@ const PlanBadge = styled.div<{ isPremium: boolean }>`
   border-radius: 20px;
   font-weight: 600;
   font-size: 0.9rem;
-  background-color: ${props => props.isPremium ? '#ebf8ff' : '#f0fff4'};
-  color: ${props => props.isPremium ? '#3182ce' : '#38a169'};
-  border: 1px solid ${props => props.isPremium ? '#bee3f8' : '#c6f6d5'};
+  background-color: ${props => props.isPremium ? 'rgba(107, 70, 193, 0.3)' : 'rgba(107, 70, 193, 0.2)'};
+  color: ${props => props.isPremium ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.8)'};
+  border: 1px solid ${props => props.isPremium ? 'rgba(159, 122, 234, 0.5)' : 'rgba(159, 122, 234, 0.3)'};
 `;
 
 const UpgradeButton = styled.button`

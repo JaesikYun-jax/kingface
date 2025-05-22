@@ -365,8 +365,8 @@ const OptionButtons = styled.div`
 
 const OptionButton = styled.button<{ isSelected: boolean }>`
   padding: 1rem 1.5rem;
-  border: 2px solid ${props => props.isSelected ? '#6b46c1' : '#e2e8f0'};
-  background-color: ${props => props.isSelected ? '#f3f0ff' : 'white'};
+  border: 2px solid ${props => props.isSelected ? '#6b46c1' : 'rgba(107, 70, 193, 0.3)'};
+  background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.5)' : 'rgba(74, 21, 81, 0.3)'};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -375,19 +375,19 @@ const OptionButton = styled.button<{ isSelected: boolean }>`
   
   &:hover {
     border-color: #6b46c1;
-    background-color: ${props => props.isSelected ? '#f3f0ff' : '#faf5ff'};
+    background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.5)' : 'rgba(107, 70, 193, 0.4)'};
   }
   
   div {
     font-weight: ${props => props.isSelected ? '700' : '500'};
     font-size: 1.1rem;
-    color: ${props => props.isSelected ? '#6b46c1' : '#4a5568'};
+    color: ${props => props.isSelected ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.8)'};
     margin-bottom: 0.5rem;
   }
   
   small {
     display: block;
-    color: #718096;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
   }
 `;
@@ -397,15 +397,15 @@ const ControlPanel = styled.div<{ isVisible: boolean }>`
   display: ${props => props.isVisible ? 'block' : 'none'};
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background-color: #e6f7ff;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border-left: 4px solid #1890ff;
+  border-left: 4px solid #6b46c1;
 `;
 
 const ControlPanelTitle = styled.h3`
   font-size: 1.2rem;
-  color: #1890ff;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
   font-weight: 600;
 `;
@@ -418,7 +418,7 @@ const ControlLabel = styled.label`
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const RangeControl = styled.input`
@@ -527,32 +527,32 @@ const ToggleSlider = styled.span`
 
 const ToggleLabel = styled.span`
   font-size: 0.9rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
 `;
 
 const InfoSection = styled.div`
   margin-bottom: 2rem;
   padding: 1rem;
-  background-color: #ebf8ff;
-  border-left: 4px solid #4299e1;
+  background-color: rgba(74, 21, 81, 0.3);
+  border-left: 4px solid #6b46c1;
   border-radius: 4px;
 `;
 
 const InfoTitle = styled.h3`
   font-size: 1.2rem;
-  color: #2b6cb0;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
 
 const InfoDescription = styled.p`
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
 `;
 
 const PreviewTitle = styled.h2`
   text-align: center;
   font-size: 1.5rem;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
 `;
 
