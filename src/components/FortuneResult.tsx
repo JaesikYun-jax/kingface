@@ -118,15 +118,15 @@ ${result.advice}
         <MysticPhrase>{mysticPhrase}</MysticPhrase>
       </MysticPhraseBox>
 
-      <OriginalContent>
-        {/* 아이보살 사주 분석 결과 제목 */}
+      {/* 아이보살 사주 분석 결과 제목 */}
+      <ContentWrapper>
         <ResultTitle>아이보살의 사주 분석 결과</ResultTitle>
         
         {/* 마크다운 결과 표시 */}
         <MarkdownContainer>
           <ReactMarkdown>{markdownContent}</ReactMarkdown>
         </MarkdownContainer>
-      </OriginalContent>
+      </ContentWrapper>
 
       <Disclaimer>
         * 이 운세는 AI에 의해 생성된 것으로, 참고용으로만 활용해주세요.
@@ -158,6 +158,7 @@ const Container = styled.div`
     border-radius: 0;
     box-shadow: none;
     margin: 0;
+    width: 100%;
   }
 `;
 
@@ -196,10 +197,10 @@ const SubTitle = styled.p`
 const InfoSection = styled.div`
   display: flex;
   justify-content: center;
-  margin: 1.5rem 1rem;
+  margin: 1.5rem 0.5rem;
   
   @media (max-width: 768px) {
-    margin: 1rem 0.5rem;
+    margin: 1rem 0.25rem;
   }
 `;
 
@@ -267,7 +268,7 @@ const MysticPhraseBox = styled.div`
   border-radius: 12px;
   padding: 1.2rem;
   margin: 0 auto 1.5rem;
-  max-width: 90%;
+  max-width: 95%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(5px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -275,7 +276,8 @@ const MysticPhraseBox = styled.div`
   @media (max-width: 768px) {
     padding: 1rem;
     margin: 0 auto 1rem;
-    max-width: 95%;
+    max-width: 98%;
+    border-radius: 8px;
   }
 `;
 
@@ -290,6 +292,18 @@ const MysticPhrase = styled.p`
   
   @media (max-width: 768px) {
     font-size: 1.1rem;
+  }
+`;
+
+// 콘텐츠 래퍼 추가
+const ContentWrapper = styled.div`
+  padding: 1.5rem 1rem;
+  margin: 0 0.5rem 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  
+  @media (max-width: 768px) {
+    padding: 1rem 0.75rem;
+    margin: 0 0.25rem 1rem;
   }
 `;
 
@@ -310,119 +324,19 @@ const ResultTitle = styled.h2`
   }
 `;
 
-const OriginalContent = styled.div`
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 1.5rem;
-  margin: 0 1rem 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  color: rgba(255, 255, 255, 0.9);
-  
-  @media (max-width: 768px) {
-    padding: 1rem;
-    margin: 0 0.5rem 1rem;
-    border-radius: 8px;
-  }
-  
-  h2 {
-    color: white;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
-    
-    @media (max-width: 768px) {
-      font-size: 1.3rem;
-    }
-  }
-  
-  h3 {
-    color: #e9d8fd;
-    font-size: 1.2rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    text-shadow: 0 0 5px rgba(107, 70, 193, 0.3);
-    
-    @media (max-width: 768px) {
-      font-size: 1.1rem;
-      margin-top: 1.2rem;
-    }
-  }
-  
-  p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.9);
-    
-    @media (max-width: 768px) {
-      font-size: 0.95rem;
-      margin-bottom: 0.8rem;
-    }
-  }
-  
-  ul, ol {
-    margin-bottom: 1rem;
-    padding-left: 1.5rem;
-    color: rgba(255, 255, 255, 0.9);
-    
-    @media (max-width: 768px) {
-      padding-left: 1.2rem;
-    }
-  }
-  
-  li {
-    margin-bottom: 0.5rem;
-    
-    @media (max-width: 768px) {
-      font-size: 0.95rem;
-      margin-bottom: 0.4rem;
-    }
-  }
-  
-  strong {
-    color: #e9d8fd;
-    font-weight: bold;
-  }
-  
-  em {
-    color: #c3dafe;
-    font-style: italic;
-  }
-  
-  a {
-    color: #90cdf4;
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-  
-  code {
-    background-color: rgba(0, 0, 0, 0.3);
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    font-family: monospace;
-    color: #e9d8fd;
-  }
-  
-  blockquote {
-    border-left: 3px solid rgba(255, 255, 255, 0.2);
-    padding-left: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-style: italic;
-  }
-`;
-
 const MarkdownContainer = styled.div`
   color: white;
   line-height: 1.7;
   white-space: pre-wrap;
-  padding: 1rem;
+  padding: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
   
   @media (max-width: 768px) {
     padding: 0.5rem;
+    border-radius: 8px;
   }
   
   h2 {
@@ -489,11 +403,11 @@ const Disclaimer = styled.p`
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
   text-align: center;
-  margin: 1.5rem 1rem;
+  margin: 1.5rem 0.5rem;
   
   @media (max-width: 768px) {
     font-size: 0.8rem;
-    margin: 1rem 0.5rem;
+    margin: 1rem 0.25rem;
   }
 `;
 
