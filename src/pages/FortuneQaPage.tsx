@@ -324,6 +324,7 @@ const QaContainer = styled.div`
     padding: 1rem;
   }
 `;
+QaContainer.displayName = 'FortuneQaPage_QaContainer';
 
 const QaHeader = styled.header`
   text-align: center;
@@ -342,6 +343,7 @@ const QaHeader = styled.header`
     font-size: 1.1rem;
   }
 `;
+QaHeader.displayName = 'FortuneQaPage_QaHeader';
 
 const OptionsContainer = styled.div`
   margin-bottom: 2rem;
@@ -356,12 +358,14 @@ const OptionsContainer = styled.div`
     color: #2d3748;
   }
 `;
+OptionsContainer.displayName = 'FortuneQaPage_OptionsContainer';
 
 const OptionButtons = styled.div`
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
 `;
+OptionButtons.displayName = 'FortuneQaPage_OptionButtons';
 
 const OptionButton = styled.button<{ isSelected: boolean }>`
   padding: 1rem 1.5rem;
@@ -391,6 +395,7 @@ const OptionButton = styled.button<{ isSelected: boolean }>`
     font-size: 0.9rem;
   }
 `;
+OptionButton.displayName = 'FortuneQaPage_OptionButton';
 
 // 컨트롤 패널 스타일
 const ControlPanel = styled.div<{ isVisible: boolean }>`
@@ -402,6 +407,7 @@ const ControlPanel = styled.div<{ isVisible: boolean }>`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   border-left: 4px solid #6b46c1;
 `;
+ControlPanel.displayName = 'FortuneQaPage_ControlPanel';
 
 const ControlPanelTitle = styled.h3`
   font-size: 1.2rem;
@@ -409,10 +415,12 @@ const ControlPanelTitle = styled.h3`
   margin-bottom: 1.5rem;
   font-weight: 600;
 `;
+ControlPanelTitle.displayName = 'FortuneQaPage_ControlPanelTitle';
 
 const ControlGroup = styled.div`
   margin-bottom: 1.5rem;
 `;
+ControlGroup.displayName = 'FortuneQaPage_ControlGroup';
 
 const ControlLabel = styled.label`
   display: block;
@@ -420,6 +428,7 @@ const ControlLabel = styled.label`
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
 `;
+ControlLabel.displayName = 'FortuneQaPage_ControlLabel';
 
 const RangeControl = styled.input`
   width: 100%;
@@ -459,12 +468,14 @@ const RangeControl = styled.input`
     transform: scale(1.1);
   }
 `;
+RangeControl.displayName = 'FortuneQaPage_RangeControl';
 
 const ColorOptions = styled.div`
   display: flex;
   gap: 1rem;
   margin-top: 0.5rem;
 `;
+ColorOptions.displayName = 'FortuneQaPage_ColorOptions';
 
 const ColorOption = styled.button<{ color: string; isSelected: boolean }>`
   width: 40px;
@@ -480,6 +491,7 @@ const ColorOption = styled.button<{ color: string; isSelected: boolean }>`
     border-color: ${props => props.isSelected ? '#6b46c1' : '#a0aec0'};
   }
 `;
+ColorOption.displayName = 'FortuneQaPage_ColorOption';
 
 const ToggleSwitch = styled.label`
   position: relative;
@@ -487,6 +499,7 @@ const ToggleSwitch = styled.label`
   align-items: center;
   cursor: pointer;
 `;
+ToggleSwitch.displayName = 'FortuneQaPage_ToggleSwitch';
 
 const ToggleInput = styled.input`
   opacity: 0;
@@ -501,6 +514,7 @@ const ToggleInput = styled.input`
     transform: translateX(26px);
   }
 `;
+ToggleInput.displayName = 'FortuneQaPage_ToggleInput';
 
 const ToggleSlider = styled.span`
   position: relative;
@@ -524,11 +538,13 @@ const ToggleSlider = styled.span`
     transition: all 0.2s;
   }
 `;
+ToggleSlider.displayName = 'FortuneQaPage_ToggleSlider';
 
 const ToggleLabel = styled.span`
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.8);
 `;
+ToggleLabel.displayName = 'FortuneQaPage_ToggleLabel';
 
 const InfoSection = styled.div`
   margin-bottom: 2rem;
@@ -537,17 +553,20 @@ const InfoSection = styled.div`
   border-left: 4px solid #6b46c1;
   border-radius: 4px;
 `;
+InfoSection.displayName = 'FortuneQaPage_InfoSection';
 
 const InfoTitle = styled.h3`
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
+InfoTitle.displayName = 'FortuneQaPage_InfoTitle';
 
 const InfoDescription = styled.p`
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
 `;
+InfoDescription.displayName = 'FortuneQaPage_InfoDescription';
 
 const PreviewTitle = styled.h2`
   text-align: center;
@@ -555,6 +574,7 @@ const PreviewTitle = styled.h2`
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
 `;
+PreviewTitle.displayName = 'FortuneQaPage_PreviewTitle';
 
 const ResultContainer = styled.div`
   background-color: #1a202c;
@@ -566,6 +586,7 @@ const ResultContainer = styled.div`
     border-radius: 0;
   }
 `;
+ResultContainer.displayName = 'FortuneQaPage_ResultContainer';
 
 // 스타일 커스터마이징을 위한 FortuneResult 래퍼
 const StyledFortuneResult = styled(FortuneResult)<{ 
@@ -594,5 +615,6 @@ const StyledFortuneResult = styled(FortuneResult)<{
     font-size: calc(1.5rem * var(--text-size, 1)) !important;
   }
 `;
+StyledFortuneResult.displayName = 'FortuneQaPage_StyledFortuneResult';
 
 export default FortuneQaPage; 

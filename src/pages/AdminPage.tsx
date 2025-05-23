@@ -404,7 +404,11 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  display: flex;
+  height: 100vh;
+  background-color: #f5f5f5;
 `;
+Container.displayName = 'AdminPage_Container';
 
 const Title = styled.h1`
   font-size: 2.5rem;
@@ -458,11 +462,13 @@ const Sidebar = styled.div`
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+  overflow-y: auto;
   
   @media (max-width: 768px) {
     width: 100%;
   }
 `;
+Sidebar.displayName = 'AdminPage_Sidebar';
 
 const SidebarTitle = styled.h2`
   font-size: 1.25rem;
@@ -471,6 +477,7 @@ const SidebarTitle = styled.h2`
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
+SidebarTitle.displayName = 'AdminPage_SidebarTitle';
 
 const PromptList = styled.div`
   display: flex;
@@ -478,6 +485,7 @@ const PromptList = styled.div`
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 `;
+PromptList.displayName = 'AdminPage_PromptList';
 
 const PromptItem = styled.div<{ isSelected: boolean }>`
   padding: 0.75rem 1rem;
@@ -492,6 +500,7 @@ const PromptItem = styled.div<{ isSelected: boolean }>`
     background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.5)' : 'rgba(107, 70, 193, 0.3)'};
   }
 `;
+PromptItem.displayName = 'AdminPage_PromptItem';
 
 const ResetButton = styled.button`
   width: 100%;
@@ -508,6 +517,7 @@ const ResetButton = styled.button`
     background-color: #fc8181;
   }
 `;
+ResetButton.displayName = 'AdminPage_ResetButton';
 
 const MainContent = styled.div<{ fullWidth?: boolean }>`
   flex: 1;
@@ -518,6 +528,7 @@ const MainContent = styled.div<{ fullWidth?: boolean }>`
   padding: 1.5rem;
   ${props => props.fullWidth && 'width: 100%;'}
 `;
+MainContent.displayName = 'AdminPage_MainContent';
 
 const NoSelection = styled.div`
   height: 100%;
@@ -527,25 +538,30 @@ const NoSelection = styled.div`
   color: rgba(255, 255, 255, 0.6);
   font-size: 1.2rem;
 `;
+NoSelection.displayName = 'AdminPage_NoSelection';
 
 const PromptHeader = styled.div`
   margin-bottom: 1.5rem;
 `;
+PromptHeader.displayName = 'AdminPage_PromptHeader';
 
 const PromptTitle = styled.h3`
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
+PromptTitle.displayName = 'AdminPage_PromptTitle';
 
 const PromptDescription = styled.p`
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.7);
 `;
+PromptDescription.displayName = 'AdminPage_PromptDescription';
 
 const TextareaContainer = styled.div`
   margin-bottom: 1.5rem;
 `;
+TextareaContainer.displayName = 'AdminPage_TextareaContainer';
 
 const PromptTextarea = styled.textarea`
   width: 100%;
@@ -566,12 +582,14 @@ const PromptTextarea = styled.textarea`
     box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.2);
   }
 `;
+PromptTextarea.displayName = 'AdminPage_PromptTextarea';
 
 const SaveButtonContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
 `;
+SaveButtonContainer.displayName = 'AdminPage_SaveButtonContainer';
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -584,6 +602,7 @@ const ButtonContainer = styled.div`
     align-items: stretch;
   }
 `;
+ButtonContainer.displayName = 'AdminPage_ButtonContainer';
 
 const SaveButton = styled.button`
   padding: 0.75rem 1.5rem;
@@ -604,11 +623,13 @@ const SaveButton = styled.button`
     cursor: not-allowed;
   }
 `;
+SaveButton.displayName = 'AdminPage_SaveButton';
 
 const SaveMessage = styled.span`
   color: #38a169;
   font-weight: 500;
 `;
+SaveMessage.displayName = 'AdminPage_SaveMessage';
 
 // 서비스 플랜 페이지 스타일
 const SectionTitle = styled.h2`
@@ -617,6 +638,7 @@ const SectionTitle = styled.h2`
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1.5rem;
 `;
+SectionTitle.displayName = 'AdminPage_SectionTitle';
 
 const SectionSubtitle = styled.h3`
   font-size: 1.25rem;
@@ -625,14 +647,17 @@ const SectionSubtitle = styled.h3`
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 `;
+SectionSubtitle.displayName = 'AdminPage_SectionSubtitle';
 
 const ServicePlanSection = styled.div`
   margin-bottom: 2rem;
 `;
+ServicePlanSection.displayName = 'AdminPage_ServicePlanSection';
 
 const FormGroup = styled.div`
   margin-bottom: 1.5rem;
 `;
+FormGroup.displayName = 'AdminPage_FormGroup';
 
 const FormLabel = styled.label`
   display: block;
@@ -640,12 +665,14 @@ const FormLabel = styled.label`
   margin-bottom: 0.5rem;
   color: rgba(255, 255, 255, 0.9);
 `;
+FormLabel.displayName = 'AdminPage_FormLabel';
 
 const FormHint = styled.p`
   font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.7);
   margin-top: 0.5rem;
 `;
+FormHint.displayName = 'AdminPage_FormHint';
 
 const ModelSelect = styled.select`
   width: 100%;
@@ -662,6 +689,7 @@ const ModelSelect = styled.select`
     box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.2);
   }
 `;
+ModelSelect.displayName = 'AdminPage_ModelSelect';
 
 const PriceInput = styled.input`
   width: 100%;
@@ -678,6 +706,7 @@ const PriceInput = styled.input`
     box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.2);
   }
 `;
+PriceInput.displayName = 'AdminPage_PriceInput';
 
 const ServicePlanFeatures = styled.div`
   display: flex;
@@ -688,6 +717,7 @@ const ServicePlanFeatures = styled.div`
     flex-direction: column;
   }
 `;
+ServicePlanFeatures.displayName = 'AdminPage_ServicePlanFeatures';
 
 const FeatureColumn = styled.div<{ highlight?: boolean }>`
   flex: 1;
@@ -697,6 +727,7 @@ const FeatureColumn = styled.div<{ highlight?: boolean }>`
   border: 1px solid ${props => props.highlight ? '#bae6fd' : '#e2e8f0'};
   ${props => props.highlight && 'box-shadow: 0 4px 10px rgba(56, 189, 248, 0.1);'}
 `;
+FeatureColumn.displayName = 'AdminPage_FeatureColumn';
 
 const FeatureColumnTitle = styled.h4`
   font-size: 1.25rem;
@@ -705,18 +736,21 @@ const FeatureColumnTitle = styled.h4`
   margin-bottom: 1rem;
   text-align: center;
 `;
+FeatureColumnTitle.displayName = 'AdminPage_FeatureColumnTitle';
 
 const FeatureList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0 0 1.5rem 0;
 `;
+FeatureList.displayName = 'AdminPage_FeatureList';
 
 const FeatureItem = styled.li`
   padding: 0.5rem 0;
   color: #4a5568;
   font-size: 1rem;
 `;
+FeatureItem.displayName = 'AdminPage_FeatureItem';
 
 const FeaturePrice = styled.div`
   text-align: center;
@@ -725,5 +759,6 @@ const FeaturePrice = styled.div`
   color: #0284c7;
   margin-top: 1rem;
 `;
+FeaturePrice.displayName = 'AdminPage_FeaturePrice';
 
 export default AdminPage; 

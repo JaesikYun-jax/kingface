@@ -358,6 +358,7 @@ const Container = styled.div`
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(5px);
 `;
+Container.displayName = 'FaceReadingResult_Container';
 
 const ResultHeader = styled.div`
   background: linear-gradient(135deg, #9796f0 0%, #fbc7d4 100%);
@@ -365,6 +366,7 @@ const ResultHeader = styled.div`
   color: white;
   text-align: center;
 `;
+ResultHeader.displayName = 'FaceReadingResult_Header';
 
 const Title = styled.h1`
   font-size: 2rem;
@@ -372,12 +374,14 @@ const Title = styled.h1`
   margin-bottom: 0.5rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
+Title.displayName = 'FaceReadingResult_Title';
 
 const SubTitle = styled.p`
   font-size: 1rem;
   font-weight: 500;
   opacity: 0.9;
 `;
+SubTitle.displayName = 'FaceReadingResult_SubTitle';
 
 // 사용자 이미지 컨테이너 스타일
 const UserImageContainer = styled.div`
@@ -386,6 +390,7 @@ const UserImageContainer = styled.div`
   justify-content: center;
   margin-bottom: 2rem;
 `;
+UserImageContainer.displayName = 'FaceReadingResult_UserImageContainer';
 
 const CenteredUserImage = styled.img`
   width: 200px;
@@ -395,6 +400,7 @@ const CenteredUserImage = styled.img`
   border: 4px solid #6b46c1;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 `;
+CenteredUserImage.displayName = 'FaceReadingResult_CenteredUserImage';
 
 // 아이보살 결과 제목 스타일
 const ResultTitle = styled.h2`
@@ -407,6 +413,7 @@ const ResultTitle = styled.h2`
   border-bottom: 2px solid rgba(233, 216, 253, 0.3);
   text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
 `;
+ResultTitle.displayName = 'FaceReadingResult_ResultTitle';
 
 const Disclaimer = styled.p`
   font-size: 0.85rem;
@@ -416,6 +423,7 @@ const Disclaimer = styled.p`
   padding: 1rem 2rem 2rem;
   font-style: italic;
 `;
+Disclaimer.displayName = 'FaceReadingResult_Disclaimer';
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -429,10 +437,12 @@ const ButtonContainer = styled.div`
     flex-direction: column;
   }
 `;
+ButtonContainer.displayName = 'FaceReadingResult_ButtonContainer';
 
 const ButtonIcon = styled.span`
   margin-right: 0.5rem;
 `;
+ButtonIcon.displayName = 'FaceReadingResult_ButtonIcon';
 
 const ActionButton = styled.button<{ color: string }>`
   padding: 0.8rem 1.5rem;
@@ -459,6 +469,7 @@ const ActionButton = styled.button<{ color: string }>`
     width: 100%;
   }
 `;
+ActionButton.displayName = 'FaceReadingResult_ActionButton';
 
 // 디버그 버튼 스타일
 const DebugButton = styled.button`
@@ -484,6 +495,7 @@ const DebugButton = styled.button`
     opacity: 1;
   }
 `;
+DebugButton.displayName = 'FaceReadingResult_DebugButton';
 
 // 디버그 모달 스타일
 const DebugModal = styled.div`
@@ -498,6 +510,7 @@ const DebugModal = styled.div`
   justify-content: center;
   z-index: 9999;
 `;
+DebugModal.displayName = 'FaceReadingResult_DebugModal';
 
 const DebugModalContent = styled.div`
   width: 90%;
@@ -509,6 +522,7 @@ const DebugModalContent = styled.div`
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 `;
+DebugModalContent.displayName = 'FaceReadingResult_DebugModalContent';
 
 const DebugModalHeader = styled.div`
   display: flex;
@@ -523,6 +537,7 @@ const DebugModalHeader = styled.div`
     font-size: 1.2rem;
   }
 `;
+DebugModalHeader.displayName = 'FaceReadingResult_DebugModalHeader';
 
 const CloseButton = styled.button`
   background: none;
@@ -535,6 +550,7 @@ const CloseButton = styled.button`
     opacity: 0.7;
   }
 `;
+CloseButton.displayName = 'FaceReadingResult_CloseButton';
 
 const DebugModalBody = styled.div`
   padding: 1rem;
@@ -561,6 +577,7 @@ const DebugModalBody = styled.div`
     color: #e2e8f0;
   }
 `;
+DebugModalBody.displayName = 'FaceReadingResult_DebugModalBody';
 
 const DebugTable = styled.table`
   width: 100%;
@@ -580,6 +597,7 @@ const DebugTable = styled.table`
     background-color: #2d3748;
   }
 `;
+DebugTable.displayName = 'FaceReadingResult_DebugTable';
 
 // 원본 관상 분석 콘텐츠 렌더링을 위한 컴포넌트 추가
 const OriginalContent = styled.div`
@@ -656,5 +674,6 @@ const OriginalContent = styled.div`
     font-style: italic;
   }
 `;
+OriginalContent.displayName = 'FaceReadingResult_OriginalContent';
 
 export default FaceReadingResult; 

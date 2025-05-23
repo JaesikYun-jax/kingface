@@ -431,6 +431,7 @@ const Container = styled.div`
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
+Container.displayName = 'FaceCapture_Container';
 
 const Title = styled.h2`
   font-size: 1.75rem;
@@ -438,6 +439,7 @@ const Title = styled.h2`
   margin-bottom: 0.5rem;
   color: #2d3748;
 `;
+Title.displayName = 'FaceCapture_Title';
 
 const SubTitle = styled.p`
   text-align: center;
@@ -445,10 +447,12 @@ const SubTitle = styled.p`
   color: #4a5568;
   font-size: 1rem;
 `;
+SubTitle.displayName = 'FaceCapture_SubTitle';
 
 const Content = styled.div`
   margin-bottom: 1.5rem;
 `;
+Content.displayName = 'FaceCapture_Content';
 
 const ErrorMessage = styled.div`
   background-color: #fed7d7;
@@ -458,10 +462,12 @@ const ErrorMessage = styled.div`
   border-radius: 4px;
   font-size: 0.9rem;
 `;
+ErrorMessage.displayName = 'FaceCapture_ErrorMessage';
 
 const UploadContainer = styled.div`
   width: 100%;
 `;
+UploadContainer.displayName = 'FaceCapture_UploadContainer';
 
 const UploadArea = styled.div`
   border: 2px dashed #cbd5e0;
@@ -476,11 +482,13 @@ const UploadArea = styled.div`
     background-color: #f7fafc;
   }
 `;
+UploadArea.displayName = 'FaceCapture_UploadArea';
 
 const UploadIcon = styled.div`
   font-size: 3rem;
   margin-bottom: 1rem;
 `;
+UploadIcon.displayName = 'FaceCapture_UploadIcon';
 
 const UploadText = styled.p`
   font-size: 1.1rem;
@@ -488,11 +496,13 @@ const UploadText = styled.p`
   margin-bottom: 0.5rem;
   color: #4a5568;
 `;
+UploadText.displayName = 'FaceCapture_UploadText';
 
 const UploadSubText = styled.p`
   font-size: 0.9rem;
   color: #718096;
 `;
+UploadSubText.displayName = 'FaceCapture_UploadSubText';
 
 const SmallImageContainer = styled.div`
   position: relative;
@@ -503,6 +513,7 @@ const SmallImageContainer = styled.div`
   overflow: hidden;
   background-color: #000;
 `;
+SmallImageContainer.displayName = 'FaceCapture_SmallImageContainer';
 
 const CapturedImage = styled.img`
   position: absolute;
@@ -513,6 +524,7 @@ const CapturedImage = styled.img`
   object-fit: contain;
   display: block;
 `;
+CapturedImage.displayName = 'FaceCapture_CapturedImage';
 
 const CloseButton = styled.button`
   position: absolute;
@@ -534,6 +546,7 @@ const CloseButton = styled.button`
     background-color: rgba(0, 0, 0, 0.7);
   }
 `;
+CloseButton.displayName = 'FaceCapture_CloseButton';
 
 const EditButton = styled.button`
   position: absolute;
@@ -555,16 +568,19 @@ const EditButton = styled.button`
     background-color: rgba(0, 0, 0, 0.7);
   }
 `;
+EditButton.displayName = 'FaceCapture_EditButton';
 
 const ButtonContainer = styled.div`
   margin-bottom: 1rem;
 `;
+ButtonContainer.displayName = 'FaceCapture_ButtonContainer';
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
 `;
+ButtonGroup.displayName = 'FaceCapture_ButtonGroup';
 
 const ButtonBase = styled.button<{ fullWidth?: boolean }>`
   padding: 0.75rem 1rem;
@@ -580,6 +596,7 @@ const ButtonBase = styled.button<{ fullWidth?: boolean }>`
     cursor: not-allowed;
   }
 `;
+ButtonBase.displayName = 'FaceCapture_ButtonBase';
 
 const UploadButton = styled(ButtonBase)`
   background-color: white;
@@ -591,6 +608,7 @@ const UploadButton = styled(ButtonBase)`
     border-color: #a0aec0;
   }
 `;
+UploadButton.displayName = 'FaceCapture_UploadButton';
 
 const ConfirmButton = styled(ButtonBase)`
   background-color: #6b46c1;
@@ -601,6 +619,7 @@ const ConfirmButton = styled(ButtonBase)`
     background-color: #553c9a;
   }
 `;
+ConfirmButton.displayName = 'FaceCapture_ConfirmButton';
 
 const ModeToggleButtons = styled.div`
   display: flex;
@@ -609,6 +628,7 @@ const ModeToggleButtons = styled.div`
   overflow: hidden;
   border: 1px solid #e2e8f0;
 `;
+ModeToggleButtons.displayName = 'FaceCapture_ModeToggleButtons';
 
 const ModeButton = styled.button<{ active: boolean }>`
   flex: 1;
@@ -630,6 +650,7 @@ const ModeButton = styled.button<{ active: boolean }>`
     cursor: not-allowed;
   }
 `;
+ModeButton.displayName = 'FaceCapture_ModeButton';
 
 const PrivacyNote = styled.p`
   text-align: center;
@@ -637,6 +658,7 @@ const PrivacyNote = styled.p`
   color: #718096;
   margin-top: 0.5rem;
 `;
+PrivacyNote.displayName = 'FaceCapture_PrivacyNote';
 
 /* 크롭 관련 스타일 컴포넌트 주석 처리
 // 새로운 크롭 관련 컴포넌트들

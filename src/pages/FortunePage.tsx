@@ -448,11 +448,13 @@ const Container = styled.div`
   padding: 2rem 1rem;
   position: relative;
 `;
+Container.displayName = 'FortunePage_Container';
 
 const Header = styled.header`
   text-align: center;
   margin-bottom: 2rem;
 `;
+Header.displayName = 'FortunePage_Header';
 
 const Title = styled.h1`
   font-size: 2.5rem;
@@ -461,12 +463,14 @@ const Title = styled.h1`
   margin-bottom: 0.5rem;
   text-shadow: 0 0 15px rgba(107, 70, 193, 0.5);
 `;
+Title.displayName = 'FortunePage_Title';
 
 const SubTitle = styled.h2`
   font-size: 1.25rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
 `;
+SubTitle.displayName = 'FortunePage_SubTitle';
 
 const ContentSection = styled.div`
   background-color: rgba(74, 21, 81, 0.3);
@@ -475,6 +479,7 @@ const ContentSection = styled.div`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: rgba(255, 255, 255, 0.9);
 `;
+ContentSection.displayName = 'FortunePage_ContentSection';
 
 const ErrorMessage = styled.div`
   background-color: #fed7d7;
@@ -485,10 +490,12 @@ const ErrorMessage = styled.div`
   margin-bottom: 1.5rem;
   text-align: center;
 `;
+ErrorMessage.displayName = 'FortunePage_ErrorMessage';
 
 const TarotSelector = styled.div`
   text-align: center;
 `;
+TarotSelector.displayName = 'FortunePage_TarotSelector';
 
 const TarotInstruction = styled.p`
   color: rgba(255, 255, 255, 0.9);
@@ -496,6 +503,7 @@ const TarotInstruction = styled.p`
   margin-bottom: 2rem;
   line-height: 1.6;
 `;
+TarotInstruction.displayName = 'FortunePage_TarotInstruction';
 
 const SkipLink = styled.button`
   background: none;
@@ -510,6 +518,7 @@ const SkipLink = styled.button`
     color: #553c9a;
   }
 `;
+SkipLink.displayName = 'FortunePage_SkipLink';
 
 const LoadingContainer = styled.div`
   display: flex;
@@ -518,6 +527,7 @@ const LoadingContainer = styled.div`
   justify-content: center;
   padding: 3rem 0;
 `;
+LoadingContainer.displayName = 'FortunePage_LoadingContainer';
 
 const LoadingText = styled.h3`
   font-size: 1.5rem;
@@ -527,6 +537,7 @@ const LoadingText = styled.h3`
   text-align: center;
   text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
 `;
+LoadingText.displayName = 'FortunePage_LoadingText';
 
 const LoadingBarContainer = styled.div`
   width: 100%;
@@ -537,6 +548,7 @@ const LoadingBarContainer = styled.div`
   overflow: hidden;
   margin-bottom: 1.5rem;
 `;
+LoadingBarContainer.displayName = 'FortunePage_LoadingBarContainer';
 
 const LoadingBar = styled.div<{ width: number }>`
   height: 100%;
@@ -545,6 +557,7 @@ const LoadingBar = styled.div<{ width: number }>`
   border-radius: 5px;
   transition: width 0.3s ease;
 `;
+LoadingBar.displayName = 'FortunePage_LoadingBar';
 
 const LoadingDescription = styled.p`
   text-align: center;
@@ -554,6 +567,7 @@ const LoadingDescription = styled.p`
   line-height: 1.6;
   margin-bottom: 0.5rem;
 `;
+LoadingDescription.displayName = 'FortunePage_LoadingDescription';
 
 const LoadingMessage = styled.p`
   font-size: 0.95rem;
@@ -570,11 +584,13 @@ const LoadingMessage = styled.p`
     100% { opacity: 0.6; }
   }
 `;
+LoadingMessage.displayName = 'FortunePage_LoadingMessage';
 
 const UpgradeMessage = styled.div`
   text-align: center;
   padding: 1rem 0;
 `;
+UpgradeMessage.displayName = 'FortunePage_UpgradeMessage';
 
 const UpgradeTitle = styled.h3`
   font-size: 1.5rem;
@@ -582,6 +598,7 @@ const UpgradeTitle = styled.h3`
   color: #2d3748;
   margin-bottom: 1rem;
 `;
+UpgradeTitle.displayName = 'FortunePage_UpgradeTitle';
 
 const UpgradeText = styled.p`
   font-size: 1.1rem;
@@ -589,6 +606,7 @@ const UpgradeText = styled.p`
   line-height: 1.6;
   margin-bottom: 1rem;
 `;
+UpgradeText.displayName = 'FortunePage_UpgradeText';
 
 const ModelInfoBox = styled.div`
   background-color: #f8f9fa;
@@ -598,6 +616,7 @@ const ModelInfoBox = styled.div`
   max-width: 90%;
   border-left: 4px solid #6b46c1;
 `;
+ModelInfoBox.displayName = 'FortunePage_ModelInfoBox';
 
 const ModelInfoText = styled.p`
   color: #4a5568;
@@ -615,6 +634,7 @@ const ModelInfoText = styled.p`
     color: #718096;
   }
 `;
+ModelInfoText.displayName = 'FortunePage_ModelInfoText';
 
 const ModelBadge = styled.div`
   display: inline-block;
@@ -626,6 +646,7 @@ const ModelBadge = styled.div`
   border-radius: 20px;
   margin-top: 0.75rem;
 `;
+ModelBadge.displayName = 'FortunePage_ModelBadge';
 
 const PlanStatusBar = styled.div`
   display: flex;
@@ -637,6 +658,7 @@ const PlanStatusBar = styled.div`
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
+PlanStatusBar.displayName = 'FortunePage_PlanStatusBar';
 
 const PlanBadge = styled.div<{ isPremium: boolean }>`
   display: inline-flex;
@@ -649,6 +671,7 @@ const PlanBadge = styled.div<{ isPremium: boolean }>`
   color: ${props => props.isPremium ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.8)'};
   border: 1px solid ${props => props.isPremium ? 'rgba(159, 122, 234, 0.5)' : 'rgba(159, 122, 234, 0.3)'};
 `;
+PlanBadge.displayName = 'FortunePage_PlanBadge';
 
 const UpgradeButton = styled.button`
   margin-left: 1rem;
@@ -666,5 +689,6 @@ const UpgradeButton = styled.button`
     background-color: #553c9a;
   }
 `;
+UpgradeButton.displayName = 'FortunePage_UpgradeButton';
 
 export default FortunePage; 

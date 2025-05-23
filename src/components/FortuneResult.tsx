@@ -129,6 +129,7 @@ const Container = styled.div`
     width: 100%;
   }
 `;
+Container.displayName = 'FortuneResult_Container';
 
 const ResultHeader = styled.div`
   background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%);
@@ -140,6 +141,7 @@ const ResultHeader = styled.div`
     padding: 1.5rem 1rem;
   }
 `;
+ResultHeader.displayName = 'FortuneResult_Header';
 
 const Title = styled.h1`
   font-size: 2rem;
@@ -151,6 +153,7 @@ const Title = styled.h1`
     font-size: 1.7rem;
   }
 `;
+Title.displayName = 'FortuneResult_Title';
 
 const SubTitle = styled.p`
   font-size: 1rem;
@@ -161,6 +164,7 @@ const SubTitle = styled.p`
     font-size: 0.9rem;
   }
 `;
+SubTitle.displayName = 'FortuneResult_SubTitle';
 
 // 사용자 이미지 컨테이너 스타일 - 관상보기와 동일한 형식
 const UserImageContainer = styled.div`
@@ -174,6 +178,7 @@ const UserImageContainer = styled.div`
     margin-bottom: 1.5rem;
   }
 `;
+UserImageContainer.displayName = 'FortuneResult_UserImageContainer';
 
 const CenteredCardImage = styled.img`
   width: 180px;
@@ -189,6 +194,7 @@ const CenteredCardImage = styled.img`
     width: 140px;
   }
 `;
+CenteredCardImage.displayName = 'FortuneResult_CenteredCardImage';
 
 const CardName = styled.h4`
   font-size: 1.25rem;
@@ -201,6 +207,7 @@ const CardName = styled.h4`
     font-size: 1.1rem;
   }
 `;
+CardName.displayName = 'FortuneResult_CardName';
 
 const CardMeaning = styled.p`
   font-size: 1rem;
@@ -213,6 +220,7 @@ const CardMeaning = styled.p`
     font-size: 0.9rem;
   }
 `;
+CardMeaning.displayName = 'FortuneResult_CardMeaning';
 
 const MysticPhraseBox = styled.div`
   background: linear-gradient(135deg, rgba(107, 70, 193, 0.4) 0%, rgba(45, 55, 72, 0.4) 100%);
@@ -231,6 +239,7 @@ const MysticPhraseBox = styled.div`
     border-radius: 8px;
   }
 `;
+MysticPhraseBox.displayName = 'FortuneResult_MysticPhraseBox';
 
 const MysticPhrase = styled.p`
   font-size: 1.2rem;
@@ -245,6 +254,7 @@ const MysticPhrase = styled.p`
     font-size: 1.1rem;
   }
 `;
+MysticPhrase.displayName = 'FortuneResult_MysticPhrase';
 
 // 아이보살 결과 제목 스타일
 const ResultTitle = styled.h2`
@@ -262,6 +272,7 @@ const ResultTitle = styled.h2`
     margin-bottom: 1.5rem;
   }
 `;
+ResultTitle.displayName = 'FortuneResult_ResultTitle';
 
 const OriginalContent = styled.div`
   background-color: #4a1551;
@@ -364,6 +375,7 @@ const OriginalContent = styled.div`
     font-style: italic;
   }
 `;
+OriginalContent.displayName = 'FortuneResult_OriginalContent';
 
 const Disclaimer = styled.p`
   font-size: 0.85rem;
@@ -378,6 +390,7 @@ const Disclaimer = styled.p`
     padding: 0.5rem 1rem 1.5rem;
   }
 `;
+Disclaimer.displayName = 'FortuneResult_Disclaimer';
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -391,10 +404,12 @@ const ButtonContainer = styled.div`
     flex-direction: column;
   }
 `;
+ButtonContainer.displayName = 'FortuneResult_ButtonContainer';
 
 const ButtonIcon = styled.span`
   margin-right: 0.5rem;
 `;
+ButtonIcon.displayName = 'FortuneResult_ButtonIcon';
 
 const ActionButton = styled.button<{ color: string }>`
   padding: 0.8rem 1.5rem;
@@ -421,5 +436,6 @@ const ActionButton = styled.button<{ color: string }>`
     width: 100%;
   }
 `;
+ActionButton.displayName = 'FortuneResult_ActionButton';
 
 export default FortuneResult; 
