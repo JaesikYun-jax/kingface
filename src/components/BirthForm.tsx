@@ -19,16 +19,16 @@ interface TimeSlot {
 // 12시신 데이터
 const timeSlots: TimeSlot[] = [
   { id: 'rat', name: '🐭 자시', label: '자(子) 23:00-01:00', hanja: '子', hours: [23, 1] },
-  { id: 'ox', name: '🐂 축시', label: '축(丑) 01:00-03:00', hanja: '丑', hours: [1, 3] },
-  { id: 'tiger', name: '🐅 인시', label: '인(寅) 03:00-05:00', hanja: '寅', hours: [3, 5] },
+  { id: 'ox', name: '🐮 축시', label: '축(丑) 01:00-03:00', hanja: '丑', hours: [1, 3] },
+  { id: 'tiger', name: '🐯 인시', label: '인(寅) 03:00-05:00', hanja: '寅', hours: [3, 5] },
   { id: 'rabbit', name: '🐰 묘시', label: '묘(卯) 05:00-07:00', hanja: '卯', hours: [5, 7] },
   { id: 'dragon', name: '🐲 진시', label: '진(辰) 07:00-09:00', hanja: '辰', hours: [7, 9] },
   { id: 'snake', name: '🐍 사시', label: '사(巳) 09:00-11:00', hanja: '巳', hours: [9, 11] },
   { id: 'horse', name: '🐴 오시', label: '오(午) 11:00-13:00', hanja: '午', hours: [11, 13] },
   { id: 'sheep', name: '🐑 미시', label: '미(未) 13:00-15:00', hanja: '未', hours: [13, 15] },
   { id: 'monkey', name: '🐵 신시', label: '신(申) 15:00-17:00', hanja: '申', hours: [15, 17] },
-  { id: 'rooster', name: '🐓 유시', label: '유(酉) 17:00-19:00', hanja: '酉', hours: [17, 19] },
-  { id: 'dog', name: '🐕 술시', label: '술(戌) 19:00-21:00', hanja: '戌', hours: [19, 21] },
+  { id: 'rooster', name: '🐔 유시', label: '유(酉) 17:00-19:00', hanja: '酉', hours: [17, 19] },
+  { id: 'dog', name: '🐶 술시', label: '술(戌) 19:00-21:00', hanja: '戌', hours: [19, 21] },
   { id: 'pig', name: '🐷 해시', label: '해(亥) 21:00-23:00', hanja: '亥', hours: [21, 23] },
   { id: 'unknown', name: '🤷 모름', label: '시간 모름', hanja: '?', hours: [0, 0] }
 ];
@@ -213,6 +213,7 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
 
   return (
     <FormContainer onSubmit={handleSubmit}>
+      <StepIndicator>1단계</StepIndicator>
       <Title>사주 정보 입력</Title>
       <Description>정확한 사주풀이를 위해 태어난 정보를 입력하세요</Description>
       
@@ -361,6 +362,21 @@ const FormContainer = styled.form`
   border-radius: 12px;
 `;
 FormContainer.displayName = 'BirthForm_FormContainer';
+
+const StepIndicator = styled.div`
+  background-color: rgba(107, 70, 193, 0.6);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  text-align: center;
+  margin-bottom: 1rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+`;
+StepIndicator.displayName = 'BirthForm_StepIndicator';
 
 const Title = styled.h2`
   color: white;

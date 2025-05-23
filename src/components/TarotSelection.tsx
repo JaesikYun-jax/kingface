@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
+import { keyframes } from '@emotion/react';
 import { TarotCard } from '../types';
 import { getRandomTarotCards } from '../services/api';
 
@@ -10,39 +11,26 @@ interface TarotSelectionProps {
 const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   const [cards, setCards] = useState<TarotCard[]>([]);
   const [selectedCardIdx, setSelectedCardIdx] = useState<number | null>(null);
-  const [flippedCards, setFlippedCards] = useState<boolean[]>([false, false, false, false]);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<TarotCard | null>(null);
+  const [isAnimating, setIsAnimating] = useState(true);
 
   useEffect(() => {
     // 랜덤 타로 카드 4장 가져오기
     const randomCards = getRandomTarotCards();
-    // 4장만 사용
     setCards(randomCards.slice(0, 4));
   }, []);
 
-  const handleCardClick = (index: number) => {
-    // 아직 뒤집히지 않은 카드만 선택 가능
-    if (!flippedCards[index]) {
-      const newFlippedCards = [...flippedCards];
-      newFlippedCards[index] = true;
-      setFlippedCards(newFlippedCards);
-      setSelectedCardIdx(index);
-      setShowConfirm(true);
-    }
-  };
-
-  const handleConfirm = () => {
-    if (selectedCardIdx !== null) {
-      onCardSelect(cards[selectedCardIdx]);
-    }
-  };
-
-  const handleReset = () => {
-    setFlippedCards([false, false, false, false]);
-    setSelectedCardIdx(null);
-    setShowConfirm(false);
-    const randomCards = getRandomTarotCards();
-    setCards(randomCards.slice(0, 4));
+  const handleCardClick = (index: number, card: TarotCard) => {
+    if (selectedCardIdx !== null) return; // 이미 선택된 경우 무시
+    
+    setSelectedCardIdx(index);
+    setSelectedCard(card);
+    setIsAnimating(false);
+    
+    // 2초 후 자동으로 다음 단계로 진행
+    setTimeout(() => {
+      onCardSelect(card);
+    }, 2000);
   };
 
   if (cards.length === 0) {
@@ -51,6 +39,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
 
   return (
     <Container>
+      <StepIndicator>2단계</StepIndicator>
       <Title>타로 카드를 한 장 선택하세요</Title>
       <Description>
         직관에 따라 끌리는 카드를 골라보세요. 타로 카드는 당신의 운세와 결합하여
@@ -58,56 +47,94 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
       </Description>
       
       <CardsContainer>
-        {cards.map((card, index) => (
-          <Card 
-            key={index} 
-            isFlipped={flippedCards[index]} 
-            isSelected={selectedCardIdx === index}
-            onClick={() => handleCardClick(index)}
-          >
-            <CardInner isFlipped={flippedCards[index]}>
-              <CardFront>
-                {/* 뒷면에는 물음표 아이콘 표시 */}
-                <CardBackIcon>?</CardBackIcon>
-                <CardBackText>운명의 카드</CardBackText>
-              </CardFront>
-              <CardBack>
-                {/* 타로 카드 숫자 크게 표시 */}
-                <CardNumber>{card.id + 1}</CardNumber>
-                <CardTitle>{card.name}</CardTitle>
-                <CardDescription>{card.description}</CardDescription>
-              </CardBack>
-            </CardInner>
-          </Card>
-        ))}
+        {/* 첫 번째 줄: 좌에서 우로 흐름 */}
+        <CardRow>
+          {cards.slice(0, 2).map((card, index) => (
+            <FlowingCard 
+              key={index} 
+              direction="left-to-right"
+              isSelected={selectedCardIdx === index}
+              isAnimating={isAnimating}
+              delay={index * 0.5}
+              onClick={() => handleCardClick(index, card)}
+            >
+              <CardInner>
+                <CardFront>
+                  <CardBackIcon>?</CardBackIcon>
+                  <CardBackText>운명의 카드</CardBackText>
+                </CardFront>
+                <CardBack>
+                  <CardNumber>{card.id + 1}</CardNumber>
+                  <CardTitle>{card.name}</CardTitle>
+                  <CardDescription>{card.description}</CardDescription>
+                </CardBack>
+              </CardInner>
+            </FlowingCard>
+          ))}
+        </CardRow>
+        
+        {/* 두 번째 줄: 우에서 좌로 흐름 */}
+        <CardRow>
+          {cards.slice(2, 4).map((card, index) => (
+            <FlowingCard 
+              key={index + 2} 
+              direction="right-to-left"
+              isSelected={selectedCardIdx === index + 2}
+              isAnimating={isAnimating}
+              delay={index * 0.5}
+              onClick={() => handleCardClick(index + 2, card)}
+            >
+              <CardInner>
+                <CardFront>
+                  <CardBackIcon>?</CardBackIcon>
+                  <CardBackText>운명의 카드</CardBackText>
+                </CardFront>
+                <CardBack>
+                  <CardNumber>{card.id + 1}</CardNumber>
+                  <CardTitle>{card.name}</CardTitle>
+                  <CardDescription>{card.description}</CardDescription>
+                </CardBack>
+              </CardInner>
+            </FlowingCard>
+          ))}
+        </CardRow>
       </CardsContainer>
       
-      <SelectedCardInfo>
-        {selectedCardIdx !== null && flippedCards[selectedCardIdx] ? (
-          <>
-            <SelectedCardTitle>
-              선택된 카드: {cards[selectedCardIdx].name} ({cards[selectedCardIdx].id + 1}번)
-            </SelectedCardTitle>
-            <SelectedCardMeaning>
-              {cards[selectedCardIdx].meaning}
-            </SelectedCardMeaning>
-          </>
-        ) : (
-          <NoneSelectedText>
-            카드를 선택해주세요
-          </NoneSelectedText>
-        )}
-      </SelectedCardInfo>
-      
-      <ButtonContainer>
-        <Button onClick={handleReset}>카드 재설정</Button>
-        <ConfirmButton onClick={handleConfirm} disabled={selectedCardIdx === null}>
-          선택 확인
-        </ConfirmButton>
-      </ButtonContainer>
+      {selectedCard && (
+        <SelectedCardDisplay>
+          <SelectedCardTitle>선택된 카드: {selectedCard.name}</SelectedCardTitle>
+          <SelectedCardMeaning>{selectedCard.meaning}</SelectedCardMeaning>
+          <AutoProgressText>잠시 후 자동으로 다음 단계로 진행됩니다...</AutoProgressText>
+        </SelectedCardDisplay>
+      )}
     </Container>
   );
 };
+
+// 애니메이션 키프레임
+const flowLeftToRight = keyframes`
+  0% {
+    transform: translateX(-100vw);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+`;
+
+const flowRightToLeft = keyframes`
+  0% {
+    transform: translateX(100vw);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100vw);
+  }
+`;
 
 const Container = styled.div`
   width: 100%;
@@ -129,6 +156,21 @@ const LoadingContainer = styled.div`
 `;
 LoadingContainer.displayName = 'TarotSelection_LoadingContainer';
 
+const StepIndicator = styled.div`
+  background-color: rgba(107, 70, 193, 0.6);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  text-align: center;
+  margin-bottom: 1rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+`;
+StepIndicator.displayName = 'TarotSelection_StepIndicator';
+
 const Title = styled.h2`
   color: white;
   font-size: 1.4rem;
@@ -141,55 +183,71 @@ Title.displayName = 'TarotSelection_Title';
 const Description = styled.p`
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.85rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   text-align: center;
   line-height: 1.6;
 `;
 Description.displayName = 'TarotSelection_Description';
 
 const CardsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   margin-bottom: 2rem;
-  justify-items: center;
-  
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-  }
+  overflow: hidden;
+  height: 400px;
 `;
 CardsContainer.displayName = 'TarotSelection_CardsContainer';
 
-const Card = styled.div<{ isFlipped: boolean; isSelected: boolean }>`
+const CardRow = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  height: 180px;
+`;
+CardRow.displayName = 'TarotSelection_CardRow';
+
+const FlowingCard = styled.div<{ 
+  direction: 'left-to-right' | 'right-to-left';
+  isSelected: boolean;
+  isAnimating: boolean;
+  delay: number;
+}>`
   width: 120px;
   height: 160px;
-  perspective: 1000px;
   cursor: pointer;
   position: relative;
-  transition: transform 0.3s;
-  transform: ${props => props.isSelected ? 'translateY(-10px)' : 'none'};
+  transition: all 0.3s ease;
+  
+  ${props => props.isSelected && `
+    transform: scale(1.2) !important;
+    z-index: 10;
+    animation: none !important;
+  `}
+  
+  ${props => props.isAnimating && !props.isSelected && `
+    animation: ${props.direction === 'left-to-right' ? flowLeftToRight : flowRightToLeft} 
+               8s linear infinite;
+    animation-delay: ${props.delay}s;
+  `}
   
   &:hover {
-    transform: ${props => props.isFlipped ? 'none' : 'translateY(-5px)'};
+    transform: ${props => props.isAnimating && !props.isSelected ? 'scale(1.05)' : 'none'};
   }
   
   @media (min-width: 768px) {
     width: 140px;
     height: 187px;
-    transform: ${props => props.isSelected ? 'translateY(-20px)' : 'none'};
   }
 `;
-Card.displayName = 'TarotSelection_Card';
+FlowingCard.displayName = 'TarotSelection_FlowingCard';
 
-const CardInner = styled.div<{ isFlipped: boolean }>`
+const CardInner = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
   text-align: center;
-  transition: transform 0.8s;
   transform-style: preserve-3d;
-  transform: ${props => props.isFlipped ? 'rotateY(180deg)' : 'rotateY(0)'};
 `;
 CardInner.displayName = 'TarotSelection_CardInner';
 
@@ -297,15 +355,16 @@ const CardDescription = styled.p`
 `;
 CardDescription.displayName = 'TarotSelection_CardDescription';
 
-const SelectedCardInfo = styled.div`
+const SelectedCardDisplay = styled.div`
   margin: 1.5rem 0;
   padding: 1rem;
   background-color: rgba(74, 21, 81, 0.3);
   border-radius: 8px;
   border-left: 4px solid #9f7aea;
   color: white;
+  text-align: center;
 `;
-SelectedCardInfo.displayName = 'TarotSelection_SelectedCardInfo';
+SelectedCardDisplay.displayName = 'TarotSelection_SelectedCardDisplay';
 
 const SelectedCardTitle = styled.h3`
   margin: 0 0 0.5rem 0;
@@ -315,77 +374,19 @@ const SelectedCardTitle = styled.h3`
 SelectedCardTitle.displayName = 'TarotSelection_SelectedCardTitle';
 
 const SelectedCardMeaning = styled.p`
-  margin: 0;
+  margin: 0 0 1rem 0;
   color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
   line-height: 1.6;
 `;
 SelectedCardMeaning.displayName = 'TarotSelection_SelectedCardMeaning';
 
-const NoneSelectedText = styled.p`
+const AutoProgressText = styled.p`
   color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
   font-style: italic;
-  text-align: center;
+  margin: 0;
 `;
-NoneSelectedText.displayName = 'TarotSelection_NoneSelectedText';
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-`;
-ButtonContainer.displayName = 'TarotSelection_ButtonContainer';
-
-const Button = styled.button`
-  padding: 0.8rem 1.5rem;
-  background-color: rgba(0, 0, 0, 0.2);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.3);
-  }
-  
-  @media (max-width: 768px) {
-    width: 80%;
-    padding: 0.7rem 1rem;
-    font-size: 0.9rem;
-  }
-`;
-Button.displayName = 'TarotSelection_Button';
-
-const ConfirmButton = styled.button`
-  padding: 0.8rem 1.5rem;
-  background-color: #6b46c1;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: #9f7aea;
-  }
-  
-  @media (max-width: 768px) {
-    width: 80%;
-    padding: 0.7rem 1rem;
-    font-size: 0.9rem;
-  }
-`;
-ConfirmButton.displayName = 'TarotSelection_ConfirmButton';
+AutoProgressText.displayName = 'TarotSelection_AutoProgressText';
 
 export default TarotSelection; 

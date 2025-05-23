@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import BirthForm from '../components/BirthForm';
-import { BirthInfo, TarotCard, PlanType, FortuneResult } from '../types';
+import { BirthInfo, TarotCard, FortuneResult } from '../types';
 import { tarotCards } from '../assets/tarotData';
 import TarotSelection from '../components/TarotSelection';
 import FortuneResultComponent from '../components/FortuneResult';
-import FaceCapture from '../components/FaceCapture';
-import PlanSelector from '../components/PlanSelector';
-import { 
-  generateFortune, 
-  getCurrentPlanType, 
-  setCurrentPlanType,
-  isFeatureAvailable
-} from '../services/api';
+import { generateFortune } from '../services/api';
 
 // 로딩 중 보여줄 위트있는 메시지 배열
 const wittyLoadingMessages = [
@@ -27,41 +20,22 @@ const wittyLoadingMessages = [
 enum Step {
   BIRTH_INFO,
   TAROT_SELECTION,
-  PLAN_UPGRADE,
   RESULT,
   LOADING
 }
-
-// 비밀번호 검증 로직 - 직접적인 비밀번호 노출 방지
-const verifyPasswordSecurely = (input: string): boolean => {
-  // "cat" 문자열을 직접 비교하지 않고 다양한 방법으로 검증
-  const hash = btoa(input.toLowerCase()); // 인코딩
-  // 'cat'을 base64로 인코딩한 값은 'Y2F0'
-  return hash === 'Y2F0';
-};
 
 const FortunePage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<Step>(Step.BIRTH_INFO);
   const [birthInfo, setBirthInfo] = useState<BirthInfo | null>(null);
   const [selectedCard, setSelectedCard] = useState<TarotCard | null>(null);
   const [fortuneResult, setFortuneResult] = useState<FortuneResult | null>(null);
-  const [faceImage, setFaceImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
   const [loadingInterval, setLoadingInterval] = useState<NodeJS.Timeout | null>(null);
-  const [currentPlan, setCurrentPlan] = useState<PlanType>(PlanType.FREE);
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState<string>(wittyLoadingMessages[0]);
-  
-  // 비밀번호 관련 상태 추가
-  const [password, setPassword] = useState<string>('');
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passwordAttempts, setPasswordAttempts] = useState<number>(0);
 
-  // 컴포넌트 마운트 시 현재 플랜 설정
+  // 컴포넌트 마운트 시 로딩 메시지 설정
   useEffect(() => {
-    const plan = getCurrentPlanType();
-    setCurrentPlan(plan);
-
     // 로딩 메시지 변경 인터벌 설정
     let messageInterval: NodeJS.Timeout;
     
@@ -99,15 +73,7 @@ const FortunePage: React.FC = () => {
   // 생년월일 제출 처리
   const handleBirthSubmit = (data: BirthInfo) => {
     setBirthInfo(data);
-    
-    // 무료 플랜은 타로 선택 없이 바로 결과 생성
-    if (currentPlan === PlanType.FREE) {
-      setCurrentStep(Step.LOADING);
-      handleGenerateFortune(data, null, null);
-    } else {
-      // 프리미엄 플랜은 타로 선택 단계로
-      setCurrentStep(Step.TAROT_SELECTION);
-    }
+    setCurrentStep(Step.TAROT_SELECTION);
   };
 
   // 타로 카드 선택 처리
@@ -115,61 +81,18 @@ const FortunePage: React.FC = () => {
     setSelectedCard(card);
     
     if (birthInfo) {
-      // 바로 결과 생성으로 진행
       setCurrentStep(Step.LOADING);
-      handleGenerateFortune(birthInfo, card, null);
-    }
-  };
-
-  // 비밀번호 제출 처리
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // 비밀번호 확인 로직
-    if (password === 'ibosal') {
-      setPasswordError('');
-      setCurrentStep(Step.LOADING);
-      
-      // 타로 카드와 생년월일 정보가 모두 있을 때만 진행
-      if (birthInfo && selectedCard) {
-        handleGenerateFortune(birthInfo, selectedCard, null);
-      }
-    } else {
-      setPasswordError('비밀번호가 일치하지 않습니다.');
-    }
-  };
-
-  // 플랜 업그레이드 처리
-  const handlePlanUpgrade = (planType: PlanType) => {
-    setCurrentPlan(planType);
-    setCurrentPlanType(planType); // 서비스에 플랜 저장
-    
-    // 생년월일 정보가 있으면 타로 단계로, 없으면 생년월일 입력 단계로
-    if (birthInfo) {
-      setCurrentStep(Step.TAROT_SELECTION);
-    } else {
-      setCurrentStep(Step.BIRTH_INFO);
-    }
-  };
-
-  // 얼굴 이미지 캡처 처리
-  const handleFaceCapture = (img: string) => {
-    setFaceImage(img);
-    
-    if (birthInfo && selectedCard) {
-      setCurrentStep(Step.LOADING);
-      handleGenerateFortune(birthInfo, selectedCard, img);
+      handleGenerateFortune(birthInfo, card);
     }
   };
 
   // 운세 생성 처리
-  const handleGenerateFortune = async (birth: BirthInfo, card: TarotCard | null, faceImg: string | null = null) => {
+  const handleGenerateFortune = async (birth: BirthInfo, card: TarotCard) => {
     setLoadingProgress(0);
     setCurrentLoadingMessage(wittyLoadingMessages[0]);
     const interval = updateLoadingProgress();
 
     try {
-      // 운세 생성 API 호출 (얼굴 이미지 관련 인자 제거)
       const result = await generateFortune(birth, card);
       
       // 로딩 효과를 위해 약간의 지연 후 결과 표시
@@ -185,15 +108,10 @@ const FortunePage: React.FC = () => {
       console.error('Fortune generation error:', err);
       setError(err?.message || '운세 생성 중 오류가 발생했습니다.');
       
-      // 5초 후 에러 메시지 제거
+      // 5초 후 에러 메시지 제거하고 처음 단계로
       setTimeout(() => {
         setError(null);
-        // 플랜 관련 오류인 경우 업그레이드 단계로, 아니면 처음 단계로
-        if (err?.message?.includes('프리미엄 플랜')) {
-          setCurrentStep(Step.PLAN_UPGRADE);
-        } else {
-          setCurrentStep(Step.BIRTH_INFO);
-        }
+        setCurrentStep(Step.BIRTH_INFO);
       }, 5000);
     }
   };
@@ -203,23 +121,8 @@ const FortunePage: React.FC = () => {
     setBirthInfo(null);
     setSelectedCard(null);
     setFortuneResult(null);
-    setFaceImage(null);
     setCurrentStep(Step.BIRTH_INFO);
     setError(null);
-  };
-
-  // 타로 선택 건너뛰기
-  const handleSkipTarot = () => {
-    if (birthInfo) {
-      // 바로 결과 생성
-      setCurrentStep(Step.LOADING);
-      handleGenerateFortune(birthInfo, null, null);
-    }
-  };
-
-  // 업그레이드 페이지 표시
-  const handleShowUpgrade = () => {
-    setCurrentStep(Step.PLAN_UPGRADE);
   };
 
   return (
@@ -244,31 +147,7 @@ const FortunePage: React.FC = () => {
             <TarotSelection 
               onCardSelect={handleTarotSelect} 
             />
-            <SkipLink onClick={handleSkipTarot}>
-              타로 선택 건너뛰기
-            </SkipLink>
           </TarotSelector>
-        </ContentSection>
-      )}
-
-      {currentStep === Step.PLAN_UPGRADE && (
-        <ContentSection>
-          <UpgradeMessage>
-            <UpgradeTitle>아이보살 프리미엄 서비스</UpgradeTitle>
-            <UpgradeText>
-              타로와 함께 더 심층적인 운명의 비밀과 인연까지 살펴드립니다.
-              더 깊은 영적 인사이트를 원하신다면, 지금 프리미엄으로 알아보세요!
-            </UpgradeText>
-            
-            <ModelInfoBox>
-              <ModelInfoText>
-                <strong>비법 공개</strong>: 일반 운세에는 경제적인 4o-mini 모델을, 
-                프리미엄 플랜에서는 더 정확한 <strong>GPT-4.1-turbo 모델</strong>을 사용합니다.
-              </ModelInfoText>
-            </ModelInfoBox>
-            
-            <PlanSelector onSelect={handlePlanUpgrade} />
-          </UpgradeMessage>
         </ContentSection>
       )}
 
@@ -294,165 +173,9 @@ const FortunePage: React.FC = () => {
           />
         </ContentSection>
       )}
-
-      <PlanStatusBar>
-        {currentPlan === PlanType.FREE ? (
-          <>
-            <PlanBadge isPremium={false}>무료 플랜</PlanBadge>
-            <UpgradeButton onClick={handleShowUpgrade}>
-              프리미엄으로 업그레이드
-            </UpgradeButton>
-          </>
-        ) : (
-          <PlanBadge isPremium={true}>프리미엄 플랜</PlanBadge>
-        )}
-      </PlanStatusBar>
     </Container>
   );
 };
-
-const PasswordContainer = styled.div`
-  text-align: center;
-  padding: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
-`;
-PasswordContainer.displayName = 'FortunePage_PasswordContainer';
-
-const SecurityIcon = styled.div`
-  font-size: 3rem;
-  margin-bottom: 1rem;
-`;
-SecurityIcon.displayName = 'FortunePage_SecurityIcon';
-
-const PasswordTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #2d3748;
-  margin-bottom: 1rem;
-`;
-PasswordTitle.displayName = 'FortunePage_PasswordTitle';
-
-const PasswordDescription = styled.p`
-  font-size: 1rem;
-  color: #4a5568;
-  margin-bottom: 2rem;
-  line-height: 1.6;
-`;
-PasswordDescription.displayName = 'FortunePage_PasswordDescription';
-
-const AnalysisOptions = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-AnalysisOptions.displayName = 'FortunePage_AnalysisOptions';
-
-const AnalysisOption = styled.div`
-  background-color: #f9f5ff;
-  border: 1px solid #e9d8fd;
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: all 0.3s;
-  
-  &:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-5px);
-  }
-`;
-AnalysisOption.displayName = 'FortunePage_AnalysisOption';
-
-const OptionIcon = styled.div`
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-`;
-OptionIcon.displayName = 'FortunePage_OptionIcon';
-
-const OptionTitle = styled.h4`
-  font-size: 1.2rem;
-  color: #4a5568;
-  margin-bottom: 0.8rem;
-`;
-OptionTitle.displayName = 'FortunePage_OptionTitle';
-
-const OptionDescription = styled.p`
-  font-size: 0.9rem;
-  color: #718096;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
-`;
-OptionDescription.displayName = 'FortunePage_OptionDescription';
-
-const SkipButton = styled.button`
-  background-color: #6b46c1;
-  color: white;
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  
-  &:hover {
-    background-color: #553c9a;
-  }
-`;
-SkipButton.displayName = 'FortunePage_SkipButton';
-
-const PasswordForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  width: 100%;
-`;
-PasswordForm.displayName = 'FortunePage_PasswordForm';
-
-const PasswordInput = styled.input`
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  outline: none;
-  
-  &:focus {
-    border-color: #6b46c1;
-    box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.2);
-  }
-`;
-PasswordInput.displayName = 'FortunePage_PasswordInput';
-
-const SubmitButton = styled.button`
-  background-color: #6b46c1;
-  color: white;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  
-  &:hover {
-    background-color: #553c9a;
-  }
-`;
-SubmitButton.displayName = 'FortunePage_SubmitButton';
-
-const PasswordErrorMessage = styled.div`
-  color: #fed7d7;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
-`;
-PasswordErrorMessage.displayName = 'FortunePage_PasswordErrorMessage';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -536,21 +259,6 @@ const TarotInstruction = styled.p`
 `;
 TarotInstruction.displayName = 'FortunePage_TarotInstruction';
 
-const SkipLink = styled.button`
-  background: none;
-  border: none;
-  color: #6b46c1;
-  font-size: 1rem;
-  text-decoration: underline;
-  cursor: pointer;
-  margin-top: 1.5rem;
-  
-  &:hover {
-    color: #553c9a;
-  }
-`;
-SkipLink.displayName = 'FortunePage_SkipLink';
-
 const LoadingContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -616,115 +324,5 @@ const LoadingMessage = styled.p`
   }
 `;
 LoadingMessage.displayName = 'FortunePage_LoadingMessage';
-
-const UpgradeMessage = styled.div`
-  text-align: center;
-  padding: 1rem 0;
-`;
-UpgradeMessage.displayName = 'FortunePage_UpgradeMessage';
-
-const UpgradeTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 1rem;
-`;
-UpgradeTitle.displayName = 'FortunePage_UpgradeTitle';
-
-const UpgradeText = styled.p`
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  margin-bottom: 1rem;
-`;
-UpgradeText.displayName = 'FortunePage_UpgradeText';
-
-const ModelInfoBox = styled.div`
-  background-color: rgba(107, 70, 193, 0.2);
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 0 auto 2rem;
-  max-width: 90%;
-  border-left: 4px solid #6b46c1;
-`;
-ModelInfoBox.displayName = 'FortunePage_ModelInfoBox';
-
-const ModelInfoText = styled.p`
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  text-align: left;
-  
-  strong {
-    color: #e9d8fd;
-    font-weight: 600;
-  }
-  
-  i {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-`;
-ModelInfoText.displayName = 'FortunePage_ModelInfoText';
-
-const ModelBadge = styled.div`
-  display: inline-block;
-  background-color: rgba(107, 70, 193, 0.5);
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  margin-top: 0.75rem;
-`;
-ModelBadge.displayName = 'FortunePage_ModelBadge';
-
-const PlanStatusBar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: rgba(74, 21, 81, 0.3);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-PlanStatusBar.displayName = 'FortunePage_PlanStatusBar';
-
-const PlanBadge = styled.div<{ isPremium: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  background-color: ${props => props.isPremium ? 'rgba(107, 70, 193, 0.6)' : 'rgba(107, 70, 193, 0.4)'};
-  color: ${props => props.isPremium ? 'white' : 'rgba(255, 255, 255, 0.9)'};
-  border: 2px solid ${props => props.isPremium ? '#9f7aea' : '#805ad5'};
-  box-shadow: 0 2px 8px rgba(107, 70, 193, 0.3);
-`;
-PlanBadge.displayName = 'FortunePage_PlanBadge';
-
-const UpgradeButton = styled.button`
-  margin-left: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  background-color: #9f7aea;
-  color: white;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border: 2px solid #b794f6;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(159, 122, 234, 0.3);
-  
-  &:hover {
-    background-color: #805ad5;
-    border-color: #9f7aea;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.4);
-  }
-`;
-UpgradeButton.displayName = 'FortunePage_UpgradeButton';
 
 export default FortunePage; 
