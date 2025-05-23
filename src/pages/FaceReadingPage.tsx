@@ -450,9 +450,10 @@ const Subtitle = styled.p`
 `;
 
 const ErrorMessage = styled.div`
-  background-color: #fed7d7;
-  color: #c53030;
-  padding: 1rem;
+  background-color: rgba(197, 48, 48, 0.3); /* 어두운 배경에 붉은색 투명도 */
+  border: 1px solid #f56565;
+  color: #fed7d7; /* 붉은색 계열 밝은 텍스트 */
+  padding: 0.75rem;
   border-radius: 8px;
   text-align: center;
   margin-bottom: 1.5rem;
@@ -621,22 +622,30 @@ const ModelBadge = styled.div`
 `;
 
 const ModelInfo = styled.div`
-  background-color: #f8f9fa;
+  background-color: rgba(107, 70, 193, 0.2); /* 보라색 계열 투명 배경 */
   border-radius: 8px;
-  padding: 1.2rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem;
+  margin: 0 auto 2rem;
+  max-width: 90%;
   border-left: 4px solid #6b46c1;
 `;
 
 const ModelInfoText = styled.p`
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9); /* 밝은 텍스트 색상 */
   font-size: 0.95rem;
   line-height: 1.5;
+  text-align: left;
   
   strong {
-    color: #6b46c1;
+    color: #e9d8fd; /* 강조 색상 유지 */
     font-weight: 600;
   }
+  
+  i {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7); /* 약간 어두운 밝은 텍스트 */
+  }
 `;
+ModelInfoText.displayName = 'FaceReadingResult_ModelInfoText';
 
 export default FaceReadingPage; 

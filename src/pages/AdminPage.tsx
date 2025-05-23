@@ -219,7 +219,7 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <Container>
+    <AdminContainer>
       <Title>관리자 페이지</Title>
       <Description>
         AI 응답 생성 프롬프트 및 서비스 플랜을 관리하는 페이지입니다.
@@ -242,7 +242,7 @@ const AdminPage: React.FC = () => {
       </TabContainer>
       
       {activeTab === AdminTab.PROMPTS && (
-        <Content>
+        <TabContent>
           <Sidebar>
             <SidebarTitle>프롬프트 목록</SidebarTitle>
             <PromptList>
@@ -293,11 +293,11 @@ const AdminPage: React.FC = () => {
               </NoSelection>
             )}
           </MainContent>
-        </Content>
+        </TabContent>
       )}
       
       {activeTab === AdminTab.SERVICE_PLANS && (
-        <Content>
+        <TabContent>
           <MainContent fullWidth>
             <SectionTitle>서비스 플랜 설정</SectionTitle>
             
@@ -394,28 +394,34 @@ const AdminPage: React.FC = () => {
               {saveMessage && <SaveMessage>{saveMessage}</SaveMessage>}
             </ButtonContainer>
           </MainContent>
-        </Content>
+        </TabContent>
       )}
-    </Container>
+    </AdminContainer>
   );
 };
 
-const Container = styled.div`
+const AdminContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
-  display: flex;
-  height: 100vh;
-  background-color: #f5f5f5;
+  padding: 2rem;
+  background-color: rgba(74, 21, 81, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
-Container.displayName = 'AdminPage_Container';
+AdminContainer.displayName = 'AdminPage_AdminContainer';
 
 const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
+Title.displayName = 'AdminPage_Title';
 
 const Description = styled.p`
   font-size: 1.1rem;
@@ -445,6 +451,15 @@ const TabButton = styled.button<{ isActive: boolean }>`
     color: #2d3748;
   }
 `;
+
+const TabContent = styled.div`
+  background-color: rgba(107, 70, 193, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border: 1px solid rgba(107, 70, 193, 0.2);
+`;
+TabContent.displayName = 'AdminPage_TabContent';
 
 const Content = styled.div`
   display: flex;
@@ -505,8 +520,8 @@ PromptItem.displayName = 'AdminPage_PromptItem';
 const ResetButton = styled.button`
   width: 100%;
   padding: 0.75rem;
-  background-color: #feb2b2;
-  color: #c53030;
+  background-color: rgba(254, 178, 178, 0.3);
+  color: #feb2b2;
   border: none;
   border-radius: 8px;
   font-weight: 500;
@@ -677,11 +692,11 @@ FormHint.displayName = 'AdminPage_FormHint';
 const ModelSelect = styled.select`
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
-  color: #2d3748;
   
   &:focus {
     outline: none;
@@ -695,10 +710,11 @@ const PriceInput = styled.input`
   width: 100%;
   max-width: 200px;
   padding: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
-  color: #2d3748;
   
   &:focus {
     outline: none;
@@ -723,8 +739,8 @@ const FeatureColumn = styled.div<{ highlight?: boolean }>`
   flex: 1;
   padding: 1.5rem;
   border-radius: 10px;
-  background-color: ${props => props.highlight ? '#f0f9ff' : '#f7fafc'};
-  border: 1px solid ${props => props.highlight ? '#bae6fd' : '#e2e8f0'};
+  background-color: ${props => props.highlight ? 'rgba(56, 189, 248, 0.2)' : 'rgba(74, 21, 81, 0.3)'};
+  border: 1px solid ${props => props.highlight ? 'rgba(56, 189, 248, 0.5)' : 'rgba(107, 70, 193, 0.3)'};
   ${props => props.highlight && 'box-shadow: 0 4px 10px rgba(56, 189, 248, 0.1);'}
 `;
 FeatureColumn.displayName = 'AdminPage_FeatureColumn';
@@ -732,7 +748,7 @@ FeatureColumn.displayName = 'AdminPage_FeatureColumn';
 const FeatureColumnTitle = styled.h4`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1rem;
   text-align: center;
 `;
@@ -747,7 +763,7 @@ FeatureList.displayName = 'AdminPage_FeatureList';
 
 const FeatureItem = styled.li`
   padding: 0.5rem 0;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
 `;
 FeatureItem.displayName = 'AdminPage_FeatureItem';
@@ -756,7 +772,7 @@ const FeaturePrice = styled.div`
   text-align: center;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0284c7;
+  color: #90cdf4;
   margin-top: 1rem;
 `;
 FeaturePrice.displayName = 'AdminPage_FeaturePrice';

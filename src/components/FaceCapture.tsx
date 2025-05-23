@@ -427,9 +427,10 @@ const Container = styled.div`
   max-width: 500px;
   margin: 0 auto;
   padding: 1.5rem;
-  background-color: white;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
 `;
 Container.displayName = 'FaceCapture_Container';
 
@@ -437,14 +438,15 @@ const Title = styled.h2`
   font-size: 1.75rem;
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
 Title.displayName = 'FaceCapture_Title';
 
 const SubTitle = styled.p`
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
 `;
 SubTitle.displayName = 'FaceCapture_SubTitle';
@@ -470,16 +472,17 @@ const UploadContainer = styled.div`
 UploadContainer.displayName = 'FaceCapture_UploadContainer';
 
 const UploadArea = styled.div`
-  border: 2px dashed #cbd5e0;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
+  background-color: rgba(107, 70, 193, 0.1);
   
   &:hover {
-    border-color: #805ad5;
-    background-color: #f7fafc;
+    border-color: #6b46c1;
+    background-color: rgba(107, 70, 193, 0.2);
   }
 `;
 UploadArea.displayName = 'FaceCapture_UploadArea';
@@ -494,13 +497,13 @@ const UploadText = styled.p`
   font-size: 1.1rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
 `;
 UploadText.displayName = 'FaceCapture_UploadText';
 
 const UploadSubText = styled.p`
   font-size: 0.9rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.7);
 `;
 UploadSubText.displayName = 'FaceCapture_UploadSubText';
 
@@ -599,13 +602,13 @@ const ButtonBase = styled.button<{ fullWidth?: boolean }>`
 ButtonBase.displayName = 'FaceCapture_ButtonBase';
 
 const UploadButton = styled(ButtonBase)`
-  background-color: white;
-  color: #4a5568;
-  border: 1px solid #cbd5e0;
+  background-color: rgba(107, 70, 193, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(107, 70, 193, 0.5);
   
   &:hover:not(:disabled) {
-    background-color: #f7fafc;
-    border-color: #a0aec0;
+    background-color: rgba(107, 70, 193, 0.5);
+    border-color: #6b46c1;
   }
 `;
 UploadButton.displayName = 'FaceCapture_UploadButton';
@@ -655,7 +658,7 @@ ModeButton.displayName = 'FaceCapture_ModeButton';
 const PrivacyNote = styled.p`
   text-align: center;
   font-size: 0.8rem;
-  color: #718096;
+  color: rgba(255, 255, 255, 0.6);
   margin-top: 0.5rem;
 `;
 PrivacyNote.displayName = 'FaceCapture_PrivacyNote';

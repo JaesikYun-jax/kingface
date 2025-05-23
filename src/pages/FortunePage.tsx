@@ -437,7 +437,7 @@ const SubmitButton = styled.button`
 `;
 
 const PasswordErrorMessage = styled.div`
-  color: #c53030;
+  color: #fed7d7;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 `;
@@ -482,9 +482,9 @@ const ContentSection = styled.div`
 ContentSection.displayName = 'FortunePage_ContentSection';
 
 const ErrorMessage = styled.div`
-  background-color: #fed7d7;
+  background-color: rgba(197, 48, 48, 0.3);
   border: 1px solid #f56565;
-  color: #c53030;
+  color: #fed7d7;
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
@@ -595,21 +595,21 @@ UpgradeMessage.displayName = 'FortunePage_UpgradeMessage';
 const UpgradeTitle = styled.h3`
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2d3748;
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 1rem;
 `;
 UpgradeTitle.displayName = 'FortunePage_UpgradeTitle';
 
 const UpgradeText = styled.p`
   font-size: 1.1rem;
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
   margin-bottom: 1rem;
 `;
 UpgradeText.displayName = 'FortunePage_UpgradeText';
 
 const ModelInfoBox = styled.div`
-  background-color: #f8f9fa;
+  background-color: rgba(107, 70, 193, 0.2);
   border-radius: 8px;
   padding: 1rem;
   margin: 0 auto 2rem;
@@ -619,27 +619,27 @@ const ModelInfoBox = styled.div`
 ModelInfoBox.displayName = 'FortunePage_ModelInfoBox';
 
 const ModelInfoText = styled.p`
-  color: #4a5568;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.95rem;
   line-height: 1.5;
   text-align: left;
   
   strong {
-    color: #6b46c1;
+    color: #e9d8fd;
     font-weight: 600;
   }
   
   i {
     font-size: 0.9rem;
-    color: #718096;
+    color: rgba(255, 255, 255, 0.7);
   }
 `;
 ModelInfoText.displayName = 'FortunePage_ModelInfoText';
 
 const ModelBadge = styled.div`
   display: inline-block;
-  background-color: #e9d8fd;
-  color: #6b46c1;
+  background-color: rgba(107, 70, 193, 0.5);
+  color: white;
   font-size: 0.9rem;
   font-weight: 600;
   padding: 0.5rem 1rem;

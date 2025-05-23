@@ -330,16 +330,17 @@ const QaHeader = styled.header`
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   
   h1 {
     font-size: 2rem;
-    color: #2d3748;
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
   }
   
   p {
-    color: #718096;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 1.1rem;
   }
 `;
@@ -348,14 +349,15 @@ QaHeader.displayName = 'FortuneQaPage_QaHeader';
 const OptionsContainer = styled.div`
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background-color: #f7fafc;
+  background-color: rgba(74, 21, 81, 0.3);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(5px);
   
   h2 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
-    color: #2d3748;
+    color: rgba(255, 255, 255, 0.9);
   }
 `;
 OptionsContainer.displayName = 'FortuneQaPage_OptionsContainer';
