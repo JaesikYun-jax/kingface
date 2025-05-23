@@ -37,15 +37,22 @@ const timeSlots: TimeSlot[] = [
 const celestialStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
 const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
 
-// 년간지 계산
-const getYearPillar = (year: number): string => {
+// 천간지지 한글 청음 데이터 추가
+const celestialStemsKorean = ['갑', '을', '병', '정', '무', '기', '경', '신', '임', '계'];
+const earthlyBranchesKorean = ['자', '축', '인', '묘', '진', '사', '오', '미', '신', '유', '술', '해'];
+
+// 년간지 계산 - 한글과 한자 모두 반환
+const getYearPillar = (year: number): { korean: string; hanja: string } => {
   const stemIndex = (year - 4) % 10;
   const branchIndex = (year - 4) % 12;
-  return `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`;
+  return {
+    korean: `${celestialStemsKorean[stemIndex]}${earthlyBranchesKorean[branchIndex]}`,
+    hanja: `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`
+  };
 };
 
-// 월간지 계산 (간략화된 계산, 실제 사주에서는 더 복잡)
-const getMonthPillar = (month: number, year: number): string => {
+// 월간지 계산 - 한글과 한자 모두 반환
+const getMonthPillar = (month: number, year: number): { korean: string; hanja: string } => {
   // 월지(지지)는 1월=인(寅)부터 시작
   const branchIndex = (month + 1) % 12;
   
@@ -55,11 +62,14 @@ const getMonthPillar = (month: number, year: number): string => {
   const baseIndex = (yearStemIndex % 5) * 2;
   const stemIndex = (baseIndex + month - 1) % 10;
   
-  return `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`;
+  return {
+    korean: `${celestialStemsKorean[stemIndex]}${earthlyBranchesKorean[branchIndex]}`,
+    hanja: `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`
+  };
 };
 
-// 일간지 계산 (매우 간략화된 방식)
-const getDayPillar = (year: number, month: number, day: number): string => {
+// 일간지 계산 - 한글과 한자 모두 반환
+const getDayPillar = (year: number, month: number, day: number): { korean: string; hanja: string } => {
   // 실제 계산에서는 역법에 따른 정확한 계산이 필요합니다
   // 여기서는 단순화된 공식을 사용합니다
   const baseDate = new Date(1900, 0, 1);
@@ -69,11 +79,14 @@ const getDayPillar = (year: number, month: number, day: number): string => {
   const stemIndex = (daysDiff + 9) % 10;
   const branchIndex = (daysDiff + 3) % 12;
   
-  return `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`;
+  return {
+    korean: `${celestialStemsKorean[stemIndex]}${earthlyBranchesKorean[branchIndex]}`,
+    hanja: `${celestialStems[stemIndex]}${earthlyBranches[branchIndex]}`
+  };
 };
 
-// 시간지 계산
-const getTimePillar = (hour: number, dayStemnIndex: number): string => {
+// 시간지 계산 - 한글과 한자 모두 반환
+const getTimePillar = (hour: number, dayStemnIndex: number): { korean: string; hanja: string } => {
   // 시지(지지)는 자(子)시부터 시작, 2시간 간격
   let branchIndex = Math.floor(hour / 2);
   if (hour === 23) branchIndex = 0; // 23시는 자시(子時)에 포함
@@ -85,7 +98,10 @@ const getTimePillar = (hour: number, dayStemnIndex: number): string => {
   const offset = (dayStemnIndex % 5) * 2;
   const stemIndex = (offset + Math.floor(hour / 2)) % 10;
   
-  return `${celestialStems[stemIndex]}${earthlyBranches[adjustedBranchIndex]}`;
+  return {
+    korean: `${celestialStemsKorean[stemIndex]}${earthlyBranchesKorean[adjustedBranchIndex]}`,
+    hanja: `${celestialStems[stemIndex]}${earthlyBranches[adjustedBranchIndex]}`
+  };
 };
 
 const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
@@ -102,7 +118,7 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [isLunar, setIsLunar] = useState<boolean>(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
-  const [sajuText, setSajuText] = useState<string>('');
+  const [sajuText, setSajuText] = useState<{ korean: string; hanja: string }>({ korean: '', hanja: '' });
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
 
   // 사주 계산 및 표시
@@ -132,20 +148,25 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
     const dayPillar = getDayPillar(year, month, day);
     
     // 일간(일주 천간) 인덱스 구하기
-    const dayStemnIndex = celestialStems.indexOf(dayPillar[0]);
+    const dayStemnIndex = celestialStems.indexOf(dayPillar.hanja[0]);
     
     // 시간 지정이 없으면 시주는 표시하지 않음
-    let timePillar = '';
+    let timePillar = null;
     if (selectedTimeSlot !== "unknown") {
       timePillar = getTimePillar(hour, dayStemnIndex);
     }
     
-    // 시주가 있을 경우와 없을 경우를 구분해서 사주 텍스트 생성
-    if (timePillar) {
-      setSajuText(`${yearPillar}년 ${monthPillar}월 ${dayPillar}일 ${timePillar}시`);
-    } else {
-      setSajuText(`${yearPillar}년 ${monthPillar}월 ${dayPillar}일`);
-    }
+    // 사주 정보 객체로 저장
+    const sajuInfo = {
+      korean: timePillar ? 
+        `${yearPillar.korean}년 ${monthPillar.korean}월 ${dayPillar.korean}일 ${timePillar.korean}시` :
+        `${yearPillar.korean}년 ${monthPillar.korean}월 ${dayPillar.korean}일`,
+      hanja: timePillar ?
+        `${yearPillar.hanja}년 ${monthPillar.hanja}월 ${dayPillar.hanja}일 ${timePillar.hanja}시` :
+        `${yearPillar.hanja}년 ${monthPillar.hanja}월 ${dayPillar.hanja}일`
+    };
+    
+    setSajuText(sajuInfo);
   }, [birthDate, selectedTimeSlot]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -229,7 +250,6 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
           onChange={handleBirthDateChange}
           maxLength={8}
         />
-        <InputNote>YYYYMMDD 형식으로 입력해주세요 (예: 19901225)</InputNote>
         
         <LunarOption>
           <input 
@@ -303,7 +323,8 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
         <SajuBox>
           <SajuTitle>🔮 사주 정보</SajuTitle>
           <SajuDisplay>
-            <SajuText>{sajuText}</SajuText>
+            <SajuText>{sajuText.korean}</SajuText>
+            <SajuHanja>{sajuText.hanja}</SajuHanja>
           </SajuDisplay>
           <SajuDescription>
             위 사주는 입력하신 정보를 기반으로 한 간략한 사주 정보입니다.
@@ -348,10 +369,20 @@ const SajuText = styled.p`
   font-weight: 600;
   color: rgba(255, 255, 255, 0.95);
   letter-spacing: 3px;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   line-height: 1.4;
 `;
 SajuText.displayName = 'BirthForm_SajuText';
+
+const SajuHanja = styled.p`
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 2px;
+  margin: 0;
+  line-height: 1.2;
+`;
+SajuHanja.displayName = 'BirthForm_SajuHanja';
 
 const SajuDescription = styled.p`
   font-size: 0.8rem;
@@ -435,14 +466,6 @@ const BirthDateInput = styled.input`
   }
 `;
 BirthDateInput.displayName = 'BirthForm_BirthDateInput';
-
-const InputNote = styled.p`
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-`;
-InputNote.displayName = 'BirthForm_InputNote';
 
 const TimeSlotContainer = styled.div`
   display: grid;
