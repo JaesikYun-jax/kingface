@@ -40,7 +40,7 @@ const defaultServicePlan: ServicePlanConfig = {
       free: 'o4-mini-2025-04-16',  // 무료 플랜은 o4-mini-2025-04-16 사용
       premium: 'o4-mini-2025-04-16'  // 프리미엄도 사진 없는 경우 o4-mini-2025-04-16 사용
     },
-    faceReading: 'gpt-4.1'  // GPT-4.1 모델 사용 (비전 기능 지원)
+    faceReading: 'gpt-4.1-2025-04-14'  // GPT-4.1-2025-04-14 모델 사용 (비전 기능 지원)
   },
   features: {
     free: ['사주 기반 운세'],
@@ -64,7 +64,7 @@ export const getPromptConfig = (promptId: string, isVision = false, imageUrl = '
   if (isVision) {
     // Facereading Vision 모델 설정
     return {
-      model: 'gpt-4.1',  // 최신 Vision 기능이 있는 GPT-4.1 모델 사용
+      model: 'gpt-4.1-2025-04-14',  // 최신 Vision 기능이 있는 GPT-4.1-2025-04-14 모델 사용
       messages: [
         {
           role: 'system',
@@ -267,7 +267,7 @@ export const generateFortune = async (
     }
     
     // 기본 모델 사용 (플랜 체크 제거)
-    const useModel = 'gpt-3.5-turbo';
+    const useModel = 'o4-mini-2025-04-16';
       
     // 시간 포맷팅 (한국식)
     const formattedHour = birthInfo.hour < 10 ? `0${birthInfo.hour}` : birthInfo.hour;

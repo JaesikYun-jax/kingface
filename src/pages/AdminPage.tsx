@@ -310,11 +310,11 @@ const AdminPage: React.FC = () => {
                   value={servicePlan.models.fortune.free}
                   onChange={(e) => handleModelChange('fortune', 'free', e.target.value)}
                 >
+                  <option value="o4-mini-2025-04-16">o4-mini-2025-04-16 (경제적)</option>
                   <option value="gpt-3.5-turbo">GPT-3.5 Turbo (저렴)</option>
                   <option value="gpt-3.5-turbo-16k">GPT-3.5 Turbo 16K</option>
-                  <option value="gpt-4-turbo">GPT-4 Turbo (고품질)</option>
+                  <option value="gpt-4.1-2025-04-14">GPT-4.1-2025-04-14 (고품질)</option>
                 </ModelSelect>
-                <FormHint>무료 플랜에서 사용할 AI 모델입니다. 저렴한 모델 선택을 권장합니다.</FormHint>
               </FormGroup>
               
               <FormGroup>
@@ -323,11 +323,11 @@ const AdminPage: React.FC = () => {
                   value={servicePlan.models.fortune.premium}
                   onChange={(e) => handleModelChange('fortune', 'premium', e.target.value)}
                 >
+                  <option value="o4-mini-2025-04-16">o4-mini-2025-04-16 (경제적)</option>
+                  <option value="gpt-4.1-2025-04-14">GPT-4.1-2025-04-14 (고품질)</option>
                   <option value="gpt-3.5-turbo">GPT-3.5 Turbo (저렴)</option>
                   <option value="gpt-3.5-turbo-16k">GPT-3.5 Turbo 16K</option>
-                  <option value="gpt-4-turbo">GPT-4 Turbo (고품질)</option>
                 </ModelSelect>
-                <FormHint>유료 플랜에서는 보다 정확한 결과를 위해 고품질 모델 선택을 권장합니다.</FormHint>
               </FormGroup>
               
               <FormGroup>
@@ -336,11 +336,11 @@ const AdminPage: React.FC = () => {
                   value={servicePlan.models.faceReading}
                   onChange={(e) => handleModelChange('faceReading', '', e.target.value)}
                 >
+                  <option value="gpt-4.1-2025-04-14">GPT-4.1-2025-04-14</option>
                   <option value="gpt-4o">GPT-4o</option>
                   <option value="gpt-4-turbo">GPT-4 Turbo</option>
                   <option value="gpt-4">GPT-4</option>
                 </ModelSelect>
-                <FormHint>이미지 분석을 위한 AI 모델입니다. GPT-4o는 가장 최신 모델로 이미지 분석 기능을 지원합니다.</FormHint>
               </FormGroup>
             </ServicePlanSection>
             
@@ -356,7 +356,6 @@ const AdminPage: React.FC = () => {
                   min="0"
                   step="1000"
                 />
-                <FormHint>유료 플랜의 가격을 설정합니다. 권장 가격은 3,000원~10,000원 사이입니다.</FormHint>
               </FormGroup>
             </ServicePlanSection>
             
@@ -681,13 +680,6 @@ const FormLabel = styled.label`
   color: rgba(255, 255, 255, 0.9);
 `;
 FormLabel.displayName = 'AdminPage_FormLabel';
-
-const FormHint = styled.p`
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 0.5rem;
-`;
-FormHint.displayName = 'AdminPage_FormHint';
 
 const ModelSelect = styled.select`
   width: 100%;

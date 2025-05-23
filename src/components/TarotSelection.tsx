@@ -208,7 +208,7 @@ const CardRowContainer = styled.div`
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.05);
   padding: 20px 0;
-  height: auto;
+  height: 300px;
   
   &:hover .card-wrapper {
     animation-play-state: paused;
@@ -222,7 +222,7 @@ const CardWrapper = styled.div<{ direction: 'left-to-right' | 'right-to-left' }>
   will-change: transform;
   
   animation: ${props => props.direction === 'left-to-right' ? scrollLeftToRight : scrollRightToLeft} 
-             5s linear infinite;
+             7.14s linear infinite;
 `;
 CardWrapper.displayName = 'TarotSelection_CardWrapper';
 

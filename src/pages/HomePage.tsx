@@ -89,6 +89,7 @@ const Sparkles = styled.div`
     100% { opacity: 0.3; transform: scale(0.8); }
   }
 `;
+Sparkles.displayName = 'HomePage_Sparkles';
 
 const MysticText = styled.p`
   font-size: 1.1rem;
@@ -97,16 +98,19 @@ const MysticText = styled.p`
   font-style: italic;
   text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
 `;
+MysticText.displayName = 'HomePage_MysticText';
 
 const Container = styled.div`
   max-width: 1000px;
   margin: 0 auto;
 `;
+Container.displayName = 'HomePage_Container';
 
 const Header = styled.div`
   text-align: center;
   margin-bottom: 2rem;
 `;
+Header.displayName = 'HomePage_Header';
 
 const Title = styled.h1`
   font-size: 2.5rem;
@@ -118,6 +122,7 @@ const Title = styled.h1`
     font-size: 2rem;
   }
 `;
+Title.displayName = 'HomePage_Title';
 
 const Subtitle = styled.p`
   font-size: 1.2rem;
@@ -127,6 +132,7 @@ const Subtitle = styled.p`
     font-size: 1rem;
   }
 `;
+Subtitle.displayName = 'HomePage_Subtitle';
 
 const MainContent = styled.div`
   display: grid;
@@ -138,6 +144,7 @@ const MainContent = styled.div`
     gap: 1.5rem;
   }
 `;
+MainContent.displayName = 'HomePage_MainContent';
 
 const ServiceCard = styled.div`
   background-color: rgba(26, 32, 44, 0.8);
@@ -160,6 +167,7 @@ const ServiceCard = styled.div`
     background-color: rgba(34, 41, 57, 0.9);
   }
 `;
+ServiceCard.displayName = 'HomePage_ServiceCard';
 
 const CardIcon = styled.div`
   font-size: 4rem;
@@ -172,6 +180,7 @@ const CardIcon = styled.div`
     100% { transform: scale(1); }
   }
 `;
+CardIcon.displayName = 'HomePage_CardIcon';
 
 const CardTitle = styled.h2`
   font-size: 1.5rem;
@@ -179,12 +188,14 @@ const CardTitle = styled.h2`
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
 `;
+CardTitle.displayName = 'HomePage_CardTitle';
 
 const CardDescription = styled.p`
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 `;
+CardDescription.displayName = 'HomePage_CardDescription';
 
 const CardButton = styled.button`
   padding: 0.8rem 1.8rem;
@@ -204,6 +215,7 @@ const CardButton = styled.button`
     box-shadow: 0 5px 15px rgba(85, 60, 154, 0.4);
   }
 `;
+CardButton.displayName = 'HomePage_CardButton';
 
 const InfoSection = styled.div`
   grid-column: 1 / -1;
@@ -215,6 +227,7 @@ const InfoSection = styled.div`
   backdrop-filter: blur(5px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 `;
+InfoSection.displayName = 'HomePage_InfoSection';
 
 const InfoTitle = styled.h3`
   font-size: 1.4rem;
@@ -222,10 +235,12 @@ const InfoTitle = styled.h3`
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
 `;
+InfoTitle.displayName = 'HomePage_InfoTitle';
 
 const InfoText = styled.p`
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
 `;
+InfoText.displayName = 'HomePage_InfoText';
 
 export default HomePage; 
