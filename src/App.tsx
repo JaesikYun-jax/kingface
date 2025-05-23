@@ -31,10 +31,6 @@ const App: React.FC = () => {
     return () => clearInterval(emojiInterval);
   }, []);
   
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
   const togglePricing = () => {
     setShowPricing(!showPricing);
   };
@@ -53,17 +49,8 @@ const App: React.FC = () => {
               <PricingButton onClick={togglePricing}>
                 프라이싱
               </PricingButton>
-              <MenuButton onClick={toggleMenu}>
-                {menuOpen ? '✕' : '☰'}
-              </MenuButton>
             </HeaderRight>
           </HeaderContent>
-          
-          <Nav isOpen={menuOpen}>
-            <NavLink to="/" onClick={() => setMenuOpen(false)}>홈</NavLink>
-            <NavLink to="/fortune" onClick={() => setMenuOpen(false)}>운세보기</NavLink>
-            <NavLink to="/facereading" onClick={() => setMenuOpen(false)}>관상보기</NavLink>
-          </Nav>
         </Header>
         
         {showPricing && (
@@ -172,19 +159,6 @@ const Logo = styled.div`
   }
 `;
 
-const MenuButton = styled.button`
-  font-size: 1.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: none;
-  color: white;
-  
-  @media (max-width: 768px) {
-    display: block;
-  }
-`;
-
 const PricingButton = styled.button`
   padding: 0.5rem 1rem;
   background-color: rgba(107, 70, 193, 0.7);
@@ -247,37 +221,6 @@ const CloseButton = styled.button`
   cursor: pointer;
   color: white;
   padding: 0.5rem;
-`;
-
-const Nav = styled.nav<{ isOpen: boolean }>`
-  display: flex;
-  align-items: center;
-  padding: 0.25rem 0;
-  
-  @media (max-width: 768px) {
-    display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background-color: white;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    padding: 0.5rem 0;
-  }
-`;
-
-const NavLink = styled(Link)`
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s;
-  
-  &:hover {
-    color: white;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  }
 `;
 
 const Main = styled.main`

@@ -475,9 +475,13 @@ SubTitle.displayName = 'FortunePage_SubTitle';
 const ContentSection = styled.div`
   background-color: rgba(74, 21, 81, 0.3);
   border-radius: 12px;
-  padding: 2rem;
+  padding: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: rgba(255, 255, 255, 0.9);
+  
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+  }
 `;
 ContentSection.displayName = 'FortunePage_ContentSection';
 
@@ -667,9 +671,10 @@ const PlanBadge = styled.div<{ isPremium: boolean }>`
   border-radius: 20px;
   font-weight: 600;
   font-size: 0.9rem;
-  background-color: ${props => props.isPremium ? 'rgba(107, 70, 193, 0.3)' : 'rgba(107, 70, 193, 0.2)'};
-  color: ${props => props.isPremium ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.8)'};
-  border: 1px solid ${props => props.isPremium ? 'rgba(159, 122, 234, 0.5)' : 'rgba(159, 122, 234, 0.3)'};
+  background-color: ${props => props.isPremium ? 'rgba(107, 70, 193, 0.6)' : 'rgba(107, 70, 193, 0.4)'};
+  color: ${props => props.isPremium ? 'white' : 'rgba(255, 255, 255, 0.9)'};
+  border: 2px solid ${props => props.isPremium ? '#9f7aea' : '#805ad5'};
+  box-shadow: 0 2px 8px rgba(107, 70, 193, 0.3);
 `;
 PlanBadge.displayName = 'FortunePage_PlanBadge';
 
@@ -677,16 +682,20 @@ const UpgradeButton = styled.button`
   margin-left: 1rem;
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  background-color: #6b46c1;
+  background-color: #9f7aea;
   color: white;
   font-weight: 600;
   font-size: 0.9rem;
-  border: none;
+  border: 2px solid #b794f6;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(159, 122, 234, 0.3);
   
   &:hover {
-    background-color: #553c9a;
+    background-color: #805ad5;
+    border-color: #9f7aea;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.4);
   }
 `;
 UpgradeButton.displayName = 'FortunePage_UpgradeButton';
