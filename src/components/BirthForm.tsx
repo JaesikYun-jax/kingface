@@ -266,9 +266,14 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
         <SectionTitleContainer>
           <SectionTitle>⏰ 태어난 시간</SectionTitle>
           <InfoIconButton 
-            onClick={() => setShowTooltip(!showTooltip)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowTooltip(!showTooltip);
+            }}
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
+            type="button"
           >
             ℹ️
             {showTooltip && (
@@ -581,9 +586,8 @@ LunarLabel.displayName = 'BirthForm_LunarLabel';
 
 const SectionTitleContainer = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
 `;
 SectionTitleContainer.displayName = 'BirthForm_SectionTitleContainer';
 
@@ -595,6 +599,7 @@ const InfoIconButton = styled.button`
   cursor: pointer;
   position: relative;
   padding: 0;
+  margin-bottom: 0.5rem;
   transition: opacity 0.2s;
   
   &:hover {
@@ -605,19 +610,33 @@ InfoIconButton.displayName = 'BirthForm_InfoIconButton';
 
 const Tooltip = styled.div`
   position: absolute;
-  top: -60px;
+  top: -70px;
   left: 50%;
   transform: translateX(-50%);
   background-color: rgba(0, 0, 0, 0.9);
   color: white;
-  padding: 0.5rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  white-space: nowrap;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
   z-index: 1000;
-  max-width: 250px;
-  white-space: normal;
-  line-height: 1.4;
+  line-height: 1.5;
+  width: 280px;
+  max-width: 90vw;
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 768px) {
+    width: 250px;
+    font-size: 0.8rem;
+    padding: 0.6rem;
+    top: -65px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 220px;
+    left: -100px;
+    transform: none;
+  }
   
   &::after {
     content: '';
@@ -625,8 +644,12 @@ const Tooltip = styled.div`
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    border: 5px solid transparent;
+    border: 6px solid transparent;
     border-top-color: rgba(0, 0, 0, 0.9);
+    
+    @media (max-width: 480px) {
+      left: 120px;
+    }
   }
 `;
 Tooltip.displayName = 'BirthForm_Tooltip';

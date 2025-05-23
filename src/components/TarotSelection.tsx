@@ -18,6 +18,13 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
     // 랜덤 타로 카드 4장 가져오기
     const randomCards = getRandomTarotCards();
     setCards(randomCards.slice(0, 4));
+    
+    // 카드 입장 애니메이션 완료 후 float 애니메이션으로 전환
+    const animationTimer = setTimeout(() => {
+      setIsAnimating(false);
+    }, 3000); // 마지막 카드의 delay(1.5s) + 애니메이션 시간(1.5s) = 3s
+    
+    return () => clearTimeout(animationTimer);
   }, []);
 
   const handleCardClick = (index: number, card: TarotCard) => {
@@ -114,37 +121,38 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
 // 애니메이션 키프레임
 const flowLeftToRight = keyframes`
   0% {
-    transform: translateX(-50vw);
-  }
-  25% {
-    transform: translateX(-10vw);
-  }
-  50% {
-    transform: translateX(0);
-  }
-  75% {
-    transform: translateX(10vw);
+    transform: translateX(-100vw);
+    opacity: 0;
   }
   100% {
-    transform: translateX(50vw);
+    transform: translateX(0);
+    opacity: 1;
   }
 `;
 
 const flowRightToLeft = keyframes`
   0% {
-    transform: translateX(50vw);
-  }
-  25% {
-    transform: translateX(10vw);
-  }
-  50% {
-    transform: translateX(0);
-  }
-  75% {
-    transform: translateX(-10vw);
+    transform: translateX(100vw);
+    opacity: 0;
   }
   100% {
-    transform: translateX(-50vw);
+    transform: translateX(0);
+    opacity: 1;
+  }
+`;
+
+const gentleFloat = keyframes`
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-7px) rotate(-1deg);
   }
 `;
 
@@ -230,21 +238,29 @@ const FlowingCard = styled.div<{
   cursor: pointer;
   position: relative;
   transition: all 0.3s ease;
+  opacity: 0;
   
   ${props => props.isSelected && `
     transform: scale(1.2) !important;
     z-index: 10;
     animation: none !important;
+    opacity: 1 !important;
   `}
   
-  ${props => props.isAnimating && !props.isSelected && `
+  ${props => props.isAnimating && `
     animation: ${props.direction === 'left-to-right' ? flowLeftToRight : flowRightToLeft} 
-               4s ease-in-out infinite;
+               1.5s ease-out forwards;
     animation-delay: ${props.delay}s;
   `}
   
+  ${props => !props.isAnimating && !props.isSelected && `
+    opacity: 1;
+    animation: ${gentleFloat} 3s ease-in-out infinite;
+    animation-delay: ${props.delay * 0.5}s;
+  `}
+  
   &:hover {
-    transform: ${props => props.isAnimating && !props.isSelected ? 'scale(1.05)' : 'none'};
+    transform: ${props => !props.isSelected ? 'scale(1.05)' : 'scale(1.2)'};
   }
   
   @media (min-width: 768px) {
