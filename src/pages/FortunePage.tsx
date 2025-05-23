@@ -182,12 +182,10 @@ Container.displayName = 'FortunePage_Container';
 const ContentSection = styled.div`
   background-color: rgba(74, 21, 81, 0.3);
   border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: rgba(255, 255, 255, 0.9);
   
   @media (max-width: 768px) {
-    padding: 0.75rem;
+    border-radius: 8px;
   }
 `;
 ContentSection.displayName = 'FortunePage_ContentSection';
