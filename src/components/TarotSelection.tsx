@@ -81,7 +81,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
       {showModal && selectedCard && (
         <ModalOverlay onClick={closeModal}>
           <EnlargedCardContainer onClick={(e) => e.stopPropagation()}>
-            <EnlargedCard>
+            <EnlargedCard cardImage={selectedCard.image}>
               <CardNumber>{selectedCard.id + 1}</CardNumber>
               <CardTitle>{selectedCard.name}</CardTitle>
               <CardDescription>{selectedCard.description}</CardDescription>
@@ -183,7 +183,7 @@ const CardRowContainer = styled.div`
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.05);
   padding: 20px 0;
-  height: 320px;
+  height: 340px;
   
   &:hover .card-wrapper {
     animation-play-state: paused;
@@ -197,7 +197,7 @@ const CardWrapper = styled.div<{ direction: 'left-to-right' | 'right-to-left' }>
   will-change: transform;
   
   animation: ${props => props.direction === 'left-to-right' ? scrollLeftToRight : scrollRightToLeft} 
-             7.14s linear infinite;
+             10.7s linear infinite;
 `;
 CardWrapper.displayName = 'TarotSelection_CardWrapper';
 
@@ -205,6 +205,10 @@ const FlowingCard = styled.div`
   width: 180px;
   height: 300px;
   background-color: #4a4e69;
+  background-image: url('/assets/images/tarot/card-back.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border: 2px solid #9a8c98;
   border-radius: 8px;
   margin: 0 10px;
@@ -215,10 +219,23 @@ const FlowingCard = styled.div`
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
   flex-shrink: 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
   
   &:hover {
     transform: translateY(-5px) scale(1.05);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  }
+  
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(107, 70, 193, 0.1) 0%, rgba(233, 216, 253, 0.1) 100%);
+    pointer-events: none;
   }
   
   @media (max-width: 768px) {
@@ -238,6 +255,9 @@ FlowingCard.displayName = 'TarotSelection_FlowingCard';
 const CardBackDesign = styled.div`
   font-size: 24px;
   color: #f2e9e4;
+  text-shadow: 0 0 10px rgba(242, 233, 228, 0.8);
+  z-index: 1;
+  position: relative;
   
   @media (max-width: 768px) {
     font-size: 18px;
@@ -280,6 +300,11 @@ const EnlargedCard = styled.div`
   width: 300px;
   height: 400px;
   background-color: #f2e9e4;
+  background-image: ${(props: { cardImage?: string }) => 
+    props.cardImage ? `url('${props.cardImage}')` : 'none'};
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border: 3px solid #9a8c98;
   border-radius: 12px;
   display: flex;
@@ -289,6 +314,20 @@ const EnlargedCard = styled.div`
   color: #1a1a2e;
   text-align: center;
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+  
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: ${(props: { cardImage?: string }) => 
+      props.cardImage ? 'rgba(0, 0, 0, 0.3)' : 'transparent'};
+    pointer-events: none;
+  }
   
   @media (max-width: 768px) {
     width: 240px;
@@ -306,6 +345,10 @@ const CardNumber = styled.div`
   font-size: 4rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+  position: relative;
   
   @media (max-width: 768px) {
     font-size: 3rem;
@@ -321,6 +364,10 @@ const CardTitle = styled.h3`
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+  position: relative;
   
   @media (max-width: 768px) {
     font-size: 1.2rem;
@@ -335,6 +382,10 @@ CardTitle.displayName = 'TarotSelection_CardTitle';
 const CardDescription = styled.p`
   font-size: 1rem;
   line-height: 1.4;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+  position: relative;
   
   @media (max-width: 768px) {
     font-size: 0.9rem;
