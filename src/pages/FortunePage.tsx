@@ -241,9 +241,6 @@ const FortunePage: React.FC = () => {
       {currentStep === Step.TAROT_SELECTION && (
         <ContentSection>
           <TarotSelector>
-            <TarotInstruction>
-              마음을 가라앉히고 진정한 마음으로 끌리는 타로 카드 한 장을 선택하세요.
-            </TarotInstruction>
             <TarotSelection 
               onCardSelect={handleTarotSelect} 
             />
@@ -320,11 +317,13 @@ const PasswordContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
 `;
+PasswordContainer.displayName = 'FortunePage_PasswordContainer';
 
 const SecurityIcon = styled.div`
   font-size: 3rem;
   margin-bottom: 1rem;
 `;
+SecurityIcon.displayName = 'FortunePage_SecurityIcon';
 
 const PasswordTitle = styled.h3`
   font-size: 1.5rem;
@@ -332,6 +331,7 @@ const PasswordTitle = styled.h3`
   color: #2d3748;
   margin-bottom: 1rem;
 `;
+PasswordTitle.displayName = 'FortunePage_PasswordTitle';
 
 const PasswordDescription = styled.p`
   font-size: 1rem;
@@ -339,6 +339,7 @@ const PasswordDescription = styled.p`
   margin-bottom: 2rem;
   line-height: 1.6;
 `;
+PasswordDescription.displayName = 'FortunePage_PasswordDescription';
 
 const AnalysisOptions = styled.div`
   display: grid;
@@ -349,6 +350,7 @@ const AnalysisOptions = styled.div`
     grid-template-columns: 1fr;
   }
 `;
+AnalysisOptions.displayName = 'FortunePage_AnalysisOptions';
 
 const AnalysisOption = styled.div`
   background-color: #f9f5ff;
@@ -365,17 +367,20 @@ const AnalysisOption = styled.div`
     transform: translateY(-5px);
   }
 `;
+AnalysisOption.displayName = 'FortunePage_AnalysisOption';
 
 const OptionIcon = styled.div`
   font-size: 2.5rem;
   margin-bottom: 1rem;
 `;
+OptionIcon.displayName = 'FortunePage_OptionIcon';
 
 const OptionTitle = styled.h4`
   font-size: 1.2rem;
   color: #4a5568;
   margin-bottom: 0.8rem;
 `;
+OptionTitle.displayName = 'FortunePage_OptionTitle';
 
 const OptionDescription = styled.p`
   font-size: 0.9rem;
@@ -384,6 +389,7 @@ const OptionDescription = styled.p`
   margin-bottom: 1.5rem;
   line-height: 1.5;
 `;
+OptionDescription.displayName = 'FortunePage_OptionDescription';
 
 const SkipButton = styled.button`
   background-color: #6b46c1;
@@ -399,6 +405,7 @@ const SkipButton = styled.button`
     background-color: #553c9a;
   }
 `;
+SkipButton.displayName = 'FortunePage_SkipButton';
 
 const PasswordForm = styled.form`
   display: flex;
@@ -407,6 +414,7 @@ const PasswordForm = styled.form`
   margin-bottom: 1.5rem;
   width: 100%;
 `;
+PasswordForm.displayName = 'FortunePage_PasswordForm';
 
 const PasswordInput = styled.input`
   padding: 0.75rem 1rem;
@@ -420,6 +428,7 @@ const PasswordInput = styled.input`
     box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.2);
   }
 `;
+PasswordInput.displayName = 'FortunePage_PasswordInput';
 
 const SubmitButton = styled.button`
   background-color: #6b46c1;
@@ -436,17 +445,19 @@ const SubmitButton = styled.button`
     background-color: #553c9a;
   }
 `;
+SubmitButton.displayName = 'FortunePage_SubmitButton';
 
 const PasswordErrorMessage = styled.div`
   color: #fed7d7;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 `;
+PasswordErrorMessage.displayName = 'FortunePage_PasswordErrorMessage';
 
 const Container = styled.div`
   max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0.5rem 1rem;
   position: relative;
 `;
 Container.displayName = 'FortunePage_Container';
@@ -458,9 +469,10 @@ const Header = styled.header`
 Header.displayName = 'FortunePage_Header';
 
 const TitleEmoji = styled.span`
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   margin-right: 0.5rem;
 `;
+TitleEmoji.displayName = 'FortunePage_TitleEmoji';
 
 const Title = styled.h1`
   font-size: 2rem;

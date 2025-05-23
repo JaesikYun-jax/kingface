@@ -117,6 +117,7 @@ const Container = styled.div`
   background-color: transparent;
   border-radius: 12px;
 `;
+Container.displayName = 'TarotSelection_Container';
 
 const LoadingContainer = styled.div`
   display: flex;
@@ -126,22 +127,25 @@ const LoadingContainer = styled.div`
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.9);
 `;
+LoadingContainer.displayName = 'TarotSelection_LoadingContainer';
 
 const Title = styled.h2`
   color: white;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   margin-bottom: 0.5rem;
   text-align: center;
   text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
+Title.displayName = 'TarotSelection_Title';
 
 const Description = styled.p`
   color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
+  font-size: 0.85rem;
   margin-bottom: 2rem;
   text-align: center;
   line-height: 1.6;
 `;
+Description.displayName = 'TarotSelection_Description';
 
 const CardsContainer = styled.div`
   display: grid;
@@ -155,10 +159,11 @@ const CardsContainer = styled.div`
     gap: 1rem;
   }
 `;
+CardsContainer.displayName = 'TarotSelection_CardsContainer';
 
 const Card = styled.div<{ isFlipped: boolean; isSelected: boolean }>`
-  width: 140px;
-  height: 240px;
+  width: 120px;
+  height: 160px;
   perspective: 1000px;
   cursor: pointer;
   position: relative;
@@ -170,11 +175,12 @@ const Card = styled.div<{ isFlipped: boolean; isSelected: boolean }>`
   }
   
   @media (min-width: 768px) {
-    width: 160px;
-    height: 280px;
+    width: 140px;
+    height: 187px;
     transform: ${props => props.isSelected ? 'translateY(-20px)' : 'none'};
   }
 `;
+Card.displayName = 'TarotSelection_Card';
 
 const CardInner = styled.div<{ isFlipped: boolean }>`
   position: relative;
@@ -185,6 +191,7 @@ const CardInner = styled.div<{ isFlipped: boolean }>`
   transform-style: preserve-3d;
   transform: ${props => props.isFlipped ? 'rotateY(180deg)' : 'rotateY(0)'};
 `;
+CardInner.displayName = 'TarotSelection_CardInner';
 
 const CardFront = styled.div`
   position: absolute;
@@ -200,28 +207,31 @@ const CardFront = styled.div`
   color: white;
   background: linear-gradient(135deg, #4a1551 0%, #2d3748 100%);
 `;
+CardFront.displayName = 'TarotSelection_CardFront';
 
 const CardBackIcon = styled.div`
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
   
   @media (min-width: 768px) {
-    font-size: 5rem;
+    font-size: 4rem;
   }
 `;
+CardBackIcon.displayName = 'TarotSelection_CardBackIcon';
 
 const CardBackText = styled.div`
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.8);
   letter-spacing: 2px;
   
   @media (min-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 `;
+CardBackText.displayName = 'TarotSelection_CardBackText';
 
 const CardBack = styled.div`
   position: absolute;
@@ -243,45 +253,49 @@ const CardBack = styled.div`
     padding: 1rem;
   }
 `;
+CardBack.displayName = 'TarotSelection_CardBack';
 
 const CardNumber = styled.div`
-  font-size: 4rem;
+  font-size: 3rem;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.9);
   text-align: center;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   
   @media (min-width: 768px) {
-    font-size: 6rem;
-    margin: 1.5rem 0;
+    font-size: 4rem;
+    margin: 1rem 0;
   }
 `;
+CardNumber.displayName = 'TarotSelection_CardNumber';
 
 const CardTitle = styled.h3`
   margin: 0.2rem 0;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
+  font-size: 0.8rem;
   text-align: center;
   
   @media (min-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin: 0.5rem 0;
   }
 `;
+CardTitle.displayName = 'TarotSelection_CardTitle';
 
 const CardDescription = styled.p`
   margin: 0;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   line-height: 1.3;
   text-align: center;
   
   @media (min-width: 768px) {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     line-height: 1.4;
   }
 `;
+CardDescription.displayName = 'TarotSelection_CardDescription';
 
 const SelectedCardInfo = styled.div`
   margin: 1.5rem 0;
@@ -291,12 +305,14 @@ const SelectedCardInfo = styled.div`
   border-left: 4px solid #9f7aea;
   color: white;
 `;
+SelectedCardInfo.displayName = 'TarotSelection_SelectedCardInfo';
 
 const SelectedCardTitle = styled.h3`
   margin: 0 0 0.5rem 0;
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.2rem;
 `;
+SelectedCardTitle.displayName = 'TarotSelection_SelectedCardTitle';
 
 const SelectedCardMeaning = styled.p`
   margin: 0;
@@ -304,12 +320,14 @@ const SelectedCardMeaning = styled.p`
   font-size: 1rem;
   line-height: 1.6;
 `;
+SelectedCardMeaning.displayName = 'TarotSelection_SelectedCardMeaning';
 
 const NoneSelectedText = styled.p`
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
   text-align: center;
 `;
+NoneSelectedText.displayName = 'TarotSelection_NoneSelectedText';
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -323,6 +341,7 @@ const ButtonContainer = styled.div`
     gap: 0.5rem;
   }
 `;
+ButtonContainer.displayName = 'TarotSelection_ButtonContainer';
 
 const Button = styled.button`
   padding: 0.8rem 1.5rem;
@@ -344,6 +363,7 @@ const Button = styled.button`
     font-size: 0.9rem;
   }
 `;
+Button.displayName = 'TarotSelection_Button';
 
 const ConfirmButton = styled.button`
   padding: 0.8rem 1.5rem;
@@ -366,5 +386,6 @@ const ConfirmButton = styled.button`
     font-size: 0.9rem;
   }
 `;
+ConfirmButton.displayName = 'TarotSelection_ConfirmButton';
 
 export default TarotSelection; 

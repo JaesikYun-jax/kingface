@@ -873,10 +873,10 @@ const extractPersonalityTraits = (content: string): string[] => {
   return traits.slice(0, 5);
 };
 
-// 랜덤 타로 카드 3장 선택
+// 랜덤 타로 카드 4장 선택
 export const getRandomTarotCards = (): TarotCard[] => {
   const shuffled = [...tarotCards].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, 3);
+  return shuffled.slice(0, 4);
 };
 
 const apiExports = {

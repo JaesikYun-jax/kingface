@@ -18,19 +18,19 @@ interface TimeSlot {
 
 // 12시신 데이터
 const timeSlots: TimeSlot[] = [
-  { id: 'rat', name: '자시', label: '자(子) 23:00-01:00', hanja: '子', hours: [23, 1] },
-  { id: 'ox', name: '축시', label: '축(丑) 01:00-03:00', hanja: '丑', hours: [1, 3] },
-  { id: 'tiger', name: '인시', label: '인(寅) 03:00-05:00', hanja: '寅', hours: [3, 5] },
-  { id: 'rabbit', name: '묘시', label: '묘(卯) 05:00-07:00', hanja: '卯', hours: [5, 7] },
-  { id: 'dragon', name: '진시', label: '진(辰) 07:00-09:00', hanja: '辰', hours: [7, 9] },
-  { id: 'snake', name: '사시', label: '사(巳) 09:00-11:00', hanja: '巳', hours: [9, 11] },
-  { id: 'horse', name: '오시', label: '오(午) 11:00-13:00', hanja: '午', hours: [11, 13] },
-  { id: 'sheep', name: '미시', label: '미(未) 13:00-15:00', hanja: '未', hours: [13, 15] },
-  { id: 'monkey', name: '신시', label: '신(申) 15:00-17:00', hanja: '申', hours: [15, 17] },
-  { id: 'rooster', name: '유시', label: '유(酉) 17:00-19:00', hanja: '酉', hours: [17, 19] },
-  { id: 'dog', name: '술시', label: '술(戌) 19:00-21:00', hanja: '戌', hours: [19, 21] },
-  { id: 'pig', name: '해시', label: '해(亥) 21:00-23:00', hanja: '亥', hours: [21, 23] },
-  { id: 'unknown', name: '모름', label: '시간 모름', hanja: '?', hours: [0, 0] }
+  { id: 'rat', name: '🐭 자시', label: '자(子) 23:00-01:00', hanja: '子', hours: [23, 1] },
+  { id: 'ox', name: '🐂 축시', label: '축(丑) 01:00-03:00', hanja: '丑', hours: [1, 3] },
+  { id: 'tiger', name: '🐅 인시', label: '인(寅) 03:00-05:00', hanja: '寅', hours: [3, 5] },
+  { id: 'rabbit', name: '🐰 묘시', label: '묘(卯) 05:00-07:00', hanja: '卯', hours: [5, 7] },
+  { id: 'dragon', name: '🐲 진시', label: '진(辰) 07:00-09:00', hanja: '辰', hours: [7, 9] },
+  { id: 'snake', name: '🐍 사시', label: '사(巳) 09:00-11:00', hanja: '巳', hours: [9, 11] },
+  { id: 'horse', name: '🐴 오시', label: '오(午) 11:00-13:00', hanja: '午', hours: [11, 13] },
+  { id: 'sheep', name: '🐑 미시', label: '미(未) 13:00-15:00', hanja: '未', hours: [13, 15] },
+  { id: 'monkey', name: '🐵 신시', label: '신(申) 15:00-17:00', hanja: '申', hours: [15, 17] },
+  { id: 'rooster', name: '🐓 유시', label: '유(酉) 17:00-19:00', hanja: '酉', hours: [17, 19] },
+  { id: 'dog', name: '🐕 술시', label: '술(戌) 19:00-21:00', hanja: '戌', hours: [19, 21] },
+  { id: 'pig', name: '🐷 해시', label: '해(亥) 21:00-23:00', hanja: '亥', hours: [21, 23] },
+  { id: 'unknown', name: '🤷 모름', label: '시간 모름', hanja: '?', hours: [0, 0] }
 ];
 
 // 천간지지 데이터
@@ -228,6 +228,16 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
           maxLength={8}
         />
         <InputNote>YYYYMMDD 형식으로 입력해주세요 (예: 19901225)</InputNote>
+        
+        <LunarOption>
+          <input 
+            type="checkbox" 
+            id="lunar" 
+            checked={isLunar}
+            onChange={(e) => setIsLunar(e.target.checked)}
+          />
+          <LunarLabel htmlFor="lunar">음력 생일입니다</LunarLabel>
+        </LunarOption>
       </FormGroup>
 
       <FormGroup>
@@ -271,18 +281,6 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
         </GenderSelection>
       </FormGroup>
 
-      <FormGroup>
-        <LunarOption>
-          <input 
-            type="checkbox" 
-            id="lunar" 
-            checked={isLunar}
-            onChange={(e) => setIsLunar(e.target.checked)}
-          />
-          <LunarLabel htmlFor="lunar">음력 생일입니다</LunarLabel>
-        </LunarOption>
-      </FormGroup>
-
       <InfoBox>
         <InfoIcon>ℹ️</InfoIcon>
         <InfoText>
@@ -291,11 +289,13 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
         </InfoText>
       </InfoBox>
 
-      {/* 사주 정보 표시 섹션 추가 */}
+      {/* 사주 정보 표시 섹션 개선 */}
       {sajuText && (
         <SajuBox>
-          <SajuTitle>사주 정보</SajuTitle>
-          <SajuText>{sajuText}</SajuText>
+          <SajuTitle>🔮 사주 정보</SajuTitle>
+          <SajuDisplay>
+            <SajuText>{sajuText}</SajuText>
+          </SajuDisplay>
           <SajuDescription>
             위 사주는 입력하신 정보를 기반으로 한 간략한 사주 정보입니다.
             실제 사주 계산에는 더 복잡한 역법과 계산법이 사용됩니다.
@@ -313,30 +313,44 @@ const SajuBox = styled.div`
   background-color: rgba(74, 21, 81, 0.1);
   border: 1px solid rgba(107, 70, 193, 0.3);
   border-radius: 8px;
-  padding: 0.5rem;
+  padding: 1rem;
   margin-bottom: 1.5rem;
   text-align: center;
 `;
+SajuBox.displayName = 'BirthForm_SajuBox';
 
 const SajuTitle = styled.h3`
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
 `;
+SajuTitle.displayName = 'BirthForm_SajuTitle';
+
+const SajuDisplay = styled.div`
+  background-color: rgba(107, 70, 193, 0.2);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+`;
+SajuDisplay.displayName = 'BirthForm_SajuDisplay';
 
 const SajuText = styled.p`
-  font-size: 1.8rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 2px;
-  margin-bottom: 0.8rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: 3px;
+  margin: 0;
+  line-height: 1.4;
 `;
+SajuText.displayName = 'BirthForm_SajuText';
 
 const SajuDescription = styled.p`
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.4;
+  margin: 0;
 `;
+SajuDescription.displayName = 'BirthForm_SajuDescription';
 
 // 기존 스타일 컴포넌트들
 const FormContainer = styled.form`
@@ -346,6 +360,7 @@ const FormContainer = styled.form`
   background-color: transparent;
   border-radius: 12px;
 `;
+FormContainer.displayName = 'BirthForm_FormContainer';
 
 const Title = styled.h2`
   color: white;
@@ -354,6 +369,7 @@ const Title = styled.h2`
   text-align: center;
   text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
+Title.displayName = 'BirthForm_Title';
 
 const Description = styled.p`
   color: rgba(255, 255, 255, 0.9);
@@ -361,10 +377,12 @@ const Description = styled.p`
   margin-bottom: 1.5rem;
   text-align: center;
 `;
+Description.displayName = 'BirthForm_Description';
 
 const FormGroup = styled.div`
   margin-bottom: 1.5rem;
 `;
+FormGroup.displayName = 'BirthForm_FormGroup';
 
 const SectionTitle = styled.label`
   display: block;
@@ -373,6 +391,7 @@ const SectionTitle = styled.label`
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
+SectionTitle.displayName = 'BirthForm_SectionTitle';
 
 const BirthDateInput = styled.input`
   width: 100%;
@@ -391,12 +410,15 @@ const BirthDateInput = styled.input`
     box-shadow: 0 0 0 2px rgba(159, 122, 234, 0.2);
   }
 `;
+BirthDateInput.displayName = 'BirthForm_BirthDateInput';
 
 const InputNote = styled.p`
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 `;
+InputNote.displayName = 'BirthForm_InputNote';
 
 const TimeSlotContainer = styled.div`
   display: grid;
@@ -412,6 +434,7 @@ const TimeSlotContainer = styled.div`
     grid-template-columns: repeat(2, 1fr);
   }
 `;
+TimeSlotContainer.displayName = 'BirthForm_TimeSlotContainer';
 
 const TimeSlotOption = styled.button<{ isSelected: boolean; isUnknown: boolean }>`
   padding: 0.4rem 0.2rem;
@@ -434,28 +457,33 @@ const TimeSlotOption = styled.button<{ isSelected: boolean; isUnknown: boolean }
     background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.8)' : 'rgba(107, 70, 193, 0.3)'};
   }
 `;
+TimeSlotOption.displayName = 'BirthForm_TimeSlotOption';
 
 const TimeSlotName = styled.span`
   font-weight: 600;
   font-size: 0.95rem;
   margin-bottom: 0.2rem;
 `;
+TimeSlotName.displayName = 'BirthForm_TimeSlotName';
 
 const TimeSlotLabel = styled.span`
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.8);
 `;
+TimeSlotLabel.displayName = 'BirthForm_TimeSlotLabel';
 
 const TimeNote = styled.p`
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
   margin-top: 0.5rem;
 `;
+TimeNote.displayName = 'BirthForm_TimeNote';
 
 const GenderSelection = styled.div`
   display: flex;
   gap: 1rem;
 `;
+GenderSelection.displayName = 'BirthForm_GenderSelection';
 
 const GenderOption = styled.button<{ isSelected: boolean }>`
   flex: 1;
@@ -475,22 +503,26 @@ const GenderOption = styled.button<{ isSelected: boolean }>`
     background-color: ${props => props.isSelected ? 'rgba(107, 70, 193, 0.8)' : 'rgba(107, 70, 193, 0.3)'};
   }
 `;
+GenderOption.displayName = 'BirthForm_GenderOption';
 
 const GenderIcon = styled.span`
   font-size: 2rem;
   margin-bottom: 0.5rem;
 `;
+GenderIcon.displayName = 'BirthForm_GenderIcon';
 
 const GenderText = styled.span`
   font-size: 1rem;
   font-weight: 500;
 `;
+GenderText.displayName = 'BirthForm_GenderText';
 
 const LunarOption = styled.div`
   display: flex;
   align-items: center;
   margin-top: 0.5rem;
 `;
+LunarOption.displayName = 'BirthForm_LunarOption';
 
 const LunarLabel = styled.label`
   font-size: 0.9rem;
@@ -498,6 +530,7 @@ const LunarLabel = styled.label`
   margin-left: 0.5rem;
   cursor: pointer;
 `;
+LunarLabel.displayName = 'BirthForm_LunarLabel';
 
 const InfoBox = styled.div`
   background-color: rgba(0, 0, 0, 0.2);
@@ -507,18 +540,21 @@ const InfoBox = styled.div`
   display: flex;
   align-items: flex-start;
 `;
+InfoBox.displayName = 'BirthForm_InfoBox';
 
 const InfoIcon = styled.span`
   font-size: 1.2rem;
   margin-right: 0.5rem;
   margin-top: 0.1rem;
 `;
+InfoIcon.displayName = 'BirthForm_InfoIcon';
 
 const InfoText = styled.p`
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.8);
   line-height: 1.5;
 `;
+InfoText.displayName = 'BirthForm_InfoText';
 
 const SubmitButton = styled.button`
   width: 100%;
@@ -536,5 +572,6 @@ const SubmitButton = styled.button`
     background-color: #9f7aea;
   }
 `;
+SubmitButton.displayName = 'BirthForm_SubmitButton';
 
 export default BirthForm; 
