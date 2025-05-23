@@ -266,21 +266,8 @@ export const generateFortune = async (
       throw new Error('API 키가 설정되지 않았습니다. 환경 변수를 확인해주세요.');
     }
     
-    // API 모델 설정 - 플랜에 따라 다른 모델 사용
-    const currentPlan = getCurrentPlanType();
-    const config = getServicePlanConfig();
-    
-    // 플랜 확인 및 실행
-    if (currentPlan === PlanType.PREMIUM) {
-      if (!isFeatureAvailable('고급 사주 분석')) {
-        throw new Error('고급 사주 분석은 프리미엄 플랜 전용 기능입니다.');
-      }
-    }
-    
-    // 사용할 모델 설정
-    const useModel = currentPlan === PlanType.PREMIUM ? 
-      config.models.fortune.premium : 
-      config.models.fortune.free;
+    // 기본 모델 사용 (플랜 체크 제거)
+    const useModel = 'gpt-3.5-turbo';
       
     // 시간 포맷팅 (한국식)
     const formattedHour = birthInfo.hour < 10 ? `0${birthInfo.hour}` : birthInfo.hour;
@@ -291,48 +278,6 @@ export const generateFortune = async (
     const cardInfo = selectedCard ? 
       `선택한 타로 카드: ${selectedCard.name} - ${selectedCard.meaning}` : 
       '타로 카드 없이 진행';
-    
-    // 시스템 프롬프트 설정
-    const fortuneSystemPrompt = `당신은 전통 사주와 운세, 타로 해석에 대한 전문가입니다.
-  사용자의 생년월일과 태어난 시간, 그리고 선택한 타로 카드에 기반한 운세 풀이를 제공해주세요.
-
-  사용자 정보:
-  - 생년: ${birthInfo.year}년
-  - 생월: ${birthInfo.month}월
-  - 생일: ${birthInfo.day}일
-  - 태어난 시간: ${formattedHour}시 (${ampm} ${hour12}시)
-  - ${cardInfo}
-
-  응답 형식은 반드시 마크다운 형식으로 작성해주세요. 사주와 타로의 신비로운 조합이 의미하는 바를 시작 부분에서 한두 문장으로 매우 의미심장하게 표현해주세요.
-
-  다음 구조로 응답해 주세요:
-  """
-  [사주와 타로의 신비로운 조합에 대한 의미심장한 해석을 1-2문장으로 시작]
-
-  ## ✨ 전체 운세
-
-  [사주와 타로에 기반한 전체적인 운세 분석. 사용자의 기본적인 성격, 타고난 기질, 현재 상황, 가까운 미래의 운세 등]
-
-  ## 💕 사랑
-
-  [사랑과 연애, 결혼 등 대인관계와 인연에 대한 운세]
-
-  ## 🏢 직업
-
-  [직업, 재물, 학업, 출세 등과 관련된 운세]
-
-  ## 🌿 건강
-
-  [건강과 관련된 운세, 주의해야 할 점 등]
-
-  ## 💌 아이보살의 조언
-
-  [사용자가 명심해야 할 조언, 앞으로의 방향성, 발전 방향 등]
-
-  `;
-
-    // 유저 프롬프트
-    const fortuneUserPrompt = `제 생년월일과 시간, 타로 카드를 기반으로 운세를 봐주세요.`;
     
     // 시스템 프롬프트 가져오기
     const systemPrompt = getPromptConfig('fortune-system') as string;
@@ -464,20 +409,6 @@ export const generateFortune = async (
       return result;
     } catch (error: any) {
       console.error('API 호출 오류:', error);
-      
-      // 모델 오류인 경우 fallback 모델로 재시도
-      if (error.response && error.response.status === 404 && (useModel === '4o-mini' || useModel === 'o4-mini-2025-04-16')) {
-        console.log(`${useModel} 모델을 찾을 수 없어 gpt-3.5-turbo로 대체합니다`);
-        
-        // 설정 업데이트
-        const updatedConfig = {...config};
-        updatedConfig.models.fortune.free = 'gpt-3.5-turbo';
-        updatedConfig.models.fortune.premium = 'gpt-3.5-turbo';
-        localStorage.setItem('servicePlanConfig', JSON.stringify(updatedConfig));
-        
-        // 재귀적으로 다시 호출
-        return generateFortune(birthInfo, selectedCard);
-      }
       
       // API 호출 오류 상세 처리
       if (error.response) {
@@ -684,29 +615,6 @@ export const analyzeFaceReading = async (imageBase64: string): Promise<FaceReadi
       return result;
     } catch (error: any) {
       console.error('API 호출 오류:', error);
-      
-      // 모델 오류인 경우 대체 모델 시도
-      if (error.response && error.response.status === 404 && (error.response.data.error?.message?.includes('deprecated') || error.response.data.error?.message?.includes('not found'))) {
-        console.log('모델이 변경되었거나 지원되지 않습니다. 대체 모델로 시도합니다.');
-        
-        // 설정 업데이트
-        const updatedConfig = {...config};
-        // 모델 폴백 체인 확장
-        if (model === 'gpt-4.1-turbo') {
-          updatedConfig.models.faceReading = 'gpt-4o';
-        } else if (model === 'gpt-4o') {
-          updatedConfig.models.faceReading = 'gpt-4-turbo';
-        } else if (model === 'gpt-4-turbo') {
-          updatedConfig.models.faceReading = 'gpt-4';
-        } else if (model === 'gpt-4-vision-preview') {
-          updatedConfig.models.faceReading = 'gpt-4o';
-        }
-        
-        localStorage.setItem('servicePlanConfig', JSON.stringify(updatedConfig));
-        
-        // 재귀적으로 다시 호출
-        return analyzeFaceReading(imageBase64);
-      }
       
       // API 호출 오류 상세 처리
       if (error.response) {

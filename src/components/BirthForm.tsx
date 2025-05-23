@@ -103,6 +103,7 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
   const [isLunar, setIsLunar] = useState<boolean>(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
   const [sajuText, setSajuText] = useState<string>('');
+  const [showTooltip, setShowTooltip] = useState<boolean>(false);
 
   // 사주 계산 및 표시
   useEffect(() => {
@@ -242,7 +243,22 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
       </FormGroup>
 
       <FormGroup>
-        <SectionTitle>⏰ 태어난 시간</SectionTitle>
+        <SectionTitleContainer>
+          <SectionTitle>⏰ 태어난 시간</SectionTitle>
+          <InfoIconButton 
+            onClick={() => setShowTooltip(!showTooltip)}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
+            ℹ️
+            {showTooltip && (
+              <Tooltip>
+                사주 정보는 가능한 정확히 입력해 주세요.
+                시간은 태어난 시간대에 해당하는 시(時)를 선택하세요.
+              </Tooltip>
+            )}
+          </InfoIconButton>
+        </SectionTitleContainer>
         <TimeSlotContainer>
           {timeSlots.map((slot) => (
             <TimeSlotOption
@@ -281,14 +297,6 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
           </GenderOption>
         </GenderSelection>
       </FormGroup>
-
-      <InfoBox>
-        <InfoIcon>ℹ️</InfoIcon>
-        <InfoText>
-          사주 정보는 가능한 정확히 입력해 주세요.
-          시간은 태어난 시간대에 해당하는 시(時)를 선택하세요.
-        </InfoText>
-      </InfoBox>
 
       {/* 사주 정보 표시 섹션 개선 */}
       {sajuText && (
@@ -548,29 +556,57 @@ const LunarLabel = styled.label`
 `;
 LunarLabel.displayName = 'BirthForm_LunarLabel';
 
-const InfoBox = styled.div`
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 0.5rem;
-  margin-bottom: 1.5rem;
+const SectionTitleContainer = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 `;
-InfoBox.displayName = 'BirthForm_InfoBox';
+SectionTitleContainer.displayName = 'BirthForm_SectionTitleContainer';
 
-const InfoIcon = styled.span`
-  font-size: 1.2rem;
-  margin-right: 0.5rem;
-  margin-top: 0.1rem;
+const InfoIconButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1rem;
+  opacity: 0.6;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  transition: opacity 0.2s;
+  
+  &:hover {
+    opacity: 1;
+  }
 `;
-InfoIcon.displayName = 'BirthForm_InfoIcon';
+InfoIconButton.displayName = 'BirthForm_InfoIconButton';
 
-const InfoText = styled.p`
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.5;
+const Tooltip = styled.div`
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 1000;
+  max-width: 250px;
+  white-space: normal;
+  line-height: 1.4;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+  }
 `;
-InfoText.displayName = 'BirthForm_InfoText';
+Tooltip.displayName = 'BirthForm_Tooltip';
 
 const SubmitButton = styled.button`
   width: 100%;

@@ -114,25 +114,37 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
 // 애니메이션 키프레임
 const flowLeftToRight = keyframes`
   0% {
-    transform: translateX(-100vw);
+    transform: translateX(-50vw);
+  }
+  25% {
+    transform: translateX(-10vw);
   }
   50% {
     transform: translateX(0);
   }
+  75% {
+    transform: translateX(10vw);
+  }
   100% {
-    transform: translateX(100vw);
+    transform: translateX(50vw);
   }
 `;
 
 const flowRightToLeft = keyframes`
   0% {
-    transform: translateX(100vw);
+    transform: translateX(50vw);
+  }
+  25% {
+    transform: translateX(10vw);
   }
   50% {
     transform: translateX(0);
   }
+  75% {
+    transform: translateX(-10vw);
+  }
   100% {
-    transform: translateX(-100vw);
+    transform: translateX(-50vw);
   }
 `;
 
@@ -227,7 +239,7 @@ const FlowingCard = styled.div<{
   
   ${props => props.isAnimating && !props.isSelected && `
     animation: ${props.direction === 'left-to-right' ? flowLeftToRight : flowRightToLeft} 
-               8s linear infinite;
+               4s ease-in-out infinite;
     animation-delay: ${props.delay}s;
   `}
   
