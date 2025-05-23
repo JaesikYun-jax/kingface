@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 import { TarotCard } from '../types';
 import { getRandomTarotCards } from '../services/api';
+import { cardBackImagePath } from '../assets/tarotData'; // 카드 뒷면 이미지 경로 임포트
 
 interface TarotSelectionProps {
   onCardSelect: (card: TarotCard) => void;
@@ -16,7 +17,14 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   useEffect(() => {
     // 랜덤 타로 카드 가져오기
     const randomCards = getRandomTarotCards();
-    setCards(randomCards);
+    // 각 카드에 대한 이미지 경로를 설정 (png 우선)
+    const cardsWithImages = randomCards.map(card => ({
+      ...card,
+      image: card.image.replace('.jpg', '.png') // 일단 경로만 .png로 변경
+      // 실제 로드 시에는 .png가 없으면 .jpg를 시도하는 로직이 필요할 수 있습니다.
+      // 현재는 public 폴더에 .png 파일을 직접 넣어주는 방식입니다.
+    }));
+    setCards(cardsWithImages);
   }, []);
 
   const handleCardClick = (card: TarotCard) => {
@@ -205,7 +213,7 @@ const FlowingCard = styled.div`
   width: 180px;
   height: 300px;
   background-color: #4a4e69;
-  background-image: url('/assets/images/tarot/card-back.jpg');
+  background-image: url('${cardBackImagePath}');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

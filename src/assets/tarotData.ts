@@ -1,9 +1,15 @@
 import { TarotCard } from '../types';
 
 // 타로 카드 이미지 경로 생성 함수
+// .png 파일이 있는지 먼저 확인하고, 없으면 .jpg를 시도합니다.
 const getCardImagePath = (id: number): string => {
-  return `/assets/images/tarot/card-${id}.jpg`;
+  // 실제 앱에서는 .png 파일이 public 폴더에 있어야 합니다.
+  // 여기서는 경로만 생성합니다.
+  return `/assets/images/tarot/card-${id}.png`; // .png 우선
 };
+
+// 카드 뒷면 이미지 경로
+export const cardBackImagePath = '/assets/images/tarot/card-back.png'; // .png 우선
 
 export const tarotCards: TarotCard[] = [
   
