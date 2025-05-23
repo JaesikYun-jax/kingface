@@ -602,8 +602,8 @@ DebugTable.displayName = 'FaceReadingResult_DebugTable';
 // 원본 관상 분석 콘텐츠 렌더링을 위한 컴포넌트 추가
 const OriginalContent = styled.div`
   background-color: rgba(0, 0, 0, 0.2);
-  padding: 2rem;
-  margin: 0 2rem 2rem;
+  padding: 2rem 0;
+  margin: 0 0 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);

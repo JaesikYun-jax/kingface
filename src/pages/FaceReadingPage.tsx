@@ -129,13 +129,13 @@ const FaceReadingPage: React.FC = () => {
     setLoadingProgress(0);
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
-        if (prev >= 90) {
+        if (prev >= 85) {
           clearInterval(interval);
           return prev;
         }
-        return prev + Math.random() * 10;
+        return prev + Math.random() * 3;
       });
-    }, 300);
+    }, 800);
 
     return interval;
   }, []);
@@ -166,9 +166,12 @@ const FaceReadingPage: React.FC = () => {
       // 사용자 경험을 위해 최소 로딩 시간 보장
       setTimeout(() => {
         clearInterval(loadingInterval);
+        // 마지막에 결과가 나오면 남은 바를 0.3초만에 가득 채움
         setLoadingProgress(100);
-        setResult(analysisResult);
-        setCurrentStep(Step.RESULT);
+        setTimeout(() => {
+          setResult(analysisResult);
+          setCurrentStep(Step.RESULT);
+        }, 300);
       }, 2000);
     } catch (err: any) {
       console.error('Face analysis error:', err);
@@ -220,7 +223,7 @@ const FaceReadingPage: React.FC = () => {
         <Title>AI 관상 분석</Title>
         <Subtitle>
           {currentStep === Step.PLAN_CHECK 
-            ? '프리미엄 서비스로 당신의 얼굴에 담긴 운명의 비밀을 풀어드립니다' 
+            ? '이미지를 실제 분석해서 결과를 내기 때문에 유료 결제가 필요합니다. 믿고 맡겨주시면 열심히 분석해보겠습니다! 전통 관상학과 AI 기술로 당신의 얼굴에 담긴 운명의 비밀을 풀어드립니다.' 
             : '아이(AI)보살이 보는 당신의 관상과 운명'}
         </Subtitle>
       </Header>
@@ -295,16 +298,16 @@ const FaceReadingPage: React.FC = () => {
       
       {currentStep === Step.CAPTURE && (
         <>
+          <FaceCapture 
+            onCapture={handleCapture} 
+            isLoading={false} 
+          />
           <ModelInfo>
             <ModelInfoText>
               전통 관상학의 지혜를 AI가 창의적으로 해석하기 위해 일반 모델보다 더 고성능인 
               <strong> GPT-4o 모델</strong>을 사용합니다. 사진이 명확할수록 더 흥미로운 관상 해석이 가능합니다.
             </ModelInfoText>
           </ModelInfo>
-          <FaceCapture 
-            onCapture={handleCapture} 
-            isLoading={false} 
-          />
         </>
       )}
       
@@ -352,12 +355,14 @@ const PasswordContainer = styled.div`
   margin: 0 auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
 `;
+PasswordContainer.displayName = 'FaceReadingPage_PasswordContainer';
 
 const SecurityIcon = styled.div`
   font-size: 3rem;
   margin-bottom: 1rem;
   color: #e9d8fd;
 `;
+SecurityIcon.displayName = 'FaceReadingPage_SecurityIcon';
 
 const PasswordTitle = styled.h3`
   font-size: 1.75rem;
@@ -366,6 +371,7 @@ const PasswordTitle = styled.h3`
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
+PasswordTitle.displayName = 'FaceReadingPage_PasswordTitle';
 
 const PasswordDescription = styled.p`
   font-size: 1rem;
@@ -373,6 +379,7 @@ const PasswordDescription = styled.p`
   margin-bottom: 2rem;
   line-height: 1.6;
 `;
+PasswordDescription.displayName = 'FaceReadingPage_PasswordDescription';
 
 const PasswordForm = styled.form`
   display: flex;
@@ -380,6 +387,7 @@ const PasswordForm = styled.form`
   gap: 1rem;
   margin-bottom: 1.5rem;
 `;
+PasswordForm.displayName = 'FaceReadingPage_PasswordForm';
 
 const PasswordInput = styled.input`
   padding: 0.75rem 1rem;
@@ -393,6 +401,7 @@ const PasswordInput = styled.input`
     box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.2);
   }
 `;
+PasswordInput.displayName = 'FaceReadingPage_PasswordInput';
 
 const SubmitButton = styled.button`
   background-color: #6b46c1;
@@ -409,12 +418,14 @@ const SubmitButton = styled.button`
     background-color: #553c9a;
   }
 `;
+SubmitButton.displayName = 'FaceReadingPage_SubmitButton';
 
 const PasswordErrorMessage = styled.div`
   color: #feb2b2;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 `;
+PasswordErrorMessage.displayName = 'FaceReadingPage_PasswordErrorMessage';
 
 // 기존 스타일 컴포넌트들
 const Container = styled.div`
@@ -422,11 +433,13 @@ const Container = styled.div`
   margin: 0 auto;
   padding: 2rem 1rem;
 `;
+Container.displayName = 'FaceReadingPage_Container';
 
 const Header = styled.header`
   text-align: center;
   margin-bottom: 2rem;
 `;
+Header.displayName = 'FaceReadingPage_Header';
 
 const Title = styled.h1`
   font-size: 2.5rem;
@@ -439,6 +452,7 @@ const Title = styled.h1`
     font-size: 2rem;
   }
 `;
+Title.displayName = 'FaceReadingPage_Title';
 
 const Subtitle = styled.p`
   font-size: 1.2rem;
@@ -448,6 +462,7 @@ const Subtitle = styled.p`
     font-size: 1rem;
   }
 `;
+Subtitle.displayName = 'FaceReadingPage_Subtitle';
 
 const ErrorMessage = styled.div`
   background-color: rgba(197, 48, 48, 0.3); /* 어두운 배경에 붉은색 투명도 */
@@ -459,6 +474,7 @@ const ErrorMessage = styled.div`
   margin-bottom: 1.5rem;
   font-weight: 500;
 `;
+ErrorMessage.displayName = 'FaceReadingPage_ErrorMessage';
 
 const LoadingContainer = styled.div`
   display: flex;
@@ -468,6 +484,7 @@ const LoadingContainer = styled.div`
   padding: 3rem 1rem;
   text-align: center;
 `;
+LoadingContainer.displayName = 'FaceReadingPage_LoadingContainer';
 
 const LoadingText = styled.h3`
   font-size: 1.5rem;
@@ -476,6 +493,7 @@ const LoadingText = styled.h3`
   margin-bottom: 1.5rem;
   text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
 `;
+LoadingText.displayName = 'FaceReadingPage_LoadingText';
 
 const LoadingBarContainer = styled.div`
   width: 100%;
@@ -486,6 +504,7 @@ const LoadingBarContainer = styled.div`
   overflow: hidden;
   margin-bottom: 1.5rem;
 `;
+LoadingBarContainer.displayName = 'FaceReadingPage_LoadingBarContainer';
 
 const LoadingBar = styled.div<{ width: number }>`
   width: ${({ width }) => `${width}%`};
@@ -494,6 +513,7 @@ const LoadingBar = styled.div<{ width: number }>`
   border-radius: 6px;
   transition: width 0.3s ease-in-out;
 `;
+LoadingBar.displayName = 'FaceReadingPage_LoadingBar';
 
 const LoadingDescription = styled.p`
   font-size: 1rem;
@@ -502,6 +522,7 @@ const LoadingDescription = styled.p`
   line-height: 1.6;
   margin-bottom: 0.5rem;
 `;
+LoadingDescription.displayName = 'FaceReadingPage_LoadingDescription';
 
 // 로딩 메시지 스타일
 const LoadingMessage = styled.p`
@@ -518,16 +539,19 @@ const LoadingMessage = styled.p`
     100% { opacity: 0.6; }
   }
 `;
+LoadingMessage.displayName = 'FaceReadingPage_LoadingMessage';
 
 const ResultContainer = styled.div`
   margin-top: 2rem;
 `;
+ResultContainer.displayName = 'FaceReadingPage_ResultContainer';
 
 const DisclaimerSection = styled.div`
   margin-top: 3rem;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 `;
+DisclaimerSection.displayName = 'FaceReadingPage_DisclaimerSection';
 
 const Disclaimer = styled.p`
   font-size: 0.9rem;
@@ -535,6 +559,7 @@ const Disclaimer = styled.p`
   margin-bottom: 0.8rem;
   line-height: 1.5;
 `;
+Disclaimer.displayName = 'FaceReadingPage_Disclaimer';
 
 // 프리미엄 기능 안내 섹션 스타일
 const PremiumFeatureSection = styled.div`
@@ -547,6 +572,7 @@ const PremiumFeatureSection = styled.div`
   margin: 0 auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
 `;
+PremiumFeatureSection.displayName = 'FaceReadingPage_PremiumFeatureSection';
 
 const FeatureTitle = styled.h2`
   font-size: 1.75rem;
@@ -555,6 +581,7 @@ const FeatureTitle = styled.h2`
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
 `;
+FeatureTitle.displayName = 'FaceReadingPage_FeatureTitle';
 
 const FeatureDescription = styled.p`
   font-size: 1.1rem;
@@ -562,6 +589,7 @@ const FeatureDescription = styled.p`
   margin-bottom: 1.5rem;
   line-height: 1.6;
 `;
+FeatureDescription.displayName = 'FaceReadingPage_FeatureDescription';
 
 const FeaturesList = styled.div`
   display: flex;
@@ -569,12 +597,14 @@ const FeaturesList = styled.div`
   align-items: center;
   margin-bottom: 2rem;
 `;
+FeaturesList.displayName = 'FaceReadingPage_FeaturesList';
 
 const FeatureItem = styled.div`
   color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   margin-bottom: 0.75rem;
 `;
+FeatureItem.displayName = 'FaceReadingPage_FeatureItem';
 
 const BackLink = styled.button`
   background: none;
@@ -589,6 +619,7 @@ const BackLink = styled.button`
     color: #d6bcfa;
   }
 `;
+BackLink.displayName = 'FaceReadingPage_BackLink';
 
 const PlanStatusBar = styled.div`
   display: flex;
@@ -596,6 +627,7 @@ const PlanStatusBar = styled.div`
   margin-top: 2rem;
   padding: 1rem;
 `;
+PlanStatusBar.displayName = 'FaceReadingPage_PlanStatusBar';
 
 const PlanBadge = styled.div<{ isPremium: boolean }>`
   display: inline-flex;
@@ -608,6 +640,7 @@ const PlanBadge = styled.div<{ isPremium: boolean }>`
   color: ${props => props.isPremium ? '#3182ce' : '#38a169'};
   border: 1px solid ${props => props.isPremium ? '#bee3f8' : '#c6f6d5'};
 `;
+PlanBadge.displayName = 'FaceReadingPage_PlanBadge';
 
 const ModelBadge = styled.div`
   display: inline-block;
@@ -620,15 +653,17 @@ const ModelBadge = styled.div`
   margin-bottom: 1.5rem;
   border: 1px solid rgba(233, 216, 253, 0.3);
 `;
+ModelBadge.displayName = 'FaceReadingPage_ModelBadge';
 
 const ModelInfo = styled.div`
   background-color: rgba(107, 70, 193, 0.2); /* 보라색 계열 투명 배경 */
   border-radius: 8px;
   padding: 1rem;
-  margin: 0 auto 2rem;
+  margin: 2rem auto 0;
   max-width: 90%;
   border-left: 4px solid #6b46c1;
 `;
+ModelInfo.displayName = 'FaceReadingPage_ModelInfo';
 
 const ModelInfoText = styled.p`
   color: rgba(255, 255, 255, 0.9); /* 밝은 텍스트 색상 */
@@ -646,6 +681,6 @@ const ModelInfoText = styled.p`
     color: rgba(255, 255, 255, 0.7); /* 약간 어두운 밝은 텍스트 */
   }
 `;
-ModelInfoText.displayName = 'FaceReadingResult_ModelInfoText';
+ModelInfoText.displayName = 'FaceReadingPage_ModelInfoText';
 
 export default FaceReadingPage; 

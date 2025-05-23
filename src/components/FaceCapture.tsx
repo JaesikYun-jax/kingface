@@ -302,9 +302,6 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture, isLoading = false 
   
   return (
     <Container>
-      <Title>AI 관상 분석</Title>
-      <SubTitle>얼굴 사진을 업로드하여 AI 관상 분석을 받아보세요</SubTitle>
-      
       {error && <ErrorMessage>{error}</ErrorMessage>}
       
       <Content>
@@ -433,23 +430,6 @@ const Container = styled.div`
   backdrop-filter: blur(5px);
 `;
 Container.displayName = 'FaceCapture_Container';
-
-const Title = styled.h2`
-  font-size: 1.75rem;
-  text-align: center;
-  margin-bottom: 0.5rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
-`;
-Title.displayName = 'FaceCapture_Title';
-
-const SubTitle = styled.p`
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1rem;
-`;
-SubTitle.displayName = 'FaceCapture_SubTitle';
 
 const Content = styled.div`
   margin-bottom: 1.5rem;

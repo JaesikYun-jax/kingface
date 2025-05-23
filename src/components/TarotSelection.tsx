@@ -196,6 +196,8 @@ const CardsContainer = styled.div`
   width: 100%;
   overflow: hidden;
   margin-bottom: 2rem;
+  height: auto;
+  min-height: 600px;
 `;
 CardsContainer.displayName = 'TarotSelection_CardsContainer';
 
@@ -205,7 +207,8 @@ const CardRowContainer = styled.div`
   margin-bottom: 30px;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.05);
-  padding: 10px 0;
+  padding: 20px 0;
+  height: auto;
   
   &:hover .card-wrapper {
     animation-play-state: paused;
@@ -224,8 +227,8 @@ const CardWrapper = styled.div<{ direction: 'left-to-right' | 'right-to-left' }>
 CardWrapper.displayName = 'TarotSelection_CardWrapper';
 
 const FlowingCard = styled.div`
-  width: 120px;
-  height: 160px;
+  width: 168px;
+  height: 280px;
   background-color: #4a4e69;
   border: 2px solid #9a8c98;
   border-radius: 8px;
@@ -244,14 +247,14 @@ const FlowingCard = styled.div`
   }
   
   @media (max-width: 768px) {
-    width: 100px;
-    height: 133px;
+    width: 140px;
+    height: 233px;
     margin: 0 8px;
   }
   
   @media (max-width: 480px) {
-    width: 80px;
-    height: 107px;
+    width: 112px;
+    height: 187px;
     margin: 0 5px;
   }
 `;

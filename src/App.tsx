@@ -86,6 +86,10 @@ const App: React.FC = () => {
           <FooterText>
             이 서비스는 오락 목적으로 제공되며, 실제 운세 결과와 다를 수 있습니다.
           </FooterText>
+          <FooterButtonContainer>
+            <FooterButton>이용약관</FooterButton>
+            <FooterButton>개인정보 보호정책</FooterButton>
+          </FooterButtonContainer>
         </Footer>
       </AppContainer>
     </Router>
@@ -234,7 +238,7 @@ const Main = styled.main`
 const Footer = styled.footer`
   background-color: rgba(0, 0, 0, 0.3);
   color: white;
-  padding: 1.5rem;
+  padding: 0.8rem;
   text-align: center;
   margin-top: auto;
   backdrop-filter: blur(10px);
@@ -242,10 +246,35 @@ const Footer = styled.footer`
 Footer.displayName = 'App_Footer';
 
 const FooterText = styled.p`
-  margin: 0.5rem 0;
-  font-size: 0.45rem;
+  margin: 0.2rem 0;
+  font-size: 0.6rem;
   color: rgba(255, 255, 255, 0.7);
+  line-height: 1.2;
 `;
 FooterText.displayName = 'App_FooterText';
+
+const FooterButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+`;
+FooterButtonContainer.displayName = 'App_FooterButtonContainer';
+
+const FooterButton = styled.button`
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.5rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  text-decoration: underline;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: rgba(255, 255, 255, 0.9);
+  }
+`;
+FooterButton.displayName = 'App_FooterButton';
 
 export default App;
