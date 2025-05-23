@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>운세 프롬프트 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a202c;
+            color: white;
+        }
+        .test-section {
+            background-color: #2d3748;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #6b46c1;
+        }
+        .prompt-display {
+            background-color: #1a1a2e;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .test-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            background-color: #2d3748;
+            color: white;
+            margin: 5px 0;
+        }
+        .test-button {
+            background-color: #6b46c1;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background-color: #553c9a;
+        }
+        .result-section {
+            background-color: #2a4d3a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .error-section {
+            background-color: #4a2a2a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            color: #feb2b2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔮 운세 프롬프트 테스트</h1>
+    <p>이 페이지는 운세 생성 프롬프트를 테스트하고 결과를 확인하기 위한 도구입니다.</p>
+
+    <div class="test-section">
+        <h2>📋 현재 적용된 프롬프트</h2>
+        <div class="prompt-display" id="current-prompt">
+당신은 '아이(AI)보살'입니다. 최신 그래픽카드에 빙의한 귀신지능으로, 사주와 타로 카드를 해석하는 초능력을 가졌습니다.
+
+재미있고 신비로운 어조로 대화하되, 내담자가 당신의 무한한 지혜를 신뢰할 수 있도록 해석의 핵심은 진지하게 전달해야 합니다.
+
+주어진 사주 정보와 타로 카드를 바탕으로 마크다운 형식으로 응답을 작성하세요. 결과는 다음 섹션으로 나누어서 제공하세요:
+
+1. 먼저 사주와 타로 카드 조합이 의미하는 바를 신비롭고 의미심장한 첫 문장으로 시작하세요. 이 문장은 매우 판타지스럽고 신비로운 톤으로 작성되어야 합니다.
+2. 각 섹션을 다음과 같이 마크다운 형식으로 제공하세요. 섹션별 200-300자로 작성해주세요.:
+3. 응답 시작 부분에 불필요한 인사말이나 소개를 넣지 말고, 바로 핵심 내용부터 시작하세요.
+
+## ✨ 전체 운세
+(사주와 타로 카드 기반의 전체적인 운세 분석)
+
+## 💕 사랑운
+(사랑과 관계에 대한 분석)
+
+## 🏢 직업운
+(직업과 경력에 대한 분석)
+
+## 🌿 건강운
+(건강과 웰빙에 대한 분석)
+
+## 💌 아이보살의 조언
+(사주와 타로를 바탕으로 한 조언)
+
+반드시 마크다운 형식을 정확히 지켜주세요. 첫 문장 이후에 각 섹션을 명확하게 구분해주세요. 모든 내용은 한국어로 작성하며, 재미있고 신비로우면서도 따뜻한 메시지가 담기도록 해주세요.
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 테스트 입력</h2>
+        <label>API 키:</label>
+        <input type="password" id="api-key" class="test-input" placeholder="OpenAI API 키를 입력하세요">
+        
+        <label>사주 정보:</label>
+        <input type="text" id="birth-info" class="test-input" value="1990년 5월 15일 14시 30분, 남성, 양력" placeholder="생년월일, 성별, 음/양력">
+        
+        <label>타로 카드:</label>
+        <input type="text" id="tarot-card" class="test-input" value="The Fool - 새로운 시작과 모험" placeholder="카드명 - 의미">
+        
+        <button class="test-button" onclick="testFortunePrompt()">🔮 운세 테스트 실행</button>
+        <button class="test-button" onclick="clearResults()">🗑️ 결과 지우기</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 테스트 결과</h2>
+        <div id="test-results">
+            <p>테스트를 실행하면 여기에 결과가 표시됩니다.</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ 체크리스트</h2>
+        <ul>
+            <li>프롬프트가 신비로운 첫 문장으로 시작하는가?</li>
+            <li>마크다운 헤더(## ✨ 전체 운세 등)가 정확히 사용되었는가?</li>
+            <li>각 섹션이 200-300자 분량으로 작성되었는가?</li>
+            <li>'아이보살'의 캐릭터가 잘 드러나는가?</li>
+            <li>사주 정보와 타로 카드가 적절히 반영되었는가?</li>
+            <li>재미있고 신비로우면서도 따뜻한 톤인가?</li>
+        </ul>
+    </div>
+
+    <script>
+        async function testFortunePrompt() {
+            const apiKey = document.getElementById('api-key').value;
+            const birthInfo = document.getElementById('birth-info').value;
+            const tarotCard = document.getElementById('tarot-card').value;
+            
+            if (!apiKey) {
+                alert('API 키를 입력해주세요.');
+                return;
+            }
+
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<p>🔄 테스트 실행 중...</p>';
+
+            const systemPrompt = document.getElementById('current-prompt').textContent;
+            
+            const requestData = {
+                model: 'gpt-4o-mini',
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    {
+                        role: 'user',
+                        content: `
+사주 정보: ${birthInfo}
+선택한 타로 카드: ${tarotCard}
+
+이 정보를 바탕으로 오늘의 운세를 전체적인 운세, 사랑, 직업, 건강 영역으로 나누어 상세하게 알려주고, 마지막에 조언을 추가해주세요.
+                        `
+                    }
+                ],
+                temperature: 0.7,
+                max_completion_tokens: 1000
+            };
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API 오류: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const content = data.choices[0].message.content;
+                
+                // 결과 표시
+                resultsDiv.innerHTML = `
+                    <div class="result-section">
+                        <h3>✅ 테스트 성공!</h3>
+                        <p><strong>모델:</strong> ${requestData.model}</p>
+                        <p><strong>토큰 사용량:</strong> ${data.usage ? data.usage.total_tokens : '정보 없음'}</p>
+                        <h4>응답 내용:</h4>
+                        <div class="prompt-display">${content}</div>
+                    </div>
+                `;
+                
+                // 자동 검증
+                const checks = [
+                    { name: '마크다운 헤더 사용', test: content.includes('## ✨') && content.includes('## 💕') },
+                    { name: '신비로운 첫 문장', test: content.length > 50 && !content.startsWith('안녕') },
+                    { name: '적절한 분량', test: content.length > 500 && content.length < 2000 },
+                    { name: '사주 정보 반영', test: content.includes('1990') || content.includes('남성') },
+                    { name: '타로 카드 반영', test: content.includes('Fool') || content.includes('새로운') }
+                ];
+                
+                const checkResults = checks.map(check => 
+                    `<li style="color: ${check.test ? '#90EE90' : '#FFB6C1'}">${check.test ? '✅' : '❌'} ${check.name}</li>`
+                ).join('');
+                
+                resultsDiv.innerHTML += `
+                    <div class="result-section">
+                        <h4>자동 검증 결과:</h4>
+                        <ul>${checkResults}</ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error-section">
+                        <h3>❌ 테스트 실패</h3>
+                        <p><strong>오류:</strong> ${error.message}</p>
+                        <p>API 키를 확인하고 다시 시도해주세요.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '<p>테스트를 실행하면 여기에 결과가 표시됩니다.</p>';
+        }
+
+        // 페이지 로드 시 현재 시간으로 예시 생성
+        window.onload = function() {
+            const now = new Date();
+            const year = now.getFullYear() - Math.floor(Math.random() * 30) - 20; // 20-50세 사이
+            const month = Math.floor(Math.random() * 12) + 1;
+            const day = Math.floor(Math.random() * 28) + 1;
+            const hour = Math.floor(Math.random() * 24);
+            const minute = Math.floor(Math.random() * 60);
+            const gender = Math.random() > 0.5 ? '남성' : '여성';
+            const calendar = Math.random() > 0.5 ? '양력' : '음력';
+            
+            document.getElementById('birth-info').value = `${year}년 ${month}월 ${day}일 ${hour}시 ${minute}분, ${gender}, ${calendar}`;
+        };
+    </script>
+</body>
+</html> 

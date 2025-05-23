@@ -369,7 +369,7 @@ const ResultHeader = styled.div`
 ResultHeader.displayName = 'FaceReadingResult_Header';
 
 const Title = styled.h1`
-  font-size: 2rem;
+  font-size: 1.33rem; /* 2rem의 3분의 2 */
   font-weight: 700;
   margin-bottom: 0.5rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

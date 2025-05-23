@@ -431,7 +431,7 @@ PasswordErrorMessage.displayName = 'FaceReadingPage_PasswordErrorMessage';
 const Container = styled.div`
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 0.5rem;
 `;
 Container.displayName = 'FaceReadingPage_Container';
 
@@ -543,6 +543,7 @@ LoadingMessage.displayName = 'FaceReadingPage_LoadingMessage';
 
 const ResultContainer = styled.div`
   margin-top: 2rem;
+  padding: 0.5rem;
 `;
 ResultContainer.displayName = 'FaceReadingPage_ResultContainer';
 
