@@ -40,8 +40,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   }
 
   // 카드를 두 그룹으로 나누기
-  const firstRowCards = cards.slice(0, 6); // 6개로 증가
-  const secondRowCards = cards.slice(6, 12); // 6개로 증가
+  const firstRowCards = cards.slice(0, 10); // 10개로 증가하여 한 줄에 더 많은 카드 표시
 
   return (
     <Container>
@@ -53,13 +52,13 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
       </Description>
       
       <CardsContainer>
-        {/* 첫 번째 줄: 좌에서 우로 흐름 */}
+        {/* 한 줄로 된 카드 흐름 */}
         <CardRowContainer className="row-1">
           <CardWrapper className="card-wrapper" direction="left-to-right">
             {/* 원본 카드들 */}
             {firstRowCards.map((card, index) => (
               <FlowingCard 
-                key={`original-1-${index}`}
+                key={`original-${index}`}
                 onClick={() => handleCardClick(card)}
               >
                 <CardBackDesign>✨</CardBackDesign>
@@ -68,31 +67,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
             {/* 복제된 카드들 (무한 스크롤을 위해) */}
             {firstRowCards.map((card, index) => (
               <FlowingCard 
-                key={`clone-1-${index}`}
-                onClick={() => handleCardClick(card)}
-              >
-                <CardBackDesign>✨</CardBackDesign>
-              </FlowingCard>
-            ))}
-          </CardWrapper>
-        </CardRowContainer>
-        
-        {/* 두 번째 줄: 우에서 좌로 흐름 */}
-        <CardRowContainer className="row-2">
-          <CardWrapper className="card-wrapper" direction="right-to-left">
-            {/* 원본 카드들 */}
-            {secondRowCards.map((card, index) => (
-              <FlowingCard 
-                key={`original-2-${index}`}
-                onClick={() => handleCardClick(card)}
-              >
-                <CardBackDesign>✨</CardBackDesign>
-              </FlowingCard>
-            ))}
-            {/* 복제된 카드들 (무한 스크롤을 위해) */}
-            {secondRowCards.map((card, index) => (
-              <FlowingCard 
-                key={`clone-2-${index}`}
+                key={`clone-${index}`}
                 onClick={() => handleCardClick(card)}
               >
                 <CardBackDesign>✨</CardBackDesign>
@@ -197,7 +172,7 @@ const CardsContainer = styled.div`
   overflow: hidden;
   margin-bottom: 2rem;
   height: auto;
-  min-height: 600px;
+  min-height: 320px;
 `;
 CardsContainer.displayName = 'TarotSelection_CardsContainer';
 
@@ -208,7 +183,7 @@ const CardRowContainer = styled.div`
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.05);
   padding: 20px 0;
-  height: 300px;
+  height: 320px;
   
   &:hover .card-wrapper {
     animation-play-state: paused;
@@ -227,8 +202,8 @@ const CardWrapper = styled.div<{ direction: 'left-to-right' | 'right-to-left' }>
 CardWrapper.displayName = 'TarotSelection_CardWrapper';
 
 const FlowingCard = styled.div`
-  width: 168px;
-  height: 280px;
+  width: 180px;
+  height: 300px;
   background-color: #4a4e69;
   border: 2px solid #9a8c98;
   border-radius: 8px;
