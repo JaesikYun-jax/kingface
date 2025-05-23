@@ -61,8 +61,8 @@ const AdminPage: React.FC = () => {
   const defaultServicePlan: ServicePlanConfig = {
     models: {
       fortune: {
-        free: 'gpt-3.5-turbo',
-        premium: 'gpt-4-turbo'
+        free: 'gpt-4o-mini',
+        premium: 'gpt-4o'
       },
       faceReading: 'gpt-4o'
     },
@@ -310,10 +310,10 @@ const AdminPage: React.FC = () => {
                   value={servicePlan.models.fortune.free}
                   onChange={(e) => handleModelChange('fortune', 'free', e.target.value)}
                 >
-                  <option value="o4-mini-2025-04-16">o4-mini-2025-04-16 (경제적)</option>
+                  <option value="gpt-4o-mini">GPT-4o Mini (경제적)</option>
                   <option value="gpt-3.5-turbo">GPT-3.5 Turbo (저렴)</option>
-                  <option value="gpt-3.5-turbo-16k">GPT-3.5 Turbo 16K</option>
-                  <option value="gpt-4.1-2025-04-14">GPT-4.1-2025-04-14 (고품질)</option>
+                  <option value="gpt-4o">GPT-4o (고품질)</option>
+                  <option value="gpt-4-turbo">GPT-4 Turbo</option>
                 </ModelSelect>
               </FormGroup>
               
@@ -323,10 +323,10 @@ const AdminPage: React.FC = () => {
                   value={servicePlan.models.fortune.premium}
                   onChange={(e) => handleModelChange('fortune', 'premium', e.target.value)}
                 >
-                  <option value="o4-mini-2025-04-16">o4-mini-2025-04-16 (경제적)</option>
-                  <option value="gpt-4.1-2025-04-14">GPT-4.1-2025-04-14 (고품질)</option>
-                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo (저렴)</option>
-                  <option value="gpt-3.5-turbo-16k">GPT-3.5 Turbo 16K</option>
+                  <option value="gpt-4o-mini">GPT-4o Mini (경제적)</option>
+                  <option value="gpt-4o">GPT-4o (고품질)</option>
+                  <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
                 </ModelSelect>
               </FormGroup>
               
@@ -336,9 +336,8 @@ const AdminPage: React.FC = () => {
                   value={servicePlan.models.faceReading}
                   onChange={(e) => handleModelChange('faceReading', '', e.target.value)}
                 >
-                  <option value="gpt-4.1-2025-04-14">GPT-4.1-2025-04-14</option>
-                  <option value="gpt-4o">GPT-4o</option>
-                  <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                  <option value="gpt-4o">GPT-4o (Vision 지원)</option>
+                  <option value="gpt-4-turbo">GPT-4 Turbo (Vision 지원)</option>
                   <option value="gpt-4">GPT-4</option>
                 </ModelSelect>
               </FormGroup>

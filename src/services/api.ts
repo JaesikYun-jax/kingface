@@ -37,10 +37,10 @@ const getApiKey = (): string => {
 const defaultServicePlan: ServicePlanConfig = {
   models: {
     fortune: {
-      free: 'o4-mini-2025-04-16',  // 무료 플랜은 o4-mini-2025-04-16 사용
-      premium: 'o4-mini-2025-04-16'  // 프리미엄도 사진 없는 경우 o4-mini-2025-04-16 사용
+      free: 'gpt-4o-mini',  // 무료 플랜은 gpt-4o-mini 사용
+      premium: 'gpt-4o-mini'  // 프리미엄도 사진 없는 경우 gpt-4o-mini 사용
     },
-    faceReading: 'gpt-4.1-2025-04-14'  // GPT-4.1-2025-04-14 모델 사용 (비전 기능 지원)
+    faceReading: 'gpt-4o'  // gpt-4o 모델 사용 (비전 기능 지원)
   },
   features: {
     free: ['사주 기반 운세'],
@@ -64,7 +64,7 @@ export const getPromptConfig = (promptId: string, isVision = false, imageUrl = '
   if (isVision) {
     // Facereading Vision 모델 설정
     return {
-      model: 'gpt-4.1-2025-04-14',  // 최신 Vision 기능이 있는 GPT-4.1-2025-04-14 모델 사용
+      model: 'gpt-4o',  // 최신 Vision 기능이 있는 gpt-4o 모델 사용
       messages: [
         {
           role: 'system',
@@ -267,7 +267,7 @@ export const generateFortune = async (
     }
     
     // 기본 모델 사용 (플랜 체크 제거)
-    const useModel = 'o4-mini-2025-04-16';
+    const useModel = 'gpt-4o-mini';
       
     // 시간 포맷팅 (한국식)
     const formattedHour = birthInfo.hour < 10 ? `0${birthInfo.hour}` : birthInfo.hour;
@@ -312,7 +312,7 @@ export const generateFortune = async (
           }
         ],
         temperature: 0.7,
-        max_tokens: 1000
+        max_completion_tokens: 1000
       };
       
       // 헤더 설정 - ASCII 문자만 포함하도록 주의
@@ -322,6 +322,12 @@ export const generateFortune = async (
       };
       
       console.log(`운세 분석 사용 모델: ${useModel}`);
+      console.log('API 요청 데이터:', {
+        model: useModel,
+        messageCount: requestData.messages.length,
+        temperature: requestData.temperature,
+        max_completion_tokens: requestData.max_completion_tokens
+      });
       
       // 실제 환경에서는 서버에서 API 호출을 처리해야 함
       // 클라이언트 측에서는 직접 OpenAI API를 호출하지 않고 자체 백엔드를 통해 호출해야 함
@@ -465,7 +471,7 @@ export const analyzeFaceReading = async (imageBase64: string): Promise<FaceReadi
           ...(promptConfig as PromptConfig).messages || [],  // 기존 메시지 복사
         ],
         temperature: 0.6,  // 온도 더 낮춤 (더 일관된 응답을 위해)
-        max_tokens: 2000  // 토큰 증가
+        max_completion_tokens: 2000  // 토큰 증가
       };
       
       // 이미지 URL 업데이트
@@ -493,6 +499,13 @@ export const analyzeFaceReading = async (imageBase64: string): Promise<FaceReadi
       
       // 디버그 모드 - 프롬프트 로깅
       console.log('관상 분석 요청 시작');
+      console.log('사용 모델:', model);
+      console.log('요청 데이터 구조:', {
+        model: requestData.model,
+        messageCount: requestData.messages?.length,
+        temperature: requestData.temperature,
+        max_completion_tokens: requestData.max_completion_tokens
+      });
       
       // 실제 환경에서는 서버를 통해 API 키를 노출하지 않도록 백엔드 API를 사용해야 합니다
       const response = await axios.post(
