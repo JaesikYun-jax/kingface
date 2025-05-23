@@ -225,6 +225,7 @@ const FortunePage: React.FC = () => {
   return (
     <Container>
       <Header>
+        <TitleEmoji>🔮</TitleEmoji>
         <Title>아이보살 사주 운세</Title>
         <SubTitle>당신의 사주와 인연을 AI 보살이 풀어드립니다</SubTitle>
       </Header>
@@ -456,8 +457,13 @@ const Header = styled.header`
 `;
 Header.displayName = 'FortunePage_Header';
 
-const Title = styled.h1`
+const TitleEmoji = styled.span`
   font-size: 2.5rem;
+  margin-right: 0.5rem;
+`;
+
+const Title = styled.h1`
+  font-size: 2rem;
   font-weight: 700;
   color: white;
   margin-bottom: 0.5rem;
@@ -466,11 +472,20 @@ const Title = styled.h1`
 Title.displayName = 'FortunePage_Title';
 
 const SubTitle = styled.h2`
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
 `;
 SubTitle.displayName = 'FortunePage_SubTitle';
+
+const SectionTitle = styled.label`
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.5rem;
+`;
+SectionTitle.displayName = 'FortunePage_SectionTitle';
 
 const ContentSection = styled.div`
   background-color: rgba(74, 21, 81, 0.3);

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BirthInfo } from '../types';
 import styled from '@emotion/styled';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
 
 interface BirthFormProps {
@@ -100,9 +98,10 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
   
   // 상태 관리
   const [birthDate, setBirthDate] = useState<Date>(getTwentyYearsAgo());
+  const [birthDateString, setBirthDateString] = useState<string>('');
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [isLunar, setIsLunar] = useState<boolean>(false);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("unknown");
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
   const [sajuText, setSajuText] = useState<string>('');
 
   // 사주 계산 및 표시
@@ -192,32 +191,47 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
     setSelectedTimeSlot(slotId);
   };
 
+  // 생년월일 문자열 입력 핸들러
+  const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // 숫자만 허용
+    setBirthDateString(value);
+    
+    // 8자리가 입력되면 Date 객체로 변환
+    if (value.length === 8) {
+      const year = parseInt(value.substring(0, 4));
+      const month = parseInt(value.substring(4, 6)) - 1; // Date 객체는 0부터 시작
+      const day = parseInt(value.substring(6, 8));
+      
+      if (year >= 1900 && year <= new Date().getFullYear() && 
+          month >= 0 && month <= 11 && 
+          day >= 1 && day <= 31) {
+        const newDate = new Date(year, month, day);
+        setBirthDate(newDate);
+      }
+    }
+  };
+
   return (
     <FormContainer onSubmit={handleSubmit}>
       <Title>사주 정보 입력</Title>
       <Description>정확한 사주풀이를 위해 태어난 정보를 입력하세요</Description>
       
       <FormGroup>
-        <Label>생년월일</Label>
-        <DatePickerWrapper>
-          <DatePicker
-            selected={birthDate}
-            onChange={(date: Date | null) => date && setBirthDate(date)}
-            dateFormat="yyyy년 MM월 dd일"
-            locale={ko}
-            showMonthDropdown
-            showYearDropdown
-            dropdownMode="select"
-            yearDropdownItemNumber={100}
-            scrollableYearDropdown
-            className="date-picker-input"
-          />
-          <CalendarIcon>📅</CalendarIcon>
-        </DatePickerWrapper>
+        <SectionTitle>📅 생년월일</SectionTitle>
+        <BirthDateInput
+          type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          placeholder="8자리 숫자 입력 (예: 19901225)"
+          value={birthDateString}
+          onChange={handleBirthDateChange}
+          maxLength={8}
+        />
+        <InputNote>YYYYMMDD 형식으로 입력해주세요 (예: 19901225)</InputNote>
       </FormGroup>
 
       <FormGroup>
-        <Label>태어난 시간</Label>
+        <SectionTitle>⏰ 태어난 시간</SectionTitle>
         <TimeSlotContainer>
           {timeSlots.map((slot) => (
             <TimeSlotOption
@@ -236,7 +250,7 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
       </FormGroup>
 
       <FormGroup>
-        <Label htmlFor="gender">성별</Label>
+        <SectionTitle htmlFor="gender">👤 성별</SectionTitle>
         <GenderSelection>
           <GenderOption
             isSelected={gender === 'male'}
@@ -352,44 +366,36 @@ const FormGroup = styled.div`
   margin-bottom: 1.5rem;
 `;
 
-const Label = styled.label`
+const SectionTitle = styled.label`
   display: block;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.5rem;
 `;
 
-const DatePickerWrapper = styled.div`
-  position: relative;
+const BirthDateInput = styled.input`
   width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid rgba(107, 70, 193, 0.5);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
 
-  .date-picker-input {
-    width: 100%;
-    padding: 0.5rem;
-    font-size: 1rem;
-    border: 1px solid rgba(107, 70, 193, 0.5);
-    border-radius: 8px;
-    outline: none;
-    transition: border-color 0.3s;
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.2);
-    color: white;
-
-    &:focus {
-      border-color: #9f7aea;
-      box-shadow: 0 0 0 2px rgba(159, 122, 234, 0.2);
-    }
+  &:focus {
+    border-color: #9f7aea;
+    box-shadow: 0 0 0 2px rgba(159, 122, 234, 0.2);
   }
 `;
 
-const CalendarIcon = styled.span`
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.8);
-  pointer-events: none;
+const InputNote = styled.p`
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 0.5rem;
 `;
 
 const TimeSlotContainer = styled.div`
