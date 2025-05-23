@@ -14,30 +14,10 @@ const FortuneResult: React.FC<FortuneResultProps> = ({
   selectedCard, 
   onRestart 
 }) => {
-  // 사주와 타로 조합에 대한 랜덤 미스틱 문구
-  const [mysticPhrase, setMysticPhrase] = useState<string>("");
-  
   // 마크다운 형식으로 변환한 결과
   const [markdownContent, setMarkdownContent] = useState<string>("");
   
   useEffect(() => {
-    // 랜덤 미스틱 문구 생성
-    const phrases = [
-      "천년의 지혜가 당신의 사주에서 빛나고 있습니다.",
-      "우주의 별들이 당신의 운명에 빛을 비추고 있습니다.",
-      "고대의 신비가 당신의 사주 속에 감춰져 있습니다.",
-      "운명의 실타래가 당신을 향해 펼쳐지고 있습니다.",
-      "별들의 노래가 당신의 미래를 속삭입니다.",
-      "시간의 강물이 당신의 운명을 비추고 있습니다.",
-      "타로의 지혜와 사주의 비밀이 만나는 순간입니다.",
-      "당신의 운명에 신성한 빛이 내려앉았습니다.",
-      "과거와 미래가 현재에서 만나 당신의 길을 밝힙니다.",
-      "천궁의 별자리가 당신의 사주와 공명하고 있습니다."
-    ];
-    
-    const randomIndex = Math.floor(Math.random() * phrases.length);
-    setMysticPhrase(phrases[randomIndex]);
-    
     // API에서 받은 텍스트를 그대로 사용
     setMarkdownContent(result.overall);
   }, [result]);
@@ -81,11 +61,6 @@ const FortuneResult: React.FC<FortuneResultProps> = ({
             <CardMeaning>{selectedCard.meaning}</CardMeaning>
           </UserImageContainer>
         )}
-
-        {/* 신비로운 문구 표시 */}
-        <MysticPhraseBox>
-          <MysticPhrase>{mysticPhrase}</MysticPhrase>
-        </MysticPhraseBox>
 
         {/* 아이보살 사주 분석 결과 제목 */}
         <ResultTitle>아이보살의 사주 분석 결과</ResultTitle>
@@ -221,40 +196,6 @@ const CardMeaning = styled.p`
   }
 `;
 CardMeaning.displayName = 'FortuneResult_CardMeaning';
-
-const MysticPhraseBox = styled.div`
-  background: linear-gradient(135deg, rgba(107, 70, 193, 0.4) 0%, rgba(45, 55, 72, 0.4) 100%);
-  border-radius: 12px;
-  padding: 1.2rem;
-  margin: 0 auto 1.5rem;
-  max-width: 95%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  
-  @media (max-width: 768px) {
-    padding: 1rem;
-    margin: 0 auto 1.5rem;
-    max-width: 95%;
-    border-radius: 8px;
-  }
-`;
-MysticPhraseBox.displayName = 'FortuneResult_MysticPhraseBox';
-
-const MysticPhrase = styled.p`
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: white;
-  text-align: center;
-  font-style: italic;
-  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
-  line-height: 1.5;
-  
-  @media (max-width: 768px) {
-    font-size: 1.1rem;
-  }
-`;
-MysticPhrase.displayName = 'FortuneResult_MysticPhrase';
 
 // 아이보살 결과 제목 스타일
 const ResultTitle = styled.h2`
