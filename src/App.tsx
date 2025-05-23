@@ -239,11 +239,13 @@ const Footer = styled.footer`
   margin-top: auto;
   backdrop-filter: blur(10px);
 `;
+Footer.displayName = 'App_Footer';
 
 const FooterText = styled.p`
   margin: 0.5rem 0;
-  font-size: 0.9rem;
+  font-size: 0.45rem;
   color: rgba(255, 255, 255, 0.7);
 `;
+FooterText.displayName = 'App_FooterText';
 
 export default App;

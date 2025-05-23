@@ -40,8 +40,8 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   }
 
   // 카드를 두 그룹으로 나누기
-  const firstRowCards = cards.slice(0, Math.ceil(cards.length / 2));
-  const secondRowCards = cards.slice(Math.ceil(cards.length / 2));
+  const firstRowCards = cards.slice(0, 6); // 6개로 증가
+  const secondRowCards = cards.slice(6, 12); // 6개로 증가
 
   return (
     <Container>
@@ -144,7 +144,7 @@ const Container = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0;
   background-color: transparent;
 `;
 Container.displayName = 'TarotSelection_Container';
@@ -219,13 +219,13 @@ const CardWrapper = styled.div<{ direction: 'left-to-right' | 'right-to-left' }>
   will-change: transform;
   
   animation: ${props => props.direction === 'left-to-right' ? scrollLeftToRight : scrollRightToLeft} 
-             40s linear infinite;
+             5s linear infinite;
 `;
 CardWrapper.displayName = 'TarotSelection_CardWrapper';
 
 const FlowingCard = styled.div`
-  width: 90px;
-  height: 120px;
+  width: 120px;
+  height: 160px;
   background-color: #4a4e69;
   border: 2px solid #9a8c98;
   border-radius: 8px;
@@ -244,14 +244,14 @@ const FlowingCard = styled.div`
   }
   
   @media (max-width: 768px) {
-    width: 75px;
-    height: 100px;
+    width: 100px;
+    height: 133px;
     margin: 0 8px;
   }
   
   @media (max-width: 480px) {
-    width: 60px;
-    height: 80px;
+    width: 80px;
+    height: 107px;
     margin: 0 5px;
   }
 `;
