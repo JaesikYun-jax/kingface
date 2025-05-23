@@ -197,6 +197,42 @@ const CardMeaning = styled.p`
 `;
 CardMeaning.displayName = 'FortuneResult_CardMeaning';
 
+// 신비로운 문구 박스 스타일 (결과 화면에서는 사용되지 않음)
+const MysticPhraseBox = styled.div`
+  background: linear-gradient(135deg, rgba(107, 70, 193, 0.4) 0%, rgba(45, 55, 72, 0.4) 100%);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin: 0 auto 1.5rem;
+  max-width: 95%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  display: none; /* 결과 화면에서는 항상 숨김 */
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 0 auto 1.5rem;
+    max-width: 95%;
+    border-radius: 8px;
+  }
+`;
+MysticPhraseBox.displayName = 'FortuneResult_MysticPhraseBox';
+
+const MysticPhrase = styled.p`
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  font-style: italic;
+  text-shadow: 0 0 10px rgba(107, 70, 193, 0.5);
+  line-height: 1.5;
+  
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+`;
+MysticPhrase.displayName = 'FortuneResult_MysticPhrase';
+
 // 아이보살 결과 제목 스타일
 const ResultTitle = styled.h2`
   font-size: 1.8rem;
