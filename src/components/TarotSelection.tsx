@@ -2,16 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 import { TarotCard } from '../types';
-import { getRandomTarotCards } from '../services/api';
-import { cardBackImagePath } from '../assets/tarotData'; // 카드 뒷면 이미지 경로 임포트
+// import { getRandomTarotCards } from '../services/api'; // FortunePage에서 카드를 미리 선택하므로 여기서 필요 없음
 
 interface TarotSelectionProps {
   onCardSelect: (card: TarotCard) => void;
+  preselectedCards: TarotCard[]; // 부모로부터 미리 선택된 카드 목록을 받음
 }
 
-const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
-  const [cards, setCards] = useState<TarotCard[]>([]);
-  const [selectedCard, setSelectedCard] = useState<TarotCard | null>(null);
+const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect, preselectedCards }) => {
+  // const [cards, setCards] = useState<TarotCard[]>([]); // 미리 선택된 카드를 prop으로 받으므로 필요 없음
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null); // 사용자가 선택한 카드 (인덱스) - 0, 1, 2 중 하나
   // 모달 및 애니메이션 상태 관리
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
@@ -23,23 +23,24 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   // 애니메이션 타임아웃 관리를 위한 ref
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 컴포넌트 마운트 시 로딩 메시지 설정 - 이제 FortunePage에서 카드를 미리 선택하므로 이펙트 필요 없음
   useEffect(() => {
-    // 랜덤 타로 카드 가져오기
-    const randomCards = getRandomTarotCards();
-    // 각 카드에 대한 이미지 경로를 설정 (png 우선)
-    const cardsWithImages = randomCards.map(card => ({
-      ...card,
-      image: card.image.replace('.jpg', '.png') // 일단 경로만 .png로 변경
-      // 실제 로드 시에는 .png가 없으면 .jpg를 시도하는 로직이 필요할 수 있습니다.
-      // 현재는 public 폴더에 .png 파일을 직접 넣어주는 방식입니다.
-    }));
-    setCards(cardsWithImages);
+    // 이펙트 내용 비움 또는 제거
   }, []);
 
-  const handleCardClick = (card: TarotCard) => {
-    if (selectedCard) return; // 이미 선택된 경우 무시
+  // prop으로 받은 preselectedCards를 기반으로 화면에 보여줄 카드 목록 생성 (3장을 반복해서 약 15개 이상)
+  const cardsToDisplay = [];
+  const repeatCount = Math.ceil(20 / preselectedCards.length); // 최소 20개 이상 표시되도록 반복
+  for (let i = 0; i < repeatCount; i++) {
+    cardsToDisplay.push(...preselectedCards);
+  }
+
+  const handleCardClick = (cardIndex: number) => { // 클릭된 카드의 인덱스를 받도록 수정
+    if (selectedCardIndex !== null) return; // 이미 선택된 경우 무시
     
-    setSelectedCard(card);
+    setSelectedCardIndex(cardIndex); // 선택된 카드의 인덱스 저장
+    const selectedActualCard = preselectedCards[cardIndex]; // 미리 선택된 카드 목록에서 실제 카드 정보 가져오기
+    
     setIsModalVisible(true); // 모달 컨테이너 보이게 설정
     setIsOverlayVisible(false); // 오버레이 투명 상태로 시작
     setIsSelectionTextVisible(false);
@@ -84,9 +85,9 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
                   }, 700);
 
                   // 모든 애니메이션 완료 후 onCardSelect 호출 및 모달 닫기
-                  // 가장 긴 애니메이션 시간 (뒤집기 1.4초 + 확대 1.0초) + 약간의 대기 시간
+                  // onCardSelect 콜백에 선택된 실제 카드 정보를 넘겨줍니다.
                   animationTimeoutRef.current = setTimeout(() => {
-                      onCardSelect(card);
+                      onCardSelect(selectedActualCard); // 선택된 실제 카드 객체를 전달
                       closeModal();
                   }, 1400 + 1000 + 500); // 예: 뒤집기 끝 + 확대 끝 + 0.5초 대기
 
@@ -109,18 +110,19 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
     setIsSelectionTextFadingOut(false);
     setIsEnlargedCardAnimating(false);
     setIsCardFlipped(false);
-    setSelectedCard(null); // 선택된 카드 초기화
+    setSelectedCardIndex(null); // 선택된 카드 인덱스 초기화
 
     // 흐르는 카드들 움직임 다시 시작
     document.querySelectorAll('.card-wrapper').forEach(el => el.classList.remove('paused'));
   };
 
-  if (cards.length === 0) {
+  // cards 상태 대신 preselectedCards prop과 selectedCardIndex 상태 사용
+  if (preselectedCards.length === 0) {
     return <LoadingContainer>카드를 준비 중입니다...</LoadingContainer>;
   }
 
-  // 카드를 두 그룹으로 나누기
-  const firstRowCards = cards.slice(0, 10); // 10개로 증가하여 한 줄에 더 많은 카드 표시
+  // 카드를 두 그룹으로 나누기 - 이제 미리 선택된 3장으로만 구성 (반복)
+  // const firstRowCards = cards.slice(0, 10); // 이 부분 필요 없음
 
   return (
     <Container>
@@ -135,44 +137,51 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
         {/* 한 줄로 된 카드 흐름 */}
         <CardRowContainer className="row-1">
           <CardWrapper className="card-wrapper" direction="left-to-right">
-            {/* 원본 카드들 */}
-            {firstRowCards.map((card, index) => (
+            {/* 미리 선택된 카드들을 반복해서 표시 */}
+            {cardsToDisplay.map((card, index) => (
               <FlowingCard 
-                key={`original-${index}`}
-                onClick={() => handleCardClick(card)}
+                key={`card-${index}`}
+                onClick={() => handleCardClick(index % preselectedCards.length)} // 클릭 시 미리 선택된 카드 인덱스(0, 1, 2) 전달
               >
-                <CardBackDesign>✨</CardBackDesign>
+                <CardBackDesign>{/* 뒷면 디자인 */}</CardBackDesign>
+                 {/* 뒤집혔을 때 보여줄 실제 카드 이미지 - 초기에는 숨김 */}
+                 {selectedCardIndex !== null && (index % preselectedCards.length === selectedCardIndex) && (
+                    <ActualCardImage src={preselectedCards[selectedCardIndex].image} alt={preselectedCards[selectedCardIndex].name} isFlipped={isCardFlipped} />
+                 )}
               </FlowingCard>
             ))}
-            {/* 복제된 카드들 (무한 스크롤을 위해) */}
-            {firstRowCards.map((card, index) => (
-              <FlowingCard 
-                key={`clone-${index}`}
-                onClick={() => handleCardClick(card)}
-              >
-                <CardBackDesign>✨</CardBackDesign>
-              </FlowingCard>
-            ))}
+            {/* 복제된 카드들 (무한 스크롤을 위해) - 이제 cardsToDisplay에 이미 포함됨 */}
           </CardWrapper>
         </CardRowContainer>
       </CardsContainer>
       
       {/* 모달 */}
-      {isModalVisible && selectedCard && (
+      {/* selectedCard 상태 대신 selectedCardIndex와 preselectedCards prop 사용 */}
+      {isModalVisible && selectedCardIndex !== null && (
         <ModalOverlay isVisible={isOverlayVisible} onClick={closeModal}>
           <EnlargedCardAnimContainer isAnimating={isEnlargedCardAnimating} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <FlipCardArea>
               <FlipCardInner isFlipped={isCardFlipped}>
+                {/* 뒤집힌 카드 뒷면 */}
                 <FlipCardFace>
                   <FlipCardBack>
-                    <CardBackDesign>✨</CardBackDesign>
+                    {/* 여기에 선택된 실제 카드의 이미지를 넣습니다. */} 
+                    {selectedCardIndex !== null && (
+                        <ActualCardImage src={preselectedCards[selectedCardIndex].image} alt={preselectedCards[selectedCardIndex].name} isFlipped={isCardFlipped} />
+                    )}
                   </FlipCardBack>
                 </FlipCardFace>
+                {/* 뒤집힌 카드 앞면 */}
                 <FlipCardFace>
                   <FlipCardFront>
-                    <AnimatedCardImage src={selectedCard.image} alt={selectedCard.name} />
-                    <AnimatedCardName>{selectedCard.name}</AnimatedCardName>
-                    <AnimatedCardDescription>{selectedCard.description}</AnimatedCardDescription>
+                    {/* 앞면에는 이미지, 이름, 설명 표시 */} 
+                    {selectedCardIndex !== null && preselectedCards[selectedCardIndex] && (
+                      <>
+                        <AnimatedCardImage src={preselectedCards[selectedCardIndex].image} alt={preselectedCards[selectedCardIndex].name} />
+                        <AnimatedCardName>{preselectedCards[selectedCardIndex].name}</AnimatedCardName>
+                        <AnimatedCardDescription>{preselectedCards[selectedCardIndex].description}</AnimatedCardDescription>
+                      </>
+                    )}
                   </FlipCardFront>
                 </FlipCardFace>
               </FlipCardInner>
@@ -298,8 +307,7 @@ CardWrapper.displayName = 'TarotSelection_CardWrapper';
 const FlowingCard = styled.div`
   width: 180px;
   height: 300px;
-  background-color: #4a4e69;
-  background-image: url('${cardBackImagePath}');
+  background-color: #4a4e69; /* 카드 뒷면 기본 색상 */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -496,6 +504,22 @@ const FlipCardFront = styled(FlipCardFace)`
   overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
 `;
 FlipCardFront.displayName = 'TarotSelection_FlipCardFront';
+
+// 흐르는 카드 뒷면에 표시될 실제 카드 이미지 스타일
+const ActualCardImage = styled.img<{ isFlipped: boolean }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px; /* 부모(FlowingCard)의 border-radius와 일치 */
+  backface-visibility: hidden; /* 뒤집힐 때 안 보이게 */
+  transform: rotateY(180deg); /* 뒷면에 위치하도록 180도 회전 */
+  opacity: ${props => props.isFlipped ? 1 : 0}; /* 뒤집힌 상태일 때 보이게 */
+  transition: opacity 0.1s ease-out ${props => props.isFlipped ? '0.7s' : '0s'}; /* 뒤집기 애니메이션 중간쯤 나타나도록 지연 */
+`;
+ActualCardImage.displayName = 'TarotSelection_ActualCardImage';
 
 const AnimatedCardImage = styled.img`
   max-width: 80%;

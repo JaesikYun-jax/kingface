@@ -795,9 +795,10 @@ const extractPersonalityTraits = (content: string): string[] => {
 };
 
 // 랜덤 타로 카드 4장 선택
-export const getRandomTarotCards = (): TarotCard[] => {
+export const getRandomTarotCards = (count: number = 10): TarotCard[] => {
+  // 타로 카드 데이터를 섞어서 무작위로 count장을 선택
   const shuffled = [...tarotCards].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, 4);
+  return shuffled.slice(0, count);
 };
 
 const apiExports = {

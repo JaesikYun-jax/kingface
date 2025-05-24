@@ -5,7 +5,7 @@ import { BirthInfo, TarotCard, FortuneResult } from '../types';
 import { tarotCards } from '../assets/tarotData';
 import TarotSelection from '../components/TarotSelection';
 import FortuneResultComponent from '../components/FortuneResult';
-import { generateFortune } from '../services/api';
+import { generateFortune, getRandomTarotCards } from '../services/api';
 
 // 로딩 중 보여줄 위트있는 메시지 배열
 const wittyLoadingMessages = [
@@ -33,6 +33,9 @@ const FortunePage: React.FC = () => {
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
   const [loadingInterval, setLoadingInterval] = useState<NodeJS.Timeout | null>(null);
   const [currentLoadingMessage, setCurrentLoadingMessage] = useState<string>(wittyLoadingMessages[0]);
+  
+  // 미리 선택된 3장의 타로 카드 상태
+  const [preselectedTarotCards, setPreselectedTarotCards] = useState<TarotCard[]>([]);
 
   // 컴포넌트 마운트 시 로딩 메시지 설정
   useEffect(() => {
@@ -73,12 +76,26 @@ const FortunePage: React.FC = () => {
   // 생년월일 제출 처리
   const handleBirthSubmit = (data: BirthInfo) => {
     setBirthInfo(data);
+    // 타로 선택 단계로 이동하기 전에 카드 3장 미리 선택 및 이미지 사전 로딩
+    const cardsToSelect = getRandomTarotCards(3); // 3장 가져오기
+    setPreselectedTarotCards(cardsToSelect);
+    
+    // 이미지 사전 로딩
+    cardsToSelect.forEach(card => {
+      const img = new Image();
+      img.src = card.image; // 이미지 로딩 시작
+    });
+
     setCurrentStep(Step.TAROT_SELECTION);
   };
 
-  // 타로 카드 선택 처리
+  // 타로 카드 선택 처리 (FortunePage 입장에서는 '애니메이션 시작' 처리)
+  // TarotSelection 컴포넌트에서 어떤 카드가 클릭되었는지 인덱스로 받거나,
+  // 여기서는 미리 선택된 카드 목록의 특정 카드를 onCardSelect 콜백으로 받아 처리합니다.
   const handleTarotSelect = (card: TarotCard) => {
-    setSelectedCard(card);
+    // onCardSelect 콜백은 이제 TarotSelection 내부 애니메이션 완료 후 호출되며,
+    // 선택된 카드를 넘겨줍니다.
+    setSelectedCard(card); // FortuneResultComponent에 전달하기 위해 상태에 저장
     
     if (birthInfo) {
       setCurrentStep(Step.LOADING);
@@ -140,6 +157,7 @@ const FortunePage: React.FC = () => {
           <TarotSelector>
             <TarotSelection 
               onCardSelect={handleTarotSelect} 
+              preselectedCards={preselectedTarotCards}
             />
           </TarotSelector>
         </ContentSection>
@@ -224,7 +242,7 @@ const LoadingContainer = styled.div`
 LoadingContainer.displayName = 'FortunePage_LoadingContainer';
 
 const LoadingText = styled.h3`
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: white;
   margin-bottom: 2rem;
