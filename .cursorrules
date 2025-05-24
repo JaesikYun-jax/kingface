@@ -1,0 +1,198 @@
+Code Modification Rules
+
+1. Read and understand existing code first:
+
+   - Analyze the current implementation and its purpose
+   - Understand the existing patterns and conventions
+   - Keep the original code structure unless there's a clear reason to change
+
+2. Make minimal necessary changes:
+
+   - Only modify what's required for the task
+   - Preserve existing variable names and patterns
+   - Keep the original code style and formatting
+   - Don't rewrite working code from scratch
+
+3. When adding new code:
+
+   - Follow the existing patterns in the codebase
+   - Maintain consistency with surrounding code
+   - Reuse existing components and utilities when possible
+
+4. Server Action Rules:
+   - Server Component: Define server actions within the component file
+   - Client Component: Extract server actions to separate .action.ts files
+   - Only extract reusable server actions to shared files
+   - Admin actions must use ensureAdminSession()
+   - Non-admin actions should not check admin session
+
+Monorepo Package Rules
+
+Each package in packages/ directory has its own .cursorrules file
+Please refer to the specific .cursorrules file in each package directory:
+
+- packages/storygpt/.cursorrules
+- packages/story-agent-kit/.cursorrules
+- packages/osfun/.cursorrules
+  These package-specific rules take precedence over the root rules.
+
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI and Tailwind.
+
+Code Style and Structure
+
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional programming patterns with global state management.
+- Avoid classes; use global variables and exported functions instead.
+- Use module-level variables for shared state.
+- Export individual functions, not classes or objects.
+- Keep non-exported functions and variables private to the module.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files in the following order:
+  1. Type definitions and interfaces
+  2. Constants and configurations
+  3. Main functions/components (exported)
+  4. Helper functions (internal)
+- Keep related helper functions close to where they are used
+- Use for loops instead of reduce/map/filter when possible:
+  - Prefer simple for...of loops for arrays
+  - Use traditional for loops for complex iterations
+  - Only use array methods when the logic is significantly clearer
+  - Avoid chaining multiple array methods
+
+Runtime and Environment
+
+- Always use Node.js runtime for API routes and server code:
+  - Avoid Edge Runtime and Edge Functions
+  - Use standard Node.js libraries and features
+  - Prefer stable, well-tested packages over edge-specific ones
+  - Take advantage of full Node.js capabilities
+- Configure Next.js for standalone deployment:
+  - Use output: 'standalone' in next.config
+  - Keep all dependencies in node_modules
+  - Avoid edge-specific optimizations
+
+Data Management and Server Components
+
+- Prefer Server Components for data fetching and rendering.
+- Use ID-based data fetching:
+  - Pass IDs between components instead of full objects
+  - Fetch data at the point of use
+  - Keep data dependencies explicit and minimal
+- Leverage Server Actions for mutations:
+  - Use revalidatePath for efficient updates
+  - Avoid client-side state management when possible
+  - Keep mutations close to where they're used
+  - Place Server Actions in the same file as their Server Component if used only there
+  - Extract Server Actions to separate files only when used by multiple components
+- Minimize client-side data storage:
+  - Use server state as source of truth
+  - Cache data through Next.js cache mechanisms
+  - Only store ephemeral UI state on client
+
+Code Organization
+
+- Keep UI components close to their usage:
+  - Place components in the same directory as their page if used only there
+  - Move to shared directories only when used in 3+ places
+  - Consider future reusability, not speculative abstraction
+- Avoid premature abstraction and over-organization
+- Group related functionality by feature, not by type
+- Keep shared utilities minimal and focused
+
+React Server Components (RSC) and Client Components
+
+- Default to Server Components for all components
+- Split components by responsibility:
+  - Server Component: Main layout, data fetching, static UI
+  - Client Component: Interactive elements only
+- Organize client/server split:
+
+  - Keep client components small and focused
+  - Place client components next to their server parents
+  - Name client components by their specific functionality
+  - Example structure:
+
+    ```
+    # 예시 1: 사이드바
+    admin/sidebar/
+      sidebar.tsx         # Server: 레이아웃과 데이터 구조
+      sidebar-link.tsx    # Client: 인터랙티브 네비게이션
+      types.ts           # 공유 타입
+
+    # 예시 2: 데이터 테이블
+    admin/users/
+      user-table.tsx     # Server: 테이블 구조와 데이터 페칭
+      sort-header.tsx    # Client: 정렬 인터랙션
+      filter-input.tsx   # Client: 필터링 인터랙션
+      types.ts          # 공유 타입
+
+    # 예시 3: 폼
+    auth/signup/
+      signup-form.tsx    # Server: 폼 레이아웃과 유효성 검사
+      input-field.tsx    # Client: 실시간 입력 처리
+      submit-button.tsx  # Client: 제출 상태 관리
+      types.ts          # 공유 타입
+    ```
+
+- Client Component Usage:
+  - Only for browser-specific features (usePathname, onClick, etc.)
+  - Keep as leaf nodes in the component tree
+  - Pass server-rendered content as children/props
+  - Minimize client-side state
+
+Naming Conventions
+
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components and functions.
+- Use verb prefixes for function names (e.g., getFoo, setFoo, updateFoo).
+
+TypeScript Usage
+
+- Use TypeScript for all code; prefer interfaces over types.
+- Avoid enums; use maps instead.
+- Use functional components with TypeScript interfaces.
+
+Syntax and Formatting
+
+- Use the "function" keyword for pure functions.
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+- Use declarative JSX.
+
+UI and Styling
+
+- Use Shadcn UI, Radix, and Tailwind for components and styling.
+- Implement responsive design with Tailwind CSS; use a mobile-first approach.
+
+Performance Optimization
+
+- Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+
+Key Conventions
+
+- Use 'nuqs' for URL search parameter state management.
+- Optimize Web Vitals (LCP, CLS, FID).
+- Limit 'use client':
+- Favor server components and Next.js SSR.
+- Use only for Web API access in small components.
+- Avoid for data fetching or state management.
+- Follow Next.js docs for Data Fetching, Rendering, and Routing.
+
+Database Access and Data Layer
+
+- Keep database queries in @/data directory:
+  - Organize by entity (e.g., Knowledge.dal.ts, User.dal.ts)
+  - Use .dal.ts extension for data access layer files
+  - Keep schema definitions in separate .schema.ts files
+- Follow single-responsibility for database functions:
+  - Each function should return one specific piece of data
+  - Avoid functions that fetch multiple unrelated data points
+  - Name functions clearly with their specific purpose (e.g., getTotalChunksCount, getUniqueSourcesCount)
+  - Return strongly typed data with Promise<T>
+- Use drizzle-orm for database access:
+  - Prefer sql template literals for complex queries
+  - Use built-in query builders for simple queries
+  - Always handle type conversion from database types

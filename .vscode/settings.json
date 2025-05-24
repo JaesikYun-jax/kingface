@@ -1,0 +1,48 @@
+{
+  "remote.autoForwardPortsSource": "hybrid",
+  "workbench.colorTheme": "One Dark Pro",
+  "explorer.confirmDelete": false,
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "javascript.updateImportsOnFileMove.enabled": "never",
+  "explorer.confirmDragAndDrop": false,
+  "editor.indentSize": "tabSize",
+  "editor.tabSize": 2,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "explorer.confirmPasteNative": false,
+  "tailwindcss-intellisense.trace.server": "verbose",
+  "solidity.formatter": "forge",
+  "editor.codeActions.triggerOnFocusChange": true,
+  "solidity.defaultCompiler": "localFile",
+  "files.autoSave": "onFocusChange",
+  "editor.formatOnSave": true,
+  "github.copilot.advanced": {},
+  "prettier.prettierPath": "./node_modules/prettier",
+  "dotnet.formatting.organizeImportsOnFormat": true,
+  "notebook.defaultFormatter": "GitHub.copilot",
+  "prettier.semi": true,
+  "prettier.tabWidth": 2,
+  "prettier.printWidth": 80,
+  "prettier.singleQuote": false,
+  "prettier.trailingComma": "all",
+  "prettier.jsxSingleQuote": false,
+  "prettier.bracketSpacing": true,
+  "prettier.arrowParens": "always",
+  "prettier.endOfLine": "lf",
+  "prettier.useTabs": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "yaml.schemas": {
+    "https://www.artillery.io/schema.json": []
+  }
+}
