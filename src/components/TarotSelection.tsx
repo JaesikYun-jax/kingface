@@ -181,7 +181,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
               당신이 선택한 카드는...
             </SelectionText>
             <CloseButton onClick={closeModal}>
-              잠시 후 자동으로 다음 단계로 진행됩니다...
+              &times;
             </CloseButton>
           </EnlargedCardAnimContainer>
         </ModalOverlay>
@@ -385,15 +385,16 @@ ModalOverlay.displayName = 'TarotSelection_ModalOverlay';
 // "당신이 선택한 카드는..." 문구 스타일
 const SelectionText = styled.div<{ isVisible: boolean, isFadingOut: boolean }>`
   position: absolute;
-  top: 40%; /* 화면 중앙 근처 */
+  top: 25%; /* 화면 중앙 상단으로 조정 */
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #e0e0e0;
-  font-size: 24px;
+  color: #FFFFFF; /* 순수 흰색 */
+  font-size: 36px; /* 글자 크기 확대 */
   font-weight: bold;
-  z-index: 1005; /* 카드보다 위, 닫기 버튼보다 아래 */
-  text-shadow: 0 0 10px rgba(255,255,255,0.5);
-  
+  z-index: 1005;
+  text-shadow: 0 0 20px rgba(255,255,255,0.8); /* 빛나는 효과 강화 */
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+
   opacity: ${props => props.isVisible ? (props.isFadingOut ? 0 : 1) : 0};
   transition: opacity 1.5s ease-out;
   ${props => props.isVisible && !props.isFadingOut && `
@@ -410,6 +411,15 @@ const SelectionText = styled.div<{ isVisible: boolean, isFadingOut: boolean }>`
   @keyframes fadeOutText {
       from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
       to { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+    top: 20%;
+  }
+  @media (max-width: 480px) {
+    font-size: 22px;
+    top: 18%;
   }
 `;
 SelectionText.displayName = 'TarotSelection_SelectionText';
@@ -571,4 +581,4 @@ const CloseButton = styled.button`
 `;
 CloseButton.displayName = 'TarotSelection_CloseButton';
 
-export default TarotSelection; 
+export default TarotSelection;
