@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+const fs = require("fs");
+const path = require("path");
+const https = require("https");
 
 // 타로 카드 이미지를 저장할 경로
-const TAROT_IMAGES_DIR = path.join(__dirname, '../public/assets/images/tarot');
+const TAROT_IMAGES_DIR = path.join(__dirname, "../public/assets/images/tarot");
 
 // 총 카드 수
 const CARD_COUNT = 30;
@@ -27,37 +27,39 @@ if (!fs.existsSync(TAROT_IMAGES_DIR)) {
  */
 const downloadImage = (url, destination) => {
   return new Promise((resolve, reject) => {
-    https.get(url, (response) => {
-      // 리다이렉션 처리
-      if (response.statusCode === 302 || response.statusCode === 301) {
-        return downloadImage(response.headers.location, destination)
-          .then(resolve)
-          .catch(reject);
-      }
-      
-      // 200이 아니면 에러
-      if (response.statusCode !== 200) {
-        return reject(new Error(`상태 코드: ${response.statusCode}`));
-      }
+    https
+      .get(url, (response) => {
+        // 리다이렉션 처리
+        if (response.statusCode === 302 || response.statusCode === 301) {
+          return downloadImage(response.headers.location, destination)
+            .then(resolve)
+            .catch(reject);
+        }
 
-      // 파일 스트림 생성
-      const fileStream = fs.createWriteStream(destination);
-      
-      // 데이터 스트리밍
-      response.pipe(fileStream);
-      
-      // 이벤트 처리
-      fileStream.on('finish', () => {
-        fileStream.close();
-        console.log(`다운로드 완료: ${destination}`);
-        resolve();
-      });
-      
-      fileStream.on('error', (err) => {
-        fs.unlink(destination, () => {}); // 실패 시 파일 삭제 시도
-        reject(err);
-      });
-    }).on('error', reject);
+        // 200이 아니면 에러
+        if (response.statusCode !== 200) {
+          return reject(new Error(`상태 코드: ${response.statusCode}`));
+        }
+
+        // 파일 스트림 생성
+        const fileStream = fs.createWriteStream(destination);
+
+        // 데이터 스트리밍
+        response.pipe(fileStream);
+
+        // 이벤트 처리
+        fileStream.on("finish", () => {
+          fileStream.close();
+          console.log(`다운로드 완료: ${destination}`);
+          resolve();
+        });
+
+        fileStream.on("error", (err) => {
+          fs.unlink(destination, () => {}); // 실패 시 파일 삭제 시도
+          reject(err);
+        });
+      })
+      .on("error", reject);
   });
 };
 
@@ -65,32 +67,32 @@ const downloadImage = (url, destination) => {
  * 모든 타로 카드 이미지 다운로드
  */
 const downloadAllTarotImages = async () => {
-  console.log('타로 카드 이미지 다운로드 시작...');
-  
+  console.log("타로 카드 이미지 다운로드 시작...");
+
   for (let i = 0; i < CARD_COUNT; i++) {
     const imageUrl = getRandomTarotImageUrl(i);
     const imagePath = path.join(TAROT_IMAGES_DIR, `card-${i}.jpg`);
-    
+
     try {
       // 이미 존재하는 파일인지 확인
       if (fs.existsSync(imagePath)) {
         console.log(`파일이 이미 존재합니다: ${imagePath}`);
         continue;
       }
-      
+
       console.log(`다운로드 중: 카드 ${i}...`);
       await downloadImage(imageUrl, imagePath);
     } catch (error) {
       console.error(`카드 ${i} 다운로드 실패:`, error.message);
     }
   }
-  
-  console.log('타로 카드 이미지 다운로드 완료!');
+
+  console.log("타로 카드 이미지 다운로드 완료!");
 };
 
 // 스크립트 실행
-downloadAllTarotImages().catch(err => {
-  console.error('오류 발생:', err);
+downloadAllTarotImages().catch((err) => {
+  console.error("오류 발생:", err);
 });
 
 // 사용 안내 메시지
@@ -113,4 +115,4 @@ ${TAROT_IMAGES_DIR}
 스크립트 실행 방법:
 $ node scripts/download-tarot-images.js
 ===========================================
-`); 
+`);

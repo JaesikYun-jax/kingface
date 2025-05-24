@@ -5,8 +5,8 @@ export interface BirthInfo {
   day: number;
   hour: number;
   minute: number;
-  calendar: 'solar' | 'lunar';
-  gender: 'male' | 'female';
+  calendar: "solar" | "lunar";
+  gender: "male" | "female";
   timeSlot?: string; // 12시신 선택을 위한 속성 추가
 }
 
@@ -19,37 +19,43 @@ export interface TarotCard {
   description: string;
 }
 
-// 운세 결과 타입
 export interface FortuneResult {
+  content: string;
   overall: string;
   love: string;
   career: string;
   health: string;
   advice: string;
-  selectedCard?: TarotCard;  // 선택한 타로 카드 정보 (옵션)
 }
 
-// 관상 분석 결과 타입
+// 관상 분석 결과 타입 - 기존 호환성을 위해 유지
 export interface FaceReadingResult {
-  personalityTraits: string[];  // 성격 특성 배열
-  overallFortune: string;      // 전반적인 운세
-  careerSuitability: string;   // 직업 적성
-  relationships: string;      // 대인 관계
-  advice: string;            // 조언
-  imageUrl: string;          // 분석된 이미지 URL
-  content?: string;          // 원본 분석 내용 (마크다운 형식)
+  personalityTraits: string[]; // 성격 특성 배열
+  overallFortune: string; // 전반적인 운세
+  careerSuitability: string; // 직업 적성
+  relationships: string; // 대인 관계
+  advice: string; // 조언
+  imageUrl: string; // 분석된 이미지 URL
+  content: string; // 원본 분석 내용 (마크다운 형식)
 }
+
+// 스키마에서 추론된 타입들도 export
+export type {
+  FaceReadingResultSchemaType,
+  FortuneResultSchemaType,
+  TarotCardSchemaType,
+} from "@/lib/openai/schemas/schemas";
 
 // 서비스 플랜 타입
 export enum PlanType {
-  FREE = 'FREE',
-  PREMIUM = 'PREMIUM'
+  FREE = "FREE",
+  PREMIUM = "PREMIUM",
 }
 
 // AI 모델 설정 타입
 export interface AIModelConfig {
   fortune: {
-    free: string;   // 무료 운세 분석 모델
+    free: string; // 무료 운세 분석 모델
     premium: string; // 프리미엄 운세 분석 모델
   };
   faceReading: string; // 관상 분석 모델 (프리미엄 전용)
@@ -65,4 +71,4 @@ export interface ServicePlanConfig {
   prices: {
     premium: number; // 프리미엄 플랜 가격
   };
-} 
+}
