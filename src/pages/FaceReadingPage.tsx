@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import FaceCapture from '../components/FaceCapture';
 import FaceReadingResult from '../components/FaceReadingResult';
@@ -51,6 +51,7 @@ const FaceReadingPage: React.FC = () => {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordAttempts, setPasswordAttempts] = useState<number>(0);
   const navigate = useNavigate();
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // 컴포넌트 마운트 시 플랜 확인
   useEffect(() => {
@@ -64,24 +65,45 @@ const FaceReadingPage: React.FC = () => {
     }
   }, []);
 
-  // 로딩 중 메시지 변경을 위한 효과
+  // 로딩 중 메시지 변경 및 프로그레스 바 업데이트를 위한 효과
   useEffect(() => {
-    let messageInterval: NodeJS.Timeout;
-    
     if (currentStep === Step.LOADING) {
-      let index = 0;
-      
-      // 1초마다 메시지 변경
-      messageInterval = setInterval(() => {
-        index = (index + 1) % wittyLoadingMessages.length;
-        setCurrentLoadingMessage(wittyLoadingMessages[index]);
-      }, 1000);
+      setLoadingProgress(0); // 로딩 시작 시 프로그레스 0으로 초기화
+      let currentProgress = 0;
+      let phraseIndex = 0;
+      setCurrentLoadingMessage(wittyLoadingMessages[phraseIndex]); // 초기 로딩 메시지 설정
+
+      progressIntervalRef.current = setInterval(() => {
+        currentProgress += 2; // 진행 속도를 2배로 (50ms 마다 2씩 증가 -> 100%까지 약 2.5초)
+        if (currentProgress <= 100) {
+          setLoadingProgress(currentProgress);
+          // 메시지 변경은 1초 주기로 유지 (20 * 50ms = 1000ms)
+          if (currentProgress % 20 === 0 && currentProgress < 100) { 
+            phraseIndex = (phraseIndex + 1) % wittyLoadingMessages.length;
+            setCurrentLoadingMessage(wittyLoadingMessages[phraseIndex]);
+          }
+        } else {
+          // 100% 도달 시 실제로는 API 응답 후 처리되므로 여기서 clear하지 않을 수 있음
+          // 단, API가 매우 빠를 경우를 대비해 clearInterval은 유지
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+          }
+        }
+      }, 50); 
+    } else {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
     }
-    
     return () => {
-      if (messageInterval) clearInterval(messageInterval);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
     };
-  }, [currentStep]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]); // wittyLoadingMessages는 상수이므로 deps에서 제외
 
   // 플랜 업그레이드 처리
   const handlePlanSelect = (planType: PlanType) => {
@@ -124,69 +146,56 @@ const FaceReadingPage: React.FC = () => {
     }
   };
 
-  // 로딩 진행 효과를 위한 타이머 설정
-  const startLoadingAnimation = useCallback(() => {
-    setLoadingProgress(0);
-    const interval = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev >= 85) {
-          clearInterval(interval);
-          return prev;
-        }
-        return prev + Math.random() * 3;
-      });
-    }, 800);
-
-    return interval;
-  }, []);
-
   // 이미지 캡처 처리 함수
   const handleCapture = useCallback(async (imageSrc: string) => {
     setCurrentStep(Step.LOADING);
     setError(null);
-    
-    // 초기 로딩 메시지 설정
-    setCurrentLoadingMessage(wittyLoadingMessages[0]);
-    
-    // 로딩 진행 애니메이션 시작
-    const loadingInterval = startLoadingAnimation();
+    // setCurrentLoadingMessage(wittyLoadingMessages[0]); // 초기 로딩 메시지는 useEffect에서 처리
+    // const loadingInterval = startLoadingAnimation(); // 기존 로딩 애니메이션 호출 제거
 
     try {
-      // 프리미엄 플랜 확인
       if (!isFeatureAvailable('관상 분석')) {
-        clearInterval(loadingInterval);
+        // if (loadingInterval) clearInterval(loadingInterval); // 제거
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current); // 새로운 인터벌 정리
         setError('관상 분석은 프리미엄 플랜 전용 기능입니다.');
         setCurrentStep(Step.PLAN_CHECK);
         return;
       }
       
-      // 관상 분석 API 호출
       const analysisResult = await analyzeFaceReading(imageSrc);
       
-      // 사용자 경험을 위해 최소 로딩 시간 보장
+      // API 호출 완료 후 인터벌 정리 및 프로그레스 완료 처리
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      setLoadingProgress(100);
+      setCurrentLoadingMessage('분석 완료! 아이보살이 당신의 운명을 보았습니다.');
+      
+      // 결과 표시 전 잠시 대기 (선택 사항, 부드러운 전환을 위해)
       setTimeout(() => {
-        clearInterval(loadingInterval);
-        // 마지막에 결과가 나오면 남은 바를 0.3초만에 가득 채움
-        setLoadingProgress(100);
-        setTimeout(() => {
-          setResult(analysisResult);
-          setCurrentStep(Step.RESULT);
-        }, 300);
-      }, 2000);
+        setResult(analysisResult);
+        setCurrentStep(Step.RESULT);
+      }, 500); // 0.5초 후 결과 표시
+
     } catch (err: any) {
       console.error('Face analysis error:', err);
-      clearInterval(loadingInterval);
+      // if (loadingInterval) clearInterval(loadingInterval); // 제거
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      setLoadingProgress(0); // 오류 시 프로그레스 초기화
       setError(err?.message || '관상 분석 중 오류가 발생했습니다. 다시 시도해 주세요.');
       
-      // 프리미엄 플랜 관련 오류인 경우 플랜 선택 화면으로 이동
       if (err?.message?.includes('프리미엄 플랜')) {
         setCurrentStep(Step.PLAN_CHECK);
       } else {
-        // 오류 발생 시 비밀번호 입력 단계로 돌아감
         setCurrentStep(Step.PASSWORD);
       }
     }
-  }, [startLoadingAnimation, navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]); // startLoadingAnimation 제거, wittyLoadingMessages는 useCallback의 deps에 불필요
 
   // 결과 공유 기능
   const handleShareResult = useCallback(async () => {
@@ -285,14 +294,14 @@ const FaceReadingPage: React.FC = () => {
       
       {currentStep === Step.LOADING && (
         <LoadingContainer>
-          <LoadingText>관상 분석 중...</LoadingText>
-          <LoadingBarContainer>
-            <LoadingBar width={loadingProgress} />
-          </LoadingBarContainer>
+          <LoadingText>{currentLoadingMessage}</LoadingText>
+          <ProgressBarContainer>
+            <ProgressBar progress={loadingProgress} />
+          </ProgressBarContainer>
           <LoadingDescription>
             아이(AI)보살이 당신의 얼굴에서 운명의 흔적을 찾고 있습니다.
+            잠시만 기다려주시면, 놀라운 전생의 이야기를 들려드릴게요!
           </LoadingDescription>
-          <LoadingMessage>{currentLoadingMessage}</LoadingMessage>
         </LoadingContainer>
       )}
       
@@ -486,60 +495,44 @@ const LoadingContainer = styled.div`
 `;
 LoadingContainer.displayName = 'FaceReadingPage_LoadingContainer';
 
-const LoadingText = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
+const LoadingText = styled.p`
+  font-size: 1.3rem;
+  color: #c4b5fd;
   margin-bottom: 1.5rem;
-  text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
+  font-weight: 500;
+  text-shadow: 0 0 8px rgba(196, 160, 250, 0.5);
 `;
 LoadingText.displayName = 'FaceReadingPage_LoadingText';
 
-const LoadingBarContainer = styled.div`
-  width: 100%;
+const ProgressBarContainer = styled.div`
+  width: 80%;
   max-width: 400px;
-  height: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  overflow: hidden;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
   margin-bottom: 1.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
 `;
-LoadingBarContainer.displayName = 'FaceReadingPage_LoadingBarContainer';
+ProgressBarContainer.displayName = 'FaceReadingPage_ProgressBarContainer';
 
-const LoadingBar = styled.div<{ width: number }>`
-  width: ${({ width }) => `${width}%`};
+const ProgressBar = styled.div<{ progress: number }>`
+  width: ${props => props.progress}%;
   height: 100%;
-  background-image: linear-gradient(135deg, #9796f0 0%, #fbc7d4 100%);
-  border-radius: 6px;
-  transition: width 0.3s ease-in-out;
+  background: linear-gradient(90deg, #89f7fe 0%, #66a6ff 100%);
+  border-radius: 10px;
+  transition: width 0.1s ease-out; 
+  box-shadow: 0 0 10px rgba(102, 166, 255, 0.5);
 `;
-LoadingBar.displayName = 'FaceReadingPage_LoadingBar';
+ProgressBar.displayName = 'FaceReadingPage_ProgressBar';
 
 const LoadingDescription = styled.p`
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 500px;
+  font-size: 0.95rem;
+  color: rgba(220, 220, 240, 0.85);
   line-height: 1.6;
-  margin-bottom: 0.5rem;
+  max-width: 500px;
 `;
 LoadingDescription.displayName = 'FaceReadingPage_LoadingDescription';
-
-// 로딩 메시지 스타일
-const LoadingMessage = styled.p`
-  font-size: 0.95rem;
-  font-style: italic;
-  color: #e9d8fd;
-  max-width: 500px;
-  line-height: 1.6;
-  animation: pulse 2s infinite;
-  
-  @keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-  }
-`;
-LoadingMessage.displayName = 'FaceReadingPage_LoadingMessage';
 
 const ResultContainer = styled.div`
   margin-top: 2rem;

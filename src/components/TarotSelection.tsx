@@ -32,6 +32,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect, preselect
   const [isEnlargedCardPrepare, setIsEnlargedCardPrepare] = useState(false); // 확대된 카드 준비 상태 (나타나기 전)
   const [isEnlargedCardAnimating, setIsEnlargedCardAnimating] = useState(false); // 확대된 카드 애니메이션(확대/페이드인) 상태
   const [isCardFlipped, setIsCardFlipped] = useState(false); // 카드가 뒤집혔는지 여부
+  const [showSubmitButton, setShowSubmitButton] = useState(false); // 아이보살에게 카드 내미는 버튼 표시 상태
 
   // 애니메이션 타임아웃 관리를 위한 ref
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -56,10 +57,28 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect, preselect
     }
   }
 
+  const resetAnimationStates = () => {
+    setIsModalVisible(false);
+    setIsOverlayVisible(false);
+    setIsSelectionTextVisible(false);
+    setIsSelectionTextFadingOut(false);
+    setIsEnlargedCardPrepare(false);
+    setIsEnlargedCardAnimating(false);
+    setIsCardFlipped(false);
+    setShowSubmitButton(false);
+    setSelectedCardIndex(null); // 선택된 카드 인덱스도 초기화
+    document.querySelectorAll('.card-wrapper').forEach(el => {
+      if (el instanceof HTMLElement) {
+        el.style.animationPlayState = 'running';
+      }
+    });
+  };
+
   const handleCardClick = (cardIndexInPreselected: number) => {
     if (selectedCardIndex !== null || preselectedCards.length === 0) return;
 
     setSelectedCardIndex(cardIndexInPreselected);
+    setShowSubmitButton(false); // 버튼 초기 숨김
 
     setIsModalVisible(true);
     setIsOverlayVisible(false);
@@ -80,56 +99,48 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect, preselect
     });
     
     requestAnimationFrame(() => {
-        setIsOverlayVisible(true); // 오버레이 트랜지션 시작
+        setIsOverlayVisible(true);
     });
 
-    // 1. 화면 어두워짐 후 (OVERLAY_FADE_IN_TIME)
     animationTimeoutRef.current = setTimeout(() => {
-      setIsSelectionTextVisible(true); // 2. 텍스트 나타남 (TEXT_FADE_IN_TIME)
-      setIsEnlargedCardPrepare(true);  // 카드 준비 (애니메이션 컨테이너는 보이지만 내용물은 아직 숨김)
+      setIsSelectionTextVisible(true);
+      setIsEnlargedCardPrepare(true);
 
-      // 텍스트 나타난 후 유지 (TEXT_DISPLAY_TIME)
       animationTimeoutRef.current = setTimeout(() => {
-        setIsSelectionTextFadingOut(true); // 3. 텍스트 사라짐 시작 (TEXT_FADE_OUT_TIME)
+        setIsSelectionTextFadingOut(true);
 
-        // 텍스트 사라진 후 (TEXT_FADE_OUT_TIME)
         animationTimeoutRef.current = setTimeout(() => {
-          setIsSelectionTextVisible(false); // 텍스트 완전히 숨김
+          setIsSelectionTextVisible(false);
           setIsSelectionTextFadingOut(false);
           
-          // 4. 카드 애니메이션 시작
-          setIsEnlargedCardPrepare(false); // 카드 준비 상태 해제
-          requestAnimationFrame(() => { // 다음 프레임에서 카드 애니메이션 시작 (동시에)
-            setIsEnlargedCardAnimating(true); // 카드 확대/페이드인 (CARD_ZOOM_TIME)
-            setIsCardFlipped(true); // 카드 뒤집기 (CARD_FLIP_TIME)
+          setIsEnlargedCardPrepare(false);
+          requestAnimationFrame(() => {
+            setIsEnlargedCardAnimating(true);
+            setIsCardFlipped(true);
           });
 
-          // 5. 카드 애니메이션 종료 후 (가장 긴 애니메이션 + POST_ANIMATION_DELAY)
           const longestCardAnimation = Math.max(CARD_FLIP_TIME, CARD_ZOOM_TIME);
           animationTimeoutRef.current = setTimeout(() => {
-            if (selectedCardIndex !== null) { // selectedCardIndex가 설정된 상태에서만 실행
-                 const selectedActualCard = preselectedCards[cardIndexInPreselected]; // cardIndexInPreselected 사용
-                 onCardSelect(selectedActualCard);
-            }
-            // closeModal(); // 결과 화면으로 넘어가므로 여기서 닫지 않음
+            setShowSubmitButton(true); // 대신 버튼을 표시
           }, longestCardAnimation + POST_ANIMATION_DELAY);
         }, TEXT_FADE_OUT_TIME);
       }, TEXT_DISPLAY_TIME);
     }, OVERLAY_FADE_IN_TIME);
   };
 
-  const closeModal = () => {
+  const handleSubmitCard = () => {
+    if (selectedCardIndex !== null) {
+      onCardSelect(preselectedCards[selectedCardIndex]);
+      resetAnimationStates(); // 모달 닫고 상태 초기화
+    }
+  };
+
+  const closeModalAndReset = () => {
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
       animationTimeoutRef.current = null;
     }
-    setIsModalVisible(false);
-    setSelectedCardIndex(null);
-    document.querySelectorAll('.card-wrapper').forEach(el => {
-        if (el instanceof HTMLElement) {
-          el.style.animationPlayState = 'running';
-        }
-      });
+    resetAnimationStates();
   };
 
   // cards 상태 대신 preselectedCards prop과 selectedCardIndex 상태 사용
@@ -169,7 +180,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect, preselect
       {/* selectedCard 상태 대신 selectedCardIndex와 preselectedCards prop 사용 */}
       {/* isModalVisible 상태에 따라 전체 모달 표시/숨김 */}
       {isModalVisible && selectedCardIndex !== null && (
-        <ModalOverlay isVisible={isOverlayVisible} onClick={closeModal}>
+        <ModalOverlay isVisible={isOverlayVisible} onClick={closeModalAndReset}>
           {/* isEnlargedCardPrepare: 텍스트 애니메이션 동안 카드를 작고 투명하게 보이게 준비 */}
           {/* isEnlargedCardAnimating: 확대 및 페이드인 애니메이션 시작 */}
           <EnlargedCardAnimContainer 
@@ -192,13 +203,21 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect, preselect
                       <>
                         <AnimatedCardImage src={preselectedCards[selectedCardIndex].image} alt={preselectedCards[selectedCardIndex].name} />
                         <AnimatedCardName>{preselectedCards[selectedCardIndex].name}</AnimatedCardName>
-                        <AnimatedCardDescription>{preselectedCards[selectedCardIndex].description}</AnimatedCardDescription>
+                        {/* AnimatedCardDescription은 버튼 추가로 인해 공간 부족 시 숨길 수 있음 */}
+                        {/* <AnimatedCardDescription>{preselectedCards[selectedCardIndex].description}</AnimatedCardDescription> */}
                       </>
                     )}
                   </FlipCardFront>
                 </FlipCardFace>
               </FlipCardInner>
             </FlipCardArea>
+            
+            {/* "아이보살에게 카드를 내민다." 버튼 */} 
+            {showSubmitButton && isCardFlipped && (
+                <SubmitButton onClick={handleSubmitCard}>
+                    아이보살에게 카드를 내민다.
+                </SubmitButton>
+            )}
           </EnlargedCardAnimContainer>
           
           {/* SelectionText는 EnlargedCardAnimContainer와 분리하여 오버레이 중앙에 배치 */}
@@ -207,7 +226,7 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect, preselect
           </SelectionText>
 
           {/* CloseButton은 항상 보이도록 모달 오버레이 안에 배치 */}
-          <CloseButton onClick={closeModal}>
+          <CloseButton onClick={closeModalAndReset}>
             &times;
           </CloseButton>
         </ModalOverlay>
@@ -465,6 +484,9 @@ const EnlargedCardAnimContainer = styled.div<{ isPrepare: boolean, isAnimating: 
   /* 애니메이션 시간은 상수로 제어, 확대/페이드 비율 유지 */
   transition: transform ${CARD_ZOOM_TIME / 1000}s cubic-bezier(0.68, -0.55, 0.27, 1.55), 
               opacity ${CARD_ZOOM_TIME * 0.8 / 1000}s ease-out;
+  display: flex; // 버튼을 카드 하단에 위치시키기 위해 flex 추가
+  flex-direction: column; // 버튼을 카드 하단에 위치시키기 위해 flex 추가
+  align-items: center; // 버튼을 카드 하단에 위치시키기 위해 flex 추가
 
   ${props => props.isPrepare && `
     visibility: visible;
@@ -485,6 +507,7 @@ const FlipCardArea = styled.div`
   width: 300px;
   height: 400px;
   perspective: 1500px;
+  margin-bottom: 1rem; // 버튼과의 간격
   @media (max-width: 768px) { width: 240px; height: 320px; }
   @media (max-width: 480px) { width: 210px; height: 280px; }
 `;
@@ -557,26 +580,21 @@ ActualCardImage.displayName = 'TarotSelection_ActualCardImage'; */
 
 const AnimatedCardImage = styled.img`
   max-width: 80%;
-  max-height: 60%;
-  height: auto; /* 비율 유지를 위해 auto */
-  margin-bottom: 15px;
+  max-height: 70%; // 설명 공간 확보를 위해 약간 줄임 (또는 이름만 표시)
+  height: auto; 
+  margin-bottom: 10px; // 이름과의 간격
   border-radius: 8px;
   object-fit: cover;
 `;
 AnimatedCardImage.displayName = 'TarotSelection_AnimatedCardImage';
 
 const AnimatedCardName = styled.h3`
-  font-size: 22px;
+  font-size: 20px; // 공간 확보를 위해 약간 줄임
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 0; // 하단 여백 제거
   color: #1a1a2e;
-
-  @media (max-width: 768px) {
-    font-size: 18px;
-  }
-  @media (max-width: 480px) {
-    font-size: 16px;
-  }
+  @media (max-width: 768px) { font-size: 18px; }
+  @media (max-width: 480px) { font-size: 16px; }
 `;
 AnimatedCardName.displayName = 'TarotSelection_AnimatedCardName';
 
@@ -584,13 +602,8 @@ const AnimatedCardDescription = styled.p`
   font-size: 14px;
   margin-top: 10px;
   color: #333;
-
-  @media (max-width: 768px) {
-    font-size: 12px;
-  }
-  @media (max-width: 480px) {
-    font-size: 11px;
-  }
+  @media (max-width: 768px) { font-size: 12px; }
+  @media (max-width: 480px) { font-size: 11px; }
 `;
 AnimatedCardDescription.displayName = 'TarotSelection_AnimatedCardDescription';
 
@@ -613,7 +626,7 @@ const CloseButton = styled.button`
   top: 30px; 
   right: 30px;
   padding: 10px 15px;
-  background-color: rgba(201, 173, 167, 0.8); /* 약간 투명하게 */
+  background-color: rgba(201, 173, 167, 0.8);
   color: #1a1a2e;
   border: none;
   border-radius: 50%;
@@ -633,10 +646,34 @@ const CloseButton = styled.button`
       transform: scale(1.1);
   }
 
-  @media (max-width: 768px) {
-      top: 15px; right: 15px; width: 35px; height: 35px; font-size: 18px;
-  }
+  @media (max-width: 768px) { top: 15px; right: 15px; width: 35px; height: 35px; font-size: 18px; }
 `;
 CloseButton.displayName = 'TarotSelection_CloseButton';
+
+// 아이보살에게 카드 내미는 버튼 스타일
+const SubmitButton = styled.button`
+  padding: 0.8rem 1.5rem;
+  background-color: #6b46c1; // 주요 액션 색상
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  margin-top: 1rem; // 카드와의 간격
+  box-shadow: 0 4px 10px rgba(107, 70, 193, 0.4);
+
+  &:hover {
+    background-color: #553c9a;
+    transform: translateY(-2px);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.2rem;
+  }
+`;
+SubmitButton.displayName = 'TarotSelection_SubmitButton';
 
 export default TarotSelection;
