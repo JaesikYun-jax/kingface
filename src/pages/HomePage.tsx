@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
+import { keyframes } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
 
 // 로테이션할 이모지 배열
 const fortuneEmojis = ['🔮', '✨', '🌙', '🌠', '💫', '🪄'];
 const faceEmojis = ['👁️', '🧿', '🪬', '🧙', '⚡', '🌟'];
+
+// 글로잉 애니메이션 추가
+const glowingAnimation = keyframes`
+  0% { box-shadow: 0 0 5px rgba(173, 216, 230, 0.2), 0 0 10px rgba(173, 216, 230, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(173, 216, 230, 0.5), 0 0 25px rgba(173, 216, 230, 0.5); }
+  100% { box-shadow: 0 0 5px rgba(173, 216, 230, 0.2), 0 0 10px rgba(173, 216, 230, 0.2); }
+`;
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -53,7 +61,6 @@ const HomePage: React.FC = () => {
           <CardDescription>
             전통 사주와 타로의 지혜로 살펴보는 당신의 오늘 운세와 인연의 흐름
           </CardDescription>
-          <CardButton>사주 보기</CardButton>
         </ServiceCard>
 
         <ServiceCard onClick={handleStartFaceReading}>
@@ -62,7 +69,6 @@ const HomePage: React.FC = () => {
           <CardDescription>
             당신의 얼굴에 담긴 운명의 비밀과 전생의 흔적을 아이보살이 살펴드립니다
           </CardDescription>
-          <CardButton>관상 보기</CardButton>
         </ServiceCard>
         
         <InfoSection>
@@ -138,6 +144,7 @@ const MainContent = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
+  padding: 0 1rem;
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -148,74 +155,94 @@ MainContent.displayName = 'HomePage_MainContent';
 
 const ServiceCard = styled.div`
   background-color: rgba(26, 32, 44, 0.8);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.35s ease-out, box-shadow 0.35s ease-out, background-color 0.35s ease-out;
   cursor: pointer;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  box-shadow: 0 0 8px rgba(173, 216, 230, 0.2), 
+              0 0 12px rgba(173, 216, 230, 0.15), 
+              0 4px 15px rgba(0, 0, 0, 0.3);
+
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(156, 139, 218, 0.3);
-    background-color: rgba(34, 41, 57, 0.9);
+    transform: translateY(-8px) scale(1.03);
+    background-color: rgba(34, 41, 57, 0.95);
+    box-shadow: 0 0 15px rgba(196, 160, 250, 0.5), 
+                0 0 25px rgba(196, 160, 250, 0.4), 
+                0 0 35px rgba(196, 160, 250, 0.3), 
+                0 8px 30px rgba(156, 139, 218, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    border-radius: 12px;
+    &:hover {
+        transform: translateY(-5px) scale(1.02);
+    }
   }
 `;
 ServiceCard.displayName = 'HomePage_ServiceCard';
 
 const CardIcon = styled.div`
-  font-size: 4rem;
-  margin-bottom: 1.5rem;
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
   animation: pulse 4s infinite ease-in-out;
+  color: #e9d8fd;
+  text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
   
   @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2.8rem;
+    margin-bottom: 0.75rem;
   }
 `;
 CardIcon.displayName = 'HomePage_CardIcon';
 
 const CardTitle = styled.h2`
-  font-size: 1.5rem;
-  color: white;
-  margin-bottom: 1rem;
-  text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  text-shadow: 0 0 12px rgba(233, 216, 253, 0.6);
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
 `;
 CardTitle.displayName = 'HomePage_CardTitle';
 
 const CardDescription = styled.p`
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-`;
-CardDescription.displayName = 'HomePage_CardDescription';
-
-const CardButton = styled.button`
-  padding: 0.8rem 1.8rem;
-  background-color: rgba(107, 70, 193, 0.7);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-  margin-top: auto;
-  backdrop-filter: blur(5px);
+  color: rgba(220, 220, 240, 0.85);
+  line-height: 1.55;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  flex-grow: 1;
   
-  &:hover {
-    background-color: rgba(85, 60, 154, 0.9);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(85, 60, 154, 0.4);
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: calc(1.5em * 3);
   }
 `;
-CardButton.displayName = 'HomePage_CardButton';
+CardDescription.displayName = 'HomePage_CardDescription';
 
 const InfoSection = styled.div`
   grid-column: 1 / -1;
@@ -226,6 +253,11 @@ const InfoSection = styled.div`
   border-left: 4px solid rgba(107, 70, 193, 0.7);
   backdrop-filter: blur(5px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    margin-top: 0.5rem;
+  }
 `;
 InfoSection.displayName = 'HomePage_InfoSection';
 
@@ -234,12 +266,21 @@ const InfoTitle = styled.h3`
   color: white;
   margin-bottom: 1rem;
   text-shadow: 0 0 10px rgba(233, 216, 253, 0.5);
+  
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
 `;
 InfoTitle.displayName = 'HomePage_InfoTitle';
 
 const InfoText = styled.p`
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
 `;
 InfoText.displayName = 'HomePage_InfoText';
 
