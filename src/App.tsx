@@ -7,6 +7,7 @@ import FaceReadingPage from './pages/FaceReadingPage';
 import AdminPage from './pages/AdminPage';
 import FortuneQaPage from './pages/FortuneQaPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
 import PlanSelector from './components/PlanSelector';
 import './App.css';
 
@@ -78,6 +79,7 @@ const App: React.FC = () => {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/fortune-qa" element={<FortuneQaPage />} />
             <Route path="/private" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
           </Routes>
         </Main>
         
@@ -89,7 +91,9 @@ const App: React.FC = () => {
             이 서비스는 오락 목적으로 제공되며, 실제 운세 결과와 다를 수 있습니다.
           </FooterText>
           <FooterButtonContainer>
-            <FooterButton>이용약관</FooterButton>
+            <Link to="/terms" style={{ textDecoration: 'none' }}>
+              <FooterButton>이용약관</FooterButton>
+            </Link>
             <Link to="/private" style={{ textDecoration: 'none' }}>
               <FooterButton>개인정보 보호정책</FooterButton>
             </Link>
