@@ -6,6 +6,7 @@ import FortunePage from './pages/FortunePage';
 import FaceReadingPage from './pages/FaceReadingPage';
 import AdminPage from './pages/AdminPage';
 import FortuneQaPage from './pages/FortuneQaPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import PlanSelector from './components/PlanSelector';
 import './App.css';
 
@@ -76,6 +77,7 @@ const App: React.FC = () => {
             <Route path="/facereading" element={<FaceReadingPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/fortune-qa" element={<FortuneQaPage />} />
+            <Route path="/private" element={<PrivacyPolicyPage />} />
           </Routes>
         </Main>
         
@@ -88,7 +90,9 @@ const App: React.FC = () => {
           </FooterText>
           <FooterButtonContainer>
             <FooterButton>이용약관</FooterButton>
-            <FooterButton>개인정보 보호정책</FooterButton>
+            <Link to="/private" style={{ textDecoration: 'none' }}>
+              <FooterButton>개인정보 보호정책</FooterButton>
+            </Link>
           </FooterButtonContainer>
         </Footer>
       </AppContainer>
