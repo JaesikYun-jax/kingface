@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x] # 안정적인 LTS 버전 사용
+        node-version: [22.x] # 안정적인 LTS 버전 사용
 
     steps:
       - uses: actions/checkout@v4
