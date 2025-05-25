@@ -1,6 +1,6 @@
 import {
-  getCurrentPlanType,
-  getServicePlanConfig,
+    getCurrentPlanType,
+    getServicePlanConfig,
 } from "@/lib/openai/config/service-plans";
 import type { Metadata } from "next";
 import { Cinzel, Inter, Noto_Serif_KR } from "next/font/google";
