@@ -58,3 +58,8 @@ globs:
 - Write clear commit messages
 - Make small, focused commits
 - Use meaningful branch names 
+
+## Runtime Environment & Bundler & Package Manager
+- ALWAYS use "bun"
+- Use "bunx" for execution
+- DO NOT use "npm" or "npx"
