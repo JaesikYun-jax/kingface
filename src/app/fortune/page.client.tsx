@@ -176,7 +176,7 @@ export default function FortuneClient() {
       )}
 
       {currentStep === Step.TAROT_SELECTION && (
-        <Card variant="elevated" className="animate-fade-in-up">
+        <Card variant="elevated" className="animate-fade-in-up overflow-hidden relative">
           <div className="text-center">
             <TarotSelection
               onCardSelect={handleTarotSelect}

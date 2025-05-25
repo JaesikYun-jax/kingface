@@ -3,13 +3,24 @@ import {
   getServicePlanConfig,
 } from "@/lib/openai/config/service-plans";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cinzel, Inter, Noto_Serif_KR } from "next/font/google";
 import Link from "next/link";
 
 import "./globals.css";
 import { LotationEmoji, PricingDialog } from "./page.client";
 
 const inter = Inter({ subsets: ["latin"] });
+const cinzel = Cinzel({ 
+  subsets: ["latin"],
+  variable: "--font-cinzel",
+  display: "swap"
+});
+const notoSerifKR = Noto_Serif_KR({ 
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-noto-serif-kr",
+  display: "swap"
+});
 
 export const metadata: Metadata = {
   title: "아이보살 1.0 - AI 운세 서비스",
@@ -27,7 +38,7 @@ export default async function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`${inter.className} min-h-screen bg-gradient-to-br from-mystical-dark via-mystical-deeper to-mystical-purple`}
+        className={`${inter.className} ${cinzel.variable} ${notoSerifKR.variable} min-h-screen bg-gradient-to-br from-mystical-dark via-mystical-deeper to-mystical-purple`}
       >
         <div className="min-h-screen flex flex-col relative">
           {/* Background decorative elements */}

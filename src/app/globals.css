@@ -193,6 +193,15 @@
   }
 }
 
+@keyframes scrollLeftToRight {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 /* ===== ANIMATION UTILITY CLASSES ===== */
 .animate-fade-in {
   animation: fadeIn 0.5s ease-in-out;
@@ -244,6 +253,10 @@
 
 .animate-scale-in-bounce {
   animation: scaleInBounce 0.5s ease-out forwards;
+}
+
+.animate-scroll-left-to-right {
+  animation: scrollLeftToRight 10s linear infinite;
 }
 
 /* ===== TEXT SHADOWS & EFFECTS ===== */
