@@ -1,10 +1,10 @@
 "use client";
 
+import { getRandomTarotCard } from "@/lib/tarot";
 import { TarotCard } from "@/types";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 
-import { getRandomTarotCard } from "@/lib/tarot";
 import { Button } from "./ui/button";
 
 interface TarotSelectionProps {
@@ -50,44 +50,42 @@ const INITIAL_ANIMATION_STATE: AnimationState = {
 // 한글 타로카드 이름을 영어로 매핑하는 함수
 function getEnglishCardName(koreanName: string): string {
   const nameMap: Record<string, string> = {
-    "광대": "THE FOOL",
-    "마법사": "THE MAGICIAN", 
-    "여사제": "THE HIGH PRIESTESS",
-    "여제": "THE EMPRESS",
-    "황제": "THE EMPEROR",
-    "교황": "THE HIEROPHANT",
-    "연인": "THE LOVERS",
-    "전차": "THE CHARIOT",
-    "힘": "STRENGTH",
-    "은둔자": "THE HERMIT",
+    광대: "THE FOOL",
+    마법사: "THE MAGICIAN",
+    여사제: "THE HIGH PRIESTESS",
+    여제: "THE EMPRESS",
+    황제: "THE EMPEROR",
+    교황: "THE HIEROPHANT",
+    연인: "THE LOVERS",
+    전차: "THE CHARIOT",
+    힘: "STRENGTH",
+    은둔자: "THE HERMIT",
     "운명의 수레바퀴": "WHEEL OF FORTUNE",
-    "정의": "JUSTICE",
+    정의: "JUSTICE",
     "매달린 사람": "THE HANGED MAN",
-    "죽음": "DEATH",
-    "절제": "TEMPERANCE",
-    "악마": "THE DEVIL",
-    "탑": "THE TOWER",
-    "별": "THE STAR",
-    "달": "THE MOON",
-    "태양": "THE SUN",
-    "심판": "JUDGEMENT",
-    "세계": "THE WORLD",
-    "거울": "THE MIRROR",
-    "나비": "THE BUTTERFLY",
-    "등대": "THE LIGHTHOUSE",
-    "책": "THE BOOK",
-    "열쇠": "THE KEY",
-    "미로": "THE LABYRINTH",
-    "모래시계": "THE HOURGLASS",
-    "다리": "THE BRIDGE"
+    죽음: "DEATH",
+    절제: "TEMPERANCE",
+    악마: "THE DEVIL",
+    탑: "THE TOWER",
+    별: "THE STAR",
+    달: "THE MOON",
+    태양: "THE SUN",
+    심판: "JUDGEMENT",
+    세계: "THE WORLD",
+    거울: "THE MIRROR",
+    나비: "THE BUTTERFLY",
+    등대: "THE LIGHTHOUSE",
+    책: "THE BOOK",
+    열쇠: "THE KEY",
+    미로: "THE LABYRINTH",
+    모래시계: "THE HOURGLASS",
+    다리: "THE BRIDGE",
   };
-  
+
   return nameMap[koreanName] || koreanName.toUpperCase();
 }
 
-const TarotSelection: React.FC<TarotSelectionProps> = ({
-  onCardSelect,
-}) => {
+const TarotSelection: React.FC<TarotSelectionProps> = ({ onCardSelect }) => {
   const [selectedCard, setSelectedCard] = useState<TarotCard | null>(null);
   const [animationState, setAnimationState] = useState<AnimationState>(
     INITIAL_ANIMATION_STATE,
@@ -126,6 +124,11 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
 
   // 모달 닫기 및 리셋
   function closeModalAndReset() {
+    // 애니메이션 중에는 닫기 방지
+    if (!animationState.showSubmitButton || !animationState.isCardFlipped) {
+      return;
+    }
+
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
       animationTimeoutRef.current = null;
@@ -220,7 +223,10 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
       switch (event.key) {
         case "Escape":
           event.preventDefault();
-          closeModalAndReset();
+          // 애니메이션 중에는 ESC로 닫기 방지
+          if (animationState.showSubmitButton && animationState.isCardFlipped) {
+            closeModalAndReset();
+          }
           break;
         case "Enter":
         case " ":
@@ -270,10 +276,8 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
 
       {/* 설명 */}
       <p className="text-white/90 text-sm mb-8 text-center leading-relaxed break-words whitespace-normal [word-break:keep-all]">
-        흐르는 카드 중에서 직관에 따라 끌리는 
-        카드를 골라보세요. 타로 카드는 
-        당신의 운세와 결합하여 더 깊은 
-        통찰력을 제공합니다.
+        흐르는 카드 중에서 직관에 따라 끌리는 카드를 골라보세요. 타로 카드는
+        당신의 운세와 결합하여 더 깊은 통찰력을 제공합니다.
       </p>
 
       {/* 카드 슬라이더 */}
@@ -371,10 +375,10 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
                     height={600}
                     className="w-full h-full object-cover"
                   />
-                  
+
                   {/* 카드 테두리 */}
                   <div className="absolute inset-0 border-4 border-purple-300/60 rounded-xl shadow-inner"></div>
-                  
+
                   {/* 모서리 장식 */}
                   <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-purple-300/80 rounded-tl-lg"></div>
                   <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-purple-300/80 rounded-tr-lg"></div>
@@ -396,17 +400,19 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
                       height={600}
                       className="w-full h-full object-cover"
                     />
-                    
+
                     {/* 카드 테두리 */}
                     <div className="absolute inset-0 border-4 border-amber-300/80 rounded-xl shadow-inner"></div>
-                    
+
                     {/* 상단 영어 이름 오버레이 */}
                     <div className="absolute top-4 left-0 right-0 text-center">
-                      <div 
+                      <div
                         className="inline-block px-3 py-1 bg-black/70 backdrop-blur-sm rounded-lg border border-amber-300/50"
                         style={{
-                          fontFamily: "var(--font-cinzel), 'Times New Roman', serif",
-                          textShadow: "0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.4)"
+                          fontFamily:
+                            "var(--font-cinzel), 'Times New Roman', serif",
+                          textShadow:
+                            "0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.4)",
                         }}
                       >
                         <span className="text-amber-200 text-sm md:text-base font-bold tracking-wider">
@@ -414,17 +420,17 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
                         </span>
                       </div>
                     </div>
-                    
+
                     {/* 하단 장식적 테두리 */}
                     <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-                    
+
                     {/* 모서리 장식 */}
                     <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-amber-300/60 rounded-tl-lg"></div>
                     <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-amber-300/60 rounded-tr-lg"></div>
                     <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2 border-amber-300/60 rounded-bl-lg"></div>
                     <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2 border-amber-300/60 rounded-br-lg"></div>
                   </div>
-                  
+
                   {/* 접근성을 위한 숨겨진 설명 */}
                   <p id="selected-card-description" className="sr-only">
                     {selectedCard.meaning} - {selectedCard.description}
@@ -438,9 +444,10 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
               <h3
                 id="selected-card-title"
                 className="text-white text-xl md:text-2xl font-bold"
-                style={{ 
-                  textShadow: "0 0 10px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5)",
-                  fontFamily: "var(--font-noto-serif-kr), serif"
+                style={{
+                  textShadow:
+                    "0 0 10px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.5)",
+                  fontFamily: "var(--font-noto-serif-kr), serif",
                 }}
               >
                 {selectedCard.name}
@@ -458,7 +465,10 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
               }`}
               style={{ boxShadow: "0 4px 10px rgba(107, 70, 193, 0.4)" }}
               aria-describedby="submit-button-description"
-              disabled={!animationState.showSubmitButton || !animationState.isCardFlipped}
+              disabled={
+                !animationState.showSubmitButton ||
+                !animationState.isCardFlipped
+              }
             >
               아이보살에게 카드를 내민다.
               <span id="submit-button-description" className="sr-only">
@@ -488,14 +498,19 @@ const TarotSelection: React.FC<TarotSelectionProps> = ({
           </div>
 
           {/* 닫기 버튼 */}
-          {animationState.showSubmitButton && animationState.isCardFlipped && <button
-            onClick={closeModalAndReset}
-            className="absolute top-8 right-8 w-10 h-10 text-gray-800 border-none rounded-full cursor-pointer text-xl leading-none flex justify-center items-center transition-all duration-200 z-[1010] hover:text-gray-500 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent"
-            aria-label="모달 닫기"
-            disabled={!animationState.showSubmitButton || !animationState.isCardFlipped}
-          >
-            &times;
-          </button>}
+          {animationState.showSubmitButton && animationState.isCardFlipped && (
+            <button
+              onClick={closeModalAndReset}
+              className="absolute top-8 right-8 w-10 h-10 text-gray-800 border-none rounded-full cursor-pointer text-xl leading-none flex justify-center items-center transition-all duration-200 z-[1010] hover:text-gray-500 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent"
+              aria-label="모달 닫기"
+              disabled={
+                !animationState.showSubmitButton ||
+                !animationState.isCardFlipped
+              }
+            >
+              &times;
+            </button>
+          )}
         </div>
       )}
     </div>
