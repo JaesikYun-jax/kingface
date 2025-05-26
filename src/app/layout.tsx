@@ -9,8 +9,6 @@ import Link from "next/link";
 import "./globals.css";
 import { LotationEmoji, PricingDialog } from "./page.client";
 
-export const runtime = "edge";
-
 const inter = Inter({ subsets: ["latin"] });
 const cinzel = Cinzel({
   subsets: ["latin"],

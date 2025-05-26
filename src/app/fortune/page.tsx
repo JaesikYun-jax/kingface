@@ -1,7 +1,5 @@
 import FortuneClient from "./page.client";
 
-export const runtime = "edge";
-
 export default function Fortune() {
   return (
     <div className="max-w-5xl mx-auto py-4 md:py-6 space-y-6">
