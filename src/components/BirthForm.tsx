@@ -479,7 +479,7 @@ const BirthForm: React.FC<BirthFormProps> = ({ onSubmit }) => {
             ))}
           </div>
           <p className="text-xs text-white/70 mt-2">
-            정확한 시간을 모르는 경우 '모름'을 선택하세요.
+            정확한 시간을 모르는 경우 &quot;모름&quot;을 선택하세요.
           </p>
         </div>
 
