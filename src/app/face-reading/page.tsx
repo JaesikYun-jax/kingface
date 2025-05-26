@@ -5,6 +5,8 @@ import {
 
 import FaceReadingClient from "./page.client";
 
+export const runtime = "edge";
+
 export default async function FaceReading() {
   const config = await getServicePlanConfig();
   const currentPlan = await getCurrentPlanType();

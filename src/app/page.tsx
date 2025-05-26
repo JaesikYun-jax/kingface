@@ -1,5 +1,7 @@
 import { ServiceCard } from "./page.client";
 
+export const runtime = "edge";
+
 export default function Home() {
   return (
     <div className="max-w-6xl mx-auto space-y-8 md:space-y-10">

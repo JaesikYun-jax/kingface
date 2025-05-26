@@ -1,6 +1,6 @@
 import {
-    getCurrentPlanType,
-    getServicePlanConfig,
+  getCurrentPlanType,
+  getServicePlanConfig,
 } from "@/lib/openai/config/service-plans";
 import type { Metadata } from "next";
 import { Cinzel, Inter, Noto_Serif_KR } from "next/font/google";
@@ -9,17 +9,19 @@ import Link from "next/link";
 import "./globals.css";
 import { LotationEmoji, PricingDialog } from "./page.client";
 
+export const runtime = "edge";
+
 const inter = Inter({ subsets: ["latin"] });
-const cinzel = Cinzel({ 
+const cinzel = Cinzel({
   subsets: ["latin"],
   variable: "--font-cinzel",
-  display: "swap"
+  display: "swap",
 });
-const notoSerifKR = Noto_Serif_KR({ 
+const notoSerifKR = Noto_Serif_KR({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-noto-serif-kr",
-  display: "swap"
+  display: "swap",
 });
 
 export const metadata: Metadata = {
